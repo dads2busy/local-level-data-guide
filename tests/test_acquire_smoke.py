@@ -20,3 +20,12 @@ def test_fetch_acs_counts_has_count_columns():
     df = fetch_acs_counts()
     assert {"GEOID", "agg_income", "households"} <= set(df.columns)
     assert (df["households"].dropna() >= 0).all()
+
+
+@pytest.mark.network
+def test_fetch_ookla_tiles_has_speed_columns():
+    from pipeline.acquire_ookla import fetch_ookla_tiles
+
+    tiles = fetch_ookla_tiles()
+    assert len(tiles) > 0
+    assert {"quadkey", "avg_d_kbps", "tests"} <= set(tiles.columns)
