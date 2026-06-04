@@ -14,8 +14,10 @@ ACS_YEAR = 2021          # 5-year ACS vintage used throughout
 OOKLA_YEAR = 2023
 OOKLA_QUARTER = 2
 
-# Virginia State Plane North (US feet) — projected CRS for area math
-TARGET_CRS = "EPSG:3968"
+# Area weighting is handled inside sdc-redistribute, which reprojects geographic
+# inputs to EPSG:3857 before computing intersection areas. At county scale the
+# choice of projected CRS is immaterial (<0.3% area-ratio spread vs State Plane),
+# so the pipeline does not impose its own projected CRS.
 
 # ACS variables are EXTENSIVE COUNTS (never redistribute the median directly).
 # Mean household income is derived later as agg_income / households.

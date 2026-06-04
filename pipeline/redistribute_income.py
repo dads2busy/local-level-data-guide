@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import geopandas as gpd
 import pandas as pd
 from sdc_redistribute import redistribute_direct
 
@@ -40,26 +41,20 @@ def redistribute_income(
 
 
 def main() -> None:
-    acs = __import__("geopandas").read_file(config.ACS_COUNTS)
-    # The ACS counts GeoJSON uses uppercase GEOID; keep it consistent so that
-    # redistribute_direct can match source_df rows to source_geo polygons.
-    long = acs[["GEOID", "agg_income", "households"]].melt(
-        id_vars="GEOID", var_name="measure", value_name="value"
+    # ACS counts GeoJSON uses uppercase GEOID; rename to the lowercase `geoid`
+    # that redistribute_direct expects, for both the long-format counts and the
+    # source geometry. Write a geoid-keyed source file for redistribute_direct.
+    bg = gpd.read_file(config.ACS_COUNTS).rename(columns={"GEOID": "geoid"})
+    long = bg[["geoid", "agg_income", "households"]].melt(
+        id_vars="geoid", var_name="measure", value_name="value"
     )
-    long = long.rename(columns={"GEOID": "geoid"})
     long["year"] = config.ACS_YEAR
-    # The ACS counts GeoJSON has GEOID (uppercase); rename so source_geo matches.
-    import geopandas as gpd
-    src_geo = config.ACS_COUNTS
-    # Load, rename GEOID→geoid, save to a temp file so redistribute_direct finds
-    # the 'geoid' column it expects.
-    import tempfile, pathlib
-    with tempfile.TemporaryDirectory() as td:
-        tmp_src = pathlib.Path(td) / "bg.geojson"
-        src_gdf = gpd.read_file(src_geo)
-        src_gdf = src_gdf.rename(columns={"GEOID": "geoid"})
-        src_gdf.to_file(tmp_src, driver="GeoJSON")
-        out = redistribute_income(long, tmp_src, config.CIVIC_ASSOC)
+
+    src_path = config.DATA / "_acs_src.geojson"
+    bg[["geoid", "geometry"]].to_file(src_path, driver="GeoJSON")
+    out = redistribute_income(long, src_path, config.CIVIC_ASSOC)
+    src_path.unlink(missing_ok=True)
+
     out.to_csv(config.CIVIC_INCOME, index=False)
     print(f"Wrote {len(out)} civic-association income rows → {config.CIVIC_INCOME}")
 
