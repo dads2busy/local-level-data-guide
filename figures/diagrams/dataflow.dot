@@ -1,0 +1,17 @@
+digraph dataflow {
+  rankdir=LR;
+  bgcolor="white";
+  node [shape=box, style="rounded,filled", fontname="Libre Franklin",
+        color="#1B2A4A", fontcolor="#1B2A4A", fillcolor="#E5E7EB"];
+  edge [color="#6B7280"];
+
+  ookla [label="Ookla tiles\n(610 m grid)", fillcolor="#ace4e4"];
+  acs   [label="ACS block groups\n(counts)", fillcolor="#ace4e4"];
+  redis [label="sdc-redistribute\n(area-weighted counts)", fillcolor="#5698b9", fontcolor="white"];
+  derive[label="Derive intensive rates\n(mean income, mean speed)", fillcolor="#2A7F7F", fontcolor="white"];
+  civic [label="Civic associations\n(policy unit)", fillcolor="#3b4994", fontcolor="white"];
+
+  ookla -> redis;
+  acs -> redis;
+  redis -> derive -> civic;
+}

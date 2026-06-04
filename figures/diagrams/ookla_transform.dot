@@ -1,0 +1,14 @@
+digraph ookla {
+  rankdir=LR;
+  bgcolor="white";
+  node [shape=box, style="rounded,filled", fontname="Libre Franklin",
+        color="#1B2A4A", fontcolor="#1B2A4A", fillcolor="#E5E7EB"];
+  edge [color="#6B7280"];
+
+  src [label="Ookla tiles\ntests, avg_d_kbps×tests\n(extensive counts)"];
+  w   [label="Area-weighted\nredistribution", fillcolor="#5698b9", fontcolor="white"];
+  out [label="Civic association\ntests, speed×tests"];
+  d   [label="Derive\nmean speed = (speed×tests) / tests", fillcolor="#2A7F7F", fontcolor="white"];
+
+  src -> w -> out -> d;
+}
