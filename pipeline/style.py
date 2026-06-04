@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib as mpl
 import matplotlib.font_manager as fm
 import matplotlib.patches
 import matplotlib.pyplot as plt
@@ -29,7 +28,6 @@ BIVARIATE_COLORS = {
 
 FIG_DPI = 300
 MAP_CRS = "EPSG:26918"   # UTM 18N (metres) — accurate scale bars for Arlington
-WEB_MERCATOR = "EPSG:3857"
 
 _FONTS_DIR = Path(__file__).resolve().parent.parent / "fonts"
 _HEADING_FAMILY = "Libre Franklin"
