@@ -120,6 +120,20 @@ be **regenerated from the pipeline**, with the narrative rewritten to match real
   hierarchy, and a cohesive **colorblind-safe palette** used consistently across every
   figure and accent. A short style sheet defines fonts, palette hex values, and figure
   conventions so the document reads as one designed artifact.
+
+- **Proposed default identity (approved as the starting point; open-source fonts so PDF
+  and HTML render identically):**
+  - *Typography:* headings/labels in **Libre Franklin** (a humanist, civic sans);
+    body in **Source Serif 4** (readable, professional); code in **JetBrains Mono**.
+  - *Core palette:* ink navy `#1B2A4A` (primary text/headers), civic blue `#2166AC`
+    (primary accent), teal `#2A7F7F` (secondary), warm amber `#D8732E` (callouts/
+    highlights), with neutral grays (`#6B7280`, `#E5E7EB`) for rules and panel fills.
+  - *Map palettes (all colorblind-safe):* sequential = **viridis** (or ColorBrewer
+    `YlGnBu`); diverging, for ratio/balance maps = ColorBrewer `RdBu` reversed; the
+    bivariate choropleth = a 3×3 blue–red bivariate scheme.
+  - *Figure standards:* 300 DPI for print, a fixed figure width, captions + alt text,
+    and maps carrying a scale bar, north arrow, and consistent legend styling — all
+    enforced via one shared matplotlib style module.
 - **Flowcharts:** authored as **Mermaid or Graphviz** (Quarto-native; render to both PDF
   and HTML; version-controlled). These replace the PowerPoint exports. The two
   transformation diagrams (`ACS Data Transform.png`, `Ookla transform.png`) and the
