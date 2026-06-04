@@ -11,3 +11,4 @@ ookla_data/
 *.egg-info/
 guide/_output/
 guide/.quarto/
+guide/site_libs/
