@@ -314,22 +314,20 @@ The scarcity of reliable sub-county data has three overlapping causes.
 First, small-area estimates carry large statistical uncertainty: when a
 sample is divided into dozens of small geographic units, the counts per
 unit shrink, and margins of error grow until estimates become unreliable
-({``Source 1''} n.d.). Second, statistical agencies and data providers
-apply geographic suppression or aggregation to protect individual
+{[}1{]}. Second, statistical agencies and data providers apply
+geographic suppression or aggregation to protect individual
 confidentiality; the smaller the area, the more likely a cell will be
-suppressed ({``Source 4''} n.d.). Third, there is no standardized
-collection infrastructure at the sub-county level. Unlike counties or
-census tracts, neighborhood and civic-association boundaries are locally
+suppressed {[}2{]}. Third, there is no standardized collection
+infrastructure at the sub-county level. Unlike counties or census
+tracts, neighborhood and civic-association boundaries are locally
 defined, vary across jurisdictions, and change over time, so no national
-data program routinely publishes estimates for them ({``Source 32''}
-n.d.).
+data program routinely publishes estimates for them {[}3{]}.
 
 The result is a persistent data gap between the geographic scale at
 which data is collected and reported and the geographic scale at which
 local government operates. Analysts working inside local government ---
 and researchers trying to support them --- must construct the sub-county
-datasets they need rather than retrieve them from a shelf ({``Source
-45''} n.d.).
+datasets they need rather than retrieve them from a shelf {[}4{]}.
 
 \section{What this guide
 demonstrates}\label{what-this-guide-demonstrates}
@@ -348,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, colback=white, colbacktitle=quarto-callout-note-color!10!white, titlerule=0mm, coltitle=black, bottomrule=.15mm, toprule=.15mm, colframe=quarto-callout-note-color-frame, opacityback=0, left=2mm, leftrule=.75mm, breakable, rightrule=.15mm, toptitle=1mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, arc=.35mm]
+\begin{tcolorbox}[enhanced jigsaw, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, opacityback=0, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white, breakable, toprule=.15mm, left=2mm, rightrule=.15mm, opacitybacktitle=0.6, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, bottomtitle=1mm, coltitle=black, leftrule=.75mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -381,10 +379,10 @@ decisions get made.
 Problem}\label{the-modifiable-areal-unit-problem}
 
 This mismatch has a formal name in spatial statistics: the
-\textbf{Modifiable Areal Unit Problem}, or MAUP ({``Source 50''} n.d.).
-The MAUP has two related components. The \emph{scale effect} describes
-how statistical summaries --- means, correlations, rates --- change when
-the same underlying data is aggregated to larger or smaller units. The
+\textbf{Modifiable Areal Unit Problem}, or MAUP {[}5{]}. The MAUP has
+two related components. The \emph{scale effect} describes how
+statistical summaries --- means, correlations, rates --- change when the
+same underlying data is aggregated to larger or smaller units. The
 \emph{zonation effect} describes how the same summary statistics change
 when you redraw boundaries at the same scale but in a different
 configuration. Neither effect is a modeling error; both are inherent
@@ -392,14 +390,13 @@ properties of spatially aggregated data.
 
 The practical consequence for local policy work is significant: the
 relationship you observe between two variables can change substantially
-depending solely on the geographic units you use to measure it
-({``Source 79''} n.d.). A correlation between income and broadband
-access that appears strong at the block-group level may weaken,
-strengthen, or reverse at the civic-association level --- not because
-the underlying relationship changed, but because the boundary choice
-changed. Analysts who do not account for this can draw conclusions that
-are artifacts of the data's packaging rather than reflections of
-reality.
+depending solely on the geographic units you use to measure it {[}6{]}.
+A correlation between income and broadband access that appears strong at
+the block-group level may weaken, strengthen, or reverse at the
+civic-association level --- not because the underlying relationship
+changed, but because the boundary choice changed. Analysts who do not
+account for this can draw conclusions that are artifacts of the data's
+packaging rather than reflections of reality.
 
 \section{Three misaligned
 geographies}\label{three-misaligned-geographies}
@@ -469,14 +466,13 @@ civic-association boundaries. Each is publicly available.
 \section{Ookla Speed-Test Tiles}\label{ookla-speed-test-tiles}
 
 Ookla publishes quarterly snapshots of aggregated speed-test performance
-through its open-data program ({``Speedtest by Ookla Global Fixed and
-Mobile Network Performance ...''} n.d.; {``Announcing Ookla Open
-Datasets''} n.d.). The fixed-broadband dataset contains one record per
-zoom-level-16 web-mercator tile --- a global grid in which each cell is
-approximately 610 meters on a side at mid-latitudes. For each tile that
-received at least one test in a quarter, the dataset reports the median
-download speed (Mbps), median upload speed (Mbps), and number of tests
-that contributed to those medians.
+through its open-data program {[}7{]}, {[}8{]}. The fixed-broadband
+dataset contains one record per zoom-level-16 web-mercator tile --- a
+global grid in which each cell is approximately 610 meters on a side at
+mid-latitudes. For each tile that received at least one test in a
+quarter, the dataset reports the median download speed (Mbps), median
+upload speed (Mbps), and number of tests that contributed to those
+medians.
 
 For this guide, the relevant quarter is Q1 2021, chosen to align with
 the ACS 2021 five-year estimates. Download speed and test count are the
@@ -509,9 +505,8 @@ The American Community Survey is the Census Bureau's ongoing household
 survey, published annually as one-year and five-year estimates. The
 five-year estimates average data collected over a rolling 60-month
 window and are the appropriate choice for small geographies where
-single-year samples are too thin to support reliable estimates
-({``American Community Survey 5-Year Data (2009-2023)''} n.d.;
-{``American Community Survey Data - u.s. Census Bureau''} n.d.).
+single-year samples are too thin to support reliable estimates {[}9{]},
+{[}10{]}.
 
 This guide uses two block-group-level variables from the ACS 2021
 five-year release:
@@ -541,18 +536,16 @@ Associations}\label{arlington-civic-associations}
 
 Arlington County, Virginia is divided into 62 civic associations ---
 community-defined neighborhoods that serve as the county's primary
-formal mechanism for organized resident input ({``Arlington County Civic
-Federation: Home''} n.d.; {``Civic \& Citizen Associations - Arlington
-County''} n.d.). Each association elects officers and engages with
-county government on land use, transportation, infrastructure, and
-community services. Membership in the Arlington County Civic Federation,
-which coordinates the associations, is the standard means by which
-neighborhoods participate in county decision-making.
+formal mechanism for organized resident input {[}11{]}, {[}12{]}. Each
+association elects officers and engages with county government on land
+use, transportation, infrastructure, and community services. Membership
+in the Arlington County Civic Federation, which coordinates the
+associations, is the standard means by which neighborhoods participate
+in county decision-making.
 
 The civic-association boundaries used here come from Arlington County's
-GIS open data portal ({``Civic Association Polygons \textbar{} Arlington
-County, Virginia. GIS Open Data''} n.d.). The 62 associations cover the
-entire county and tile it without overlap, making them a complete and
+GIS open data portal {[}13{]}. The 62 associations cover the entire
+county and tile it without overlap, making them a complete and
 non-overlapping partition of Arlington's approximately 109,528
 households. This makes them an ideal policy geography: they are locally
 meaningful, formally recognized, and together exhaustive.
@@ -584,9 +577,7 @@ have numbers attached to one set of polygons and questions about a
 different set of polygons. Areal interpolation is the family of methods
 that bridges that gap. The specific technique used throughout this guide
 --- area-weighted redistribution --- is the most transparent and widely
-applicable member of that family ({``What Is Areal
-Interpolation?---ArcGIS Pro \textbar{} Documentation''} n.d.; {``Areal
-Interpolation \textbar{} Vincent Thorne''} n.d.).
+applicable member of that family {[}14{]}, {[}15{]}.
 
 \section{How area-weighted redistribution
 works}\label{how-area-weighted-redistribution-works}
@@ -616,9 +607,7 @@ distributed uniformly within each source polygon. Population is not
 perfectly uniform within a Census block group, and download speed is not
 perfectly uniform across a 610-meter Ookla tile. But the assumption is
 transparent, auditable, and consistent --- and it systematically
-outperforms simply ignoring the boundary problem altogether ({``Spatial
-Interpolation Using Areal Features: A Review of Methods and ...''}
-n.d.).
+outperforms simply ignoring the boundary problem altogether {[}16{]}.
 
 \section{Extensive vs.~intensive
 measures}\label{sec-extensive-intensive}
@@ -705,7 +694,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, colback=white, colbacktitle=quarto-callout-note-color!10!white, titlerule=0mm, coltitle=black, bottomrule=.15mm, toprule=.15mm, colframe=quarto-callout-note-color-frame, opacityback=0, left=2mm, leftrule=.75mm, breakable, rightrule=.15mm, toptitle=1mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, arc=.35mm]
+\begin{tcolorbox}[enhanced jigsaw, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, opacityback=0, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white, breakable, toprule=.15mm, left=2mm, rightrule=.15mm, opacitybacktitle=0.6, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, bottomtitle=1mm, coltitle=black, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -867,7 +856,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, colback=white, colbacktitle=quarto-callout-note-color!10!white, titlerule=0mm, coltitle=black, bottomrule=.15mm, toprule=.15mm, colframe=quarto-callout-note-color-frame, opacityback=0, left=2mm, leftrule=.75mm, breakable, rightrule=.15mm, toptitle=1mm, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, arc=.35mm]
+\begin{tcolorbox}[enhanced jigsaw, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, opacityback=0, titlerule=0mm, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colback=white, breakable, toprule=.15mm, left=2mm, rightrule=.15mm, opacitybacktitle=0.6, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, toptitle=1mm, bottomtitle=1mm, coltitle=black, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -968,11 +957,10 @@ The spatial pattern in Figure~\ref{fig-income} reflects Arlington's
 well-documented socio-spatial structure: income rises sharply as one
 moves away from the Rosslyn--Ballston and Route 1 corridors into the
 low-density residential tracts that border Fairfax and Falls Church
-({``Arlington County, Virginia - u.s. Census Bureau QuickFacts''} n.d.).
-The spread is wide for a jurisdiction that ranks among the wealthiest
-counties in the United States, which makes the county an instructive
-case: if income structured broadband access anywhere, it should be
-detectable here.
+{[}17{]}. The spread is wide for a jurisdiction that ranks among the
+wealthiest counties in the United States, which makes the county an
+instructive case: if income structured broadband access anywhere, it
+should be detectable here.
 
 \section{Broadband speed
 distribution}\label{broadband-speed-distribution}
@@ -1036,9 +1024,8 @@ relationship visually plain. There is no line --- positive or negative
 this data expecting the standard ``rich neighbourhoods get faster
 internet'' finding will not find it here. The naive expectation,
 plausible on its face and documented in national-scale studies of access
-gaps ({``Mapping the Digital Divide: What Predicts Internet Access
-Across ...''} n.d.), does not hold inside a uniformly affluent
-jurisdiction where income variation is high but where the key driver of
+gaps {[}18{]}, does not hold inside a uniformly affluent jurisdiction
+where income variation is high but where the key driver of
 infrastructure investment operates on a different dimension entirely.
 
 That dimension is \textbf{housing density}. Dense multifamily corridors
@@ -1137,9 +1124,7 @@ map.
 The finding that \textbf{the digital-divide axis in Arlington is housing
 density and infrastructure build-out, not household income}, has direct
 implications for how jurisdictions should design broadband equity
-interventions ({``Bridging the Digital Divide: A Path to Universal
-Broadband Access''} n.d.; {``How Policymakers Can Help Bridge the
-Digital Divide in 2021 - AAF''} n.d.).
+interventions {[}19{]}, {[}20{]}.
 
 Income-based subsidy targeting --- the most common policy tool --- would
 direct resources toward low-income households while leaving the actual
@@ -1195,9 +1180,7 @@ with additional caution and, where possible, validate against
 parcel-level or point-level data.
 
 This limitation is not unique to this workflow; it is inherent to any
-area-weighted interpolation approach ({``What Is Areal
-Interpolation?---ArcGIS Pro \textbar{} Documentation''} n.d.; {``Areal
-Interpolation \textbar{} by ITC, University of Twente''} n.d.). The
+area-weighted interpolation approach {[}14{]}, {[}21{]}. The
 \texttt{redistribute\_direct} function used here, like all
 area-weighting methods, cannot recover sub-unit spatial variation that
 is not encoded in the source data.
@@ -1211,8 +1194,7 @@ introduces a form of self-selection bias: test-takers are not a random
 sample of all internet subscribers. People who run speed tests are more
 likely to be technically engaged, more likely to be troubleshooting a
 slow connection, and possibly more concentrated in particular building
-types or demographic groups ({``Speedtest® Methodology \textbar{}
-Ookla®''} n.d.).
+types or demographic groups {[}22{]}.
 
 The direction of this bias is not straightforwardly predictable. If
 frustrated users test more frequently, the Ookla data may understate
@@ -1248,8 +1230,7 @@ sampling uncertainty. In well-populated block groups this uncertainty is
 modest; in smaller block groups it can be large enough to materially
 affect the redistributed estimate. Arlington's relatively high response
 rates and the use of five-year pooled estimates (2017--2021) mitigate
-but do not eliminate this concern ({``American Community Survey (ACS) -
-Arlington County''} n.d.).
+but do not eliminate this concern {[}23{]}.
 
 The redistribution does not propagate formal uncertainty bounds. An
 analyst who needs confidence intervals on the civic-association
@@ -1412,112 +1393,143 @@ rate of interest --- and follow the same pattern.
 \markboth{References}{References}
 
 \phantomsection\label{refs}
-\begin{CSLReferences}{1}{0}
-\bibitem[\citeproctext]{ref-ref89}
-{``American Community Survey 5-Year Data (2009-2023).''} n.d. Accessed
-June 4, 2026.
-\url{https://www.census.gov/data/developers/data-sets/acs-5year.html}.
-
-\bibitem[\citeproctext]{ref-ref156}
-{``American Community Survey (ACS) - Arlington County.''} n.d. Accessed
-June 4, 2026.
-\url{https://www.arlingtonva.us/Government/Projects/Data-Research/Demographics/American-Community-Survey}.
-
-\bibitem[\citeproctext]{ref-ref142}
-{``American Community Survey Data - u.s. Census Bureau.''} n.d. Accessed
-June 4, 2026.
-\url{https://www.census.gov/programs-surveys/acs/data.html}.
-
-\bibitem[\citeproctext]{ref-ref88}
-{``Announcing Ookla Open Datasets.''} n.d. Accessed June 4, 2026.
-\url{https://www.ookla.com/articles/announcing-ookla-open-datasets}.
-
-\bibitem[\citeproctext]{ref-ref100}
-{``Areal Interpolation \textbar{} by ITC, University of Twente.''} n.d.
-Accessed June 4, 2026.
-\url{https://gistbok-ltb.ucgis.org/27/concept/7992}.
-
-\bibitem[\citeproctext]{ref-ref135}
-{``Areal Interpolation \textbar{} Vincent Thorne.''} n.d. Accessed June
-4, 2026. \url{https://vinceth.net/2021/06/18/areal-interpolation.html}.
-
-\bibitem[\citeproctext]{ref-ref91}
-{``Arlington County Civic Federation: Home.''} n.d. Accessed June 4,
-2026. \url{https://www.civfed.org}.
-
-\bibitem[\citeproctext]{ref-ref159}
-{``Arlington County, Virginia - u.s. Census Bureau QuickFacts.''} n.d.
-Accessed June 4, 2026.
-\url{https://www.census.gov/quickfacts/fact/table/arlingtoncountyvirginia/PST045224}.
-
-\bibitem[\citeproctext]{ref-ref96}
-{``Bridging the Digital Divide: A Path to Universal Broadband Access.''}
-n.d. Accessed June 4, 2026.
-\url{https://broadbandbreakfast.com/bridging-the-digital-divide-a-path-to-universal-broadband-access/}.
-
-\bibitem[\citeproctext]{ref-ref145}
-{``Civic \& Citizen Associations - Arlington County.''} n.d. Accessed
-June 4, 2026.
-\url{https://www.arlingtonva.us/Government/Topics/Community/Civic-and-Citizen-Association}.
-
-\bibitem[\citeproctext]{ref-ref146}
-{``Civic Association Polygons \textbar{} Arlington County, Virginia. GIS
-Open Data.''} n.d. Accessed June 4, 2026.
-\url{https://gisdata-arlgis.opendata.arcgis.com/datasets/ArlGIS::civic-association-polygons/explore?location=38.880938\%2C-77.109550\%2C13.55}.
-
-\bibitem[\citeproctext]{ref-ref112}
-{``How Policymakers Can Help Bridge the Digital Divide in 2021 - AAF.''}
-n.d. Accessed June 4, 2026.
-\url{https://www.americanactionforum.org/insight/how-policymakers-can-help-bridge-the-digital-divide-in-2021/}.
-
-\bibitem[\citeproctext]{ref-ref95}
-{``Mapping the Digital Divide: What Predicts Internet Access Across
-...''} n.d. Accessed June 4, 2026.
-\url{https://pmc.ncbi.nlm.nih.gov/articles/PMC10961931/}.
-
+\begin{CSLReferences}{0}{0}
 \bibitem[\citeproctext]{ref-ref1}
-{``Source 1.''} n.d. Accessed June 4, 2026.
-\url{https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf}.
-
-\bibitem[\citeproctext]{ref-ref32}
-{``Source 32.''} n.d. Accessed June 4, 2026.
-\url{https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf}.
+\CSLLeftMargin{{[}1{]} }%
+\CSLRightInline{{``Stacks.cdc.gov.''} Accessed: Jun. 04, 2026.
+{[}Online{]}. Available:
+\url{https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf}}
 
 \bibitem[\citeproctext]{ref-ref4}
-{``Source 4.''} n.d. Accessed June 4, 2026.
-\url{https://github.com/CDCgov/EPHTracking-Subcounty}.
+\CSLLeftMargin{{[}2{]} }%
+\CSLRightInline{{``Github.com.''} Accessed: Jun. 04, 2026. {[}Online{]}.
+Available: \url{https://github.com/CDCgov/EPHTracking-Subcounty}}
+
+\bibitem[\citeproctext]{ref-ref32}
+\CSLLeftMargin{{[}3{]} }%
+\CSLRightInline{{``results4america.org.''} Accessed: Jun. 04, 2026.
+{[}Online{]}. Available:
+\url{https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf}}
 
 \bibitem[\citeproctext]{ref-ref45}
-{``Source 45.''} n.d. Accessed June 4, 2026.
-\url{https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations}.
+\CSLLeftMargin{{[}4{]} }%
+\CSLRightInline{{``Iecam.illinois.edu.''} Accessed: Jun. 04, 2026.
+{[}Online{]}. Available:
+\url{https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations}}
 
 \bibitem[\citeproctext]{ref-ref50}
-{``Source 50.''} n.d. Accessed June 4, 2026.
-\url{https://atlas.co/blog/modifiable-areal-unit-problem-maup/}.
+\CSLLeftMargin{{[}5{]} }%
+\CSLRightInline{{``Atlas.co.''} Accessed: Jun. 04, 2026. {[}Online{]}.
+Available:
+\url{https://atlas.co/blog/modifiable-areal-unit-problem-maup/}}
 
 \bibitem[\citeproctext]{ref-ref79}
-{``Source 79.''} n.d. Accessed June 4, 2026.
-\url{https://gisgeography.com/maup-modifiable-areal-unit-problem/}.
-
-\bibitem[\citeproctext]{ref-ref139}
-{``Spatial Interpolation Using Areal Features: A Review of Methods and
-...''} n.d. Accessed June 4, 2026.
-\url{https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465}.
+\CSLLeftMargin{{[}6{]} }%
+\CSLRightInline{{``Gisgeography.com.''} Accessed: Jun. 04, 2026.
+{[}Online{]}. Available:
+\url{https://gisgeography.com/maup-modifiable-areal-unit-problem/}}
 
 \bibitem[\citeproctext]{ref-ref86}
-{``Speedtest by Ookla Global Fixed and Mobile Network Performance ...''}
-n.d. Accessed June 4, 2026.
-\url{https://github.com/teamookla/ookla-open-data}.
+\CSLLeftMargin{{[}7{]} }%
+\CSLRightInline{{``Speedtest by ookla global fixed and mobile network
+performance ...''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://github.com/teamookla/ookla-open-data}}
 
-\bibitem[\citeproctext]{ref-ref137}
-{``Speedtest® Methodology \textbar{} Ookla®.''} n.d. Accessed June 4,
-2026.
-\url{https://www.ookla.com/resources/guides/speedtest-methodology}.
+\bibitem[\citeproctext]{ref-ref88}
+\CSLLeftMargin{{[}8{]} }%
+\CSLRightInline{{``Announcing ookla open datasets.''} Accessed: Jun. 04,
+2026. {[}Online{]}. Available:
+\url{https://www.ookla.com/articles/announcing-ookla-open-datasets}}
+
+\bibitem[\citeproctext]{ref-ref89}
+\CSLLeftMargin{{[}9{]} }%
+\CSLRightInline{{``American community survey 5-year data (2009-2023).''}
+Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.census.gov/data/developers/data-sets/acs-5year.html}}
+
+\bibitem[\citeproctext]{ref-ref142}
+\CSLLeftMargin{{[}10{]} }%
+\CSLRightInline{{``American community survey data - u.s. Census
+bureau.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.census.gov/programs-surveys/acs/data.html}}
+
+\bibitem[\citeproctext]{ref-ref91}
+\CSLLeftMargin{{[}11{]} }%
+\CSLRightInline{{``Arlington county civic federation: home.''} Accessed:
+Jun. 04, 2026. {[}Online{]}. Available: \url{https://www.civfed.org}}
+
+\bibitem[\citeproctext]{ref-ref145}
+\CSLLeftMargin{{[}12{]} }%
+\CSLRightInline{{``Civic \& citizen associations - arlington county.''}
+Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.arlingtonva.us/Government/Topics/Community/Civic-and-Citizen-Association}}
+
+\bibitem[\citeproctext]{ref-ref146}
+\CSLLeftMargin{{[}13{]} }%
+\CSLRightInline{{``Civic association polygons \textbar{} arlington
+county, virginia. GIS open data.''} Accessed: Jun. 04, 2026.
+{[}Online{]}. Available:
+\url{https://gisdata-arlgis.opendata.arcgis.com/datasets/ArlGIS::civic-association-polygons/explore?location=38.880938\%2C-77.109550\%2C13.55}}
 
 \bibitem[\citeproctext]{ref-ref99}
-{``What Is Areal Interpolation?---ArcGIS Pro \textbar{}
-Documentation.''} n.d. Accessed June 4, 2026.
-\url{https://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/what-is-areal-interpolation.htm}.
+\CSLLeftMargin{{[}14{]} }%
+\CSLRightInline{{``What is areal interpolation?---ArcGIS pro \textbar{}
+documentation.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/what-is-areal-interpolation.htm}}
+
+\bibitem[\citeproctext]{ref-ref135}
+\CSLLeftMargin{{[}15{]} }%
+\CSLRightInline{{``Areal interpolation \textbar{} vincent thorne.''}
+Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://vinceth.net/2021/06/18/areal-interpolation.html}}
+
+\bibitem[\citeproctext]{ref-ref139}
+\CSLLeftMargin{{[}16{]} }%
+\CSLRightInline{{``Spatial interpolation using areal features: A review
+of methods and ...''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465}}
+
+\bibitem[\citeproctext]{ref-ref159}
+\CSLLeftMargin{{[}17{]} }%
+\CSLRightInline{{``Arlington county, virginia - u.s. Census bureau
+QuickFacts.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.census.gov/quickfacts/fact/table/arlingtoncountyvirginia/PST045224}}
+
+\bibitem[\citeproctext]{ref-ref95}
+\CSLLeftMargin{{[}18{]} }%
+\CSLRightInline{{``Mapping the digital divide: What predicts internet
+access across ...''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://pmc.ncbi.nlm.nih.gov/articles/PMC10961931/}}
+
+\bibitem[\citeproctext]{ref-ref96}
+\CSLLeftMargin{{[}19{]} }%
+\CSLRightInline{{``Bridging the digital divide: A path to universal
+broadband access.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://broadbandbreakfast.com/bridging-the-digital-divide-a-path-to-universal-broadband-access/}}
+
+\bibitem[\citeproctext]{ref-ref112}
+\CSLLeftMargin{{[}20{]} }%
+\CSLRightInline{{``How policymakers can help bridge the digital divide
+in 2021 - AAF.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.americanactionforum.org/insight/how-policymakers-can-help-bridge-the-digital-divide-in-2021/}}
+
+\bibitem[\citeproctext]{ref-ref100}
+\CSLLeftMargin{{[}21{]} }%
+\CSLRightInline{{``Areal interpolation \textbar{} by ITC, university of
+twente.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://gistbok-ltb.ucgis.org/27/concept/7992}}
+
+\bibitem[\citeproctext]{ref-ref137}
+\CSLLeftMargin{{[}22{]} }%
+\CSLRightInline{{``Speedtest® methodology \textbar{} ookla®.''}
+Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.ookla.com/resources/guides/speedtest-methodology}}
+
+\bibitem[\citeproctext]{ref-ref156}
+\CSLLeftMargin{{[}23{]} }%
+\CSLRightInline{{``American community survey (ACS) - arlington
+county.''} Accessed: Jun. 04, 2026. {[}Online{]}. Available:
+\url{https://www.arlingtonva.us/Government/Projects/Data-Research/Demographics/American-Community-Survey}}
 
 \end{CSLReferences}
 

@@ -58,7 +58,14 @@ def main() -> None:
             raw_title = rest[: um.start()].strip()
         else:
             raw_title = rest
-        title = clean_title(raw_title) or f"Source {num}"
+        title = clean_title(raw_title)
+        if not title:
+            # No descriptive title in the archive — use the URL host (e.g.
+            # "stacks.cdc.gov") rather than a meaningless "Source N" placeholder.
+            if url:
+                title = re.sub(r"^https?://(www\.)?", "", url).split("/")[0]
+            else:
+                title = f"Source {num}"
         key = f"ref{num}"
         if url:
             entries.append(
