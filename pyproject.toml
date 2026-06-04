@@ -10,6 +10,7 @@ dependencies = [
     "shapely>=2.0",
     "pygris>=0.1.6",
     "census>=0.8.22",
+    "python-dotenv>=1.0",
     "us>=3.2",
     "contextily>=1.6",
     "mapclassify>=2.6",

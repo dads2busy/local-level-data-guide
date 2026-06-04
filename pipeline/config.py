@@ -1,6 +1,12 @@
 """Central configuration: geographies, CRS, source identifiers, paths."""
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+# Load secrets (e.g. CENSUS_API_KEY) from a local .env if present. The file is
+# gitignored; loading it here makes the key available to any pipeline module.
+load_dotenv()
+
 # Arlington County, Virginia
 STATE_FIPS = "51"
 COUNTY_FIPS = "013"

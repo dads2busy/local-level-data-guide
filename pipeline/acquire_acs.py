@@ -15,8 +15,12 @@ def fetch_acs_counts(api_key: str | None = None) -> pd.DataFrame:
     """Return a DataFrame: GEOID, agg_income, households for Arlington block groups."""
     key = api_key or os.environ.get("CENSUS_API_KEY")
     c = Census(key, year=config.ACS_YEAR)
+    # The census library needs the API estimate suffix "E" on each variable
+    # (e.g. B19025_001E), unlike tidycensus which strips it.
+    agg_var = config.ACS_VARS["agg_income"] + "E"
+    hh_var = config.ACS_VARS["households"] + "E"
     rows = c.acs5.state_county_blockgroup(
-        fields=("NAME", config.ACS_VARS["agg_income"], config.ACS_VARS["households"]),
+        fields=("NAME", agg_var, hh_var),
         state_fips=config.STATE_FIPS,
         county_fips=config.COUNTY_FIPS,
         blockgroup=Census.ALL,
@@ -24,12 +28,7 @@ def fetch_acs_counts(api_key: str | None = None) -> pd.DataFrame:
     )
     df = pd.DataFrame(rows)
     df["GEOID"] = df["state"] + df["county"] + df["tract"] + df["block group"]
-    df = df.rename(
-        columns={
-            config.ACS_VARS["agg_income"]: "agg_income",
-            config.ACS_VARS["households"]: "households",
-        }
-    )
+    df = df.rename(columns={agg_var: "agg_income", hh_var: "households"})
     return df[["GEOID", "agg_income", "households"]]
 
 
