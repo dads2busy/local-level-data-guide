@@ -82,8 +82,10 @@ def bivariate_legend(ax) -> None:
     ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_xlabel("Speed →", fontsize=8)
-    ax.set_ylabel("Income →", fontsize=8)
+    # Use mathtext arrows so the glyph renders regardless of the label font
+    # (Libre Franklin's variable-font subset lacks U+2192).
+    ax.set_xlabel(r"Speed $\rightarrow$", fontsize=8)
+    ax.set_ylabel(r"Income $\rightarrow$", fontsize=8)
 
 
 def add_north_arrow(ax) -> None:
