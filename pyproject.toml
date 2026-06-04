@@ -1,0 +1,29 @@
+[project]
+name = "local-level-data-pipeline"
+version = "0.1.0"
+description = "Reproducible pipeline for the local-level geographic data guide"
+requires-python = ">=3.12"
+dependencies = [
+    "geopandas>=1.0",
+    "pandas>=2.0",
+    "pyarrow>=15",
+    "shapely>=2.0",
+    "pygris>=0.1.6",
+    "census>=0.8.22",
+    "python-dotenv>=1.0",
+    "us>=3.2",
+    "contextily>=1.6",
+    "mapclassify>=2.6",
+    "matplotlib>=3.8",
+    "sdc-redistribute>=0.1.1",
+    "s3fs>=2024.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["pipeline*"]
+
+[tool.pytest.ini_options]
+markers = ["network: tests that hit live external services (deselect with -m 'not network')"]
