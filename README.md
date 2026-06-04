@@ -44,3 +44,13 @@ Requires the Graphviz `dot` binary (`brew install graphviz`) for the flowcharts.
 uv run pytest -m "not network"   # fast, deterministic
 uv run pytest -m network         # live Census/Ookla acquisition
 ```
+
+## The Guide
+
+The illustrated guide lives in `guide/` (Quarto book). Render it:
+
+```bash
+cd guide && quarto render          # PDF (primary) + HTML site -> guide/_output/
+```
+
+Figures come from `pipeline.build_figures`; the data from `pipeline.run`.
