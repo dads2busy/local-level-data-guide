@@ -9,3 +9,5 @@ __pycache__/
 .pytest_cache/
 ookla_data/
 *.egg-info/
+guide/_output/
+guide/.quarto/

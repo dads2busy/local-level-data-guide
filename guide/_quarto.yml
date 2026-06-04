@@ -1,0 +1,41 @@
+project:
+  type: book
+  output-dir: _output
+
+book:
+  title: "Creating Local-Level Geographic Datasets"
+  subtitle: "A practical, illustrated guide for sub-county policy analysis"
+  author: "Aaron Schroeder"
+  date: "2026-06-04"
+  chapters:
+    - index.qmd
+    - 01-boundary-problem.qmd
+    - 02-the-data.qmd
+    - 03-method.qmd
+    - 04-worked-example.qmd
+    - 05-results.qmd
+    - 06-limitations.qmd
+    - 07-apply-it.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  pdf:
+    documentclass: scrreprt
+    pdf-engine: xelatex
+    toc: true
+    number-sections: true
+    colorlinks: true
+    linkcolor: "RoyalBlue"
+    keep-tex: true
+    include-in-header: in-header.tex
+    mainfont: "Source Serif 4"
+    sansfont: "Libre Franklin"
+    monofont: "JetBrains Mono"
+    fig-pos: "H"
+  html:
+    theme: [cosmo, theme.scss]
+    toc: true
+    fig-cap-location: bottom
+    code-fold: true
