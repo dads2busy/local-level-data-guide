@@ -1,0 +1,14 @@
+digraph acs {
+  rankdir=LR;
+  bgcolor="white";
+  node [shape=box, style="rounded,filled", fontname="Libre Franklin",
+        color="#1B2A4A", fontcolor="#1B2A4A", fillcolor="#E5E7EB"];
+  edge [color="#6B7280"];
+
+  src [label="Block groups\nagg_income, households\n(extensive counts)"];
+  w   [label="Area-weighted\nredistribution", fillcolor="#5698b9", fontcolor="white"];
+  out [label="Civic association\nagg_income, households"];
+  d   [label="Derive\nmean income = agg / households", fillcolor="#2A7F7F", fontcolor="white"];
+
+  src -> w -> out -> d;
+}
