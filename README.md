@@ -28,6 +28,16 @@ Counts (aggregate income, households, broadband tests) are redistributed
 area-weighted with `sdc-redistribute`; intensive rates (mean income, mean
 speed) are derived from count ratios. See `docs/superpowers/specs/`.
 
+## Figures
+
+Regenerate every map, bivariate chart, scatter, and flowchart used in the guide:
+
+```bash
+uv run python -m pipeline.build_figures   # writes figures/ and figures/diagrams/
+```
+
+Requires the Graphviz `dot` binary (`brew install graphviz`) for the flowcharts.
+
 ## Tests
 
 ```bash
