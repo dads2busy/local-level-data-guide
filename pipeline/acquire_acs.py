@@ -11,6 +11,22 @@ from pipeline import config
 from pipeline.acquire_geographies import fetch_block_groups
 
 
+def _sanitize_counts(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace Census negative sentinels (e.g. -666666666) with 0.
+
+    Aggregate income and household counts are non-negative by definition; the
+    Census API returns large negative sentinel codes for suppressed or
+    not-applicable cells (typically zero-household block groups). Left in place,
+    these sentinels would propagate through area-weighted redistribution and
+    produce negative incomes. Treating them as 0 is correct for the
+    zero-household areas they mark.
+    """
+    out = df.copy()
+    for col in ("agg_income", "households"):
+        out[col] = out[col].mask(out[col] < 0, 0)
+    return out
+
+
 def fetch_acs_counts(api_key: str | None = None) -> pd.DataFrame:
     """Return a DataFrame: GEOID, agg_income, households for Arlington block groups."""
     key = api_key or os.environ.get("CENSUS_API_KEY")
@@ -29,6 +45,7 @@ def fetch_acs_counts(api_key: str | None = None) -> pd.DataFrame:
     df = pd.DataFrame(rows)
     df["GEOID"] = df["state"] + df["county"] + df["tract"] + df["block group"]
     df = df.rename(columns={agg_var: "agg_income", hh_var: "households"})
+    df = _sanitize_counts(df)
     return df[["GEOID", "agg_income", "households"]]
 
 
