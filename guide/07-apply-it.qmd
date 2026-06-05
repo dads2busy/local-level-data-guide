@@ -1,0 +1,47 @@
+# Apply It to Your Own Jurisdiction {#sec-apply}
+
+The Arlington analysis is a worked illustration of a general workflow. Any jurisdiction with civic associations, planning districts, school attendance zones, or other custom geographies can follow the same steps to estimate income and broadband speed — or any other combination of an ACS count variable and an Ookla speed-test variable — at the sub-county level. This chapter distils the pipeline into a numbered recipe and points to the tools needed to run it.
+
+## The six-step recipe
+
+**1. Define your target geography as a GeoJSON with a stable identifier.**
+Your target polygons — the units you want estimates for — must be stored as a GeoJSON (or any format readable by GeoPandas) and must include a column that uniquely identifies each polygon. The companion repository uses `geoid` by convention, but any string or integer key works as long as it is stable and unique. The polygons must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is the safe default) and should tile the jurisdiction without meaningful gaps or overlaps. Gaps will cause households and tests near the edges to be unallocated; overlaps will cause double-counting.
+
+**2. Obtain source counts on their native geography.**
+For income, retrieve ACS block-group estimates for the county of interest via the Census API. The two variables needed are B19025_001E (aggregate household income) and B11001_001E (number of households). Both must be five-year estimates aligned with the same ACS vintage. For broadband, download the relevant Ookla quarterly fixed-broadband tile from Ookla's public S3 bucket. Clip the tile to your jurisdiction's bounding box to reduce memory usage. Retain `tests` and `avg_d_kbps`. Both datasets must be in the same CRS as your target geography before redistribution.
+
+**3. Redistribute the source counts to your target geography.**
+Call `redistribute_direct` (from the `sda_areal` Python package, or its R equivalent once available) with your source GeoDataFrame and target GeoDataFrame. For ACS, redistribute `agg_income` and `households`. For Ookla, first construct `d_product = avg_d_kbps * tests`, then redistribute `tests` and `d_product`. Each call preserves the source total within floating-point tolerance.
+
+**4. Derive the intensive rates from the redistributed counts.**
+Mean income is `agg_income_target / households_target`. Download speed in Mbps is `(d_product_target / tests_target) / 1000`. Neither derived variable should be redistributed directly; the correct workflow always redistributes the underlying counts and derives the rate afterward. Attempting to redistribute mean income or average speed directly will produce area-weighted results that are correct in only the degenerate case where all source units are identical in density.
+
+**5. Validate that totals are preserved.**
+Before proceeding to analysis, compare the sum of redistributed households across all target polygons to the sum of ACS households across all source block groups. They should agree within a few percent. A larger discrepancy indicates a geometry problem (gaps, overlaps, CRS mismatch) that will bias every downstream estimate. Similarly check that redistributed test counts sum to within a few percent of source tile test counts. Both checks are implemented in the companion repository's `pipeline.validate` module.
+
+**6. Map, analyse, and interpret.**
+Join the income and speed estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or whatever format your visualisation or analysis tool requires. The companion repository builds all five result figures — choropleth maps, scatter plot, and bivariate map — through a single command.
+
+## Running the companion pipeline
+
+The full pipeline is executed with a single command from the repository root:
+
+```bash
+uv run python -m pipeline.run
+```
+
+This command fetches the Census and Ookla data, performs both redistributions, validates totals, and writes the output GeoJSON. To regenerate the result figures from the pipeline output:
+
+```bash
+uv run python -m pipeline.build_figures
+```
+
+Both commands require `uv` (the Python package manager), a Census API key in the environment variable `CENSUS_API_KEY`, and an internet connection. The repository README provides setup instructions. All code is open-source and MIT-licensed.
+
+## R implementation
+
+The areal interpolation logic in the Python pipeline mirrors the `sdc-redistribute` family of functions available in R. An R implementation of the full Arlington pipeline — using `tigris` for Census geometries, `censusapi` or `tidycensus` for ACS data, `ooklaOpenDataR` for speed-test tiles, and `areal` or a direct port of `redistribute_direct` for the interpolation step — is forthcoming. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.
+
+## Adapting to other variables
+
+The recipe generalises beyond income and broadband. Any ACS extensive variable (counts of people, households, housing units, workers) can be redistributed in step 3 by substituting the appropriate B-table variables. Any Ookla variable that can be expressed as a count-weighted product (upload speed follows the same `avg_u_kbps * tests` construction as download speed) can be substituted in the same step. Analysts working with other speed-test or coverage datasets will need to identify the analogous extensive quantity — typically a count that, when summed and divided into a product column, recovers the intensive rate of interest — and follow the same pattern.
