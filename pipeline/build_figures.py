@@ -21,6 +21,7 @@ EXPECTED = [
     "figures/map_income_parcels.png",
     "figures/map_income_diff.png",
     "figures/scatter_area_vs_parcel.png",
+    "figures/fig_disaggregation.png",
     "figures/diagrams/dataflow.png",
     "figures/diagrams/acs_transform.png",
     "figures/diagrams/ookla_transform.png",

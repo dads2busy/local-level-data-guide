@@ -245,6 +245,72 @@ def fig_maup() -> Path:
     return _save(fig, "fig_maup.png")
 
 
+def fig_disaggregation() -> Path:
+    """Schematic of dasymetric redistribution: source area -> parcels -> target area.
+
+    A source polygon's count is split across the parcels inside it, then the
+    parcels are reaggregated under a different (overlapping) target boundary.
+    Synthetic and deterministic; illustrates the spatial logic of the parcel
+    method.
+    """
+    from shapely.geometry import Point, Polygon
+
+    pal = style.PALETTE
+    rng = np.random.default_rng(0)
+    src = Polygon([(1.0, 2.0), (5.8, 1.4), (6.4, 5.6), (2.2, 6.8), (0.8, 4.2)])
+    tgt = Polygon([(4.2, 2.8), (8.8, 2.2), (9.2, 7.2), (5.0, 7.8), (3.6, 5.2)])
+
+    pts = []
+    x = 1.2
+    while x < 6.2:
+        y = 1.8
+        while y < 6.6:
+            p = Point(x + rng.uniform(-0.16, 0.16), y + rng.uniform(-0.16, 0.16))
+            if src.contains(p):
+                pts.append((p.x, p.y))
+            y += 0.92
+        x += 0.92
+    pts = np.array(pts)
+    inside = np.array([tgt.contains(Point(px, py)) for px, py in pts])
+    cx, cy = src.centroid.x, src.centroid.y
+    n = len(pts)
+
+    def xy(poly):
+        xs, ys = poly.exterior.xy
+        return list(xs), list(ys)
+
+    sx, sy = xy(src)
+    tx, ty = xy(tgt)
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.0))
+
+    axes[0].fill(sx, sy, color=pal["blue"], alpha=0.22, ec=pal["ink"], lw=1.5)
+    axes[0].scatter(pts[:, 0], pts[:, 1], s=26, color=pal["ink"], zorder=3)
+    axes[0].set_title("1. A source area and its parcels")
+
+    axes[1].fill(sx, sy, color="none", ec=pal["ink"], lw=1.2)
+    for px, py in pts:
+        axes[1].plot([cx, px], [cy, py], color=pal["gray"], lw=0.6, alpha=0.6, zorder=1)
+    axes[1].scatter([cx], [cy], s=70, color=pal["ink"], marker="s", zorder=4)
+    axes[1].scatter(pts[:, 0], pts[:, 1], s=26, color=pal["blue"], zorder=3)
+    axes[1].set_title(f"2. Disaggregate the total across {n} parcels")
+
+    axes[2].fill(sx, sy, color="none", ec=pal["gray"], lw=1.0, ls="--")
+    axes[2].fill(tx, ty, color=pal["teal"], alpha=0.22, ec=pal["ink"], lw=1.5)
+    axes[2].scatter(pts[~inside, 0], pts[~inside, 1], s=16, color=pal["light"], zorder=3)
+    axes[2].scatter(pts[inside, 0], pts[inside, 1], s=34, color=pal["amber"], zorder=4)
+    axes[2].set_title(f"3. Reaggregate to a new boundary ({int(inside.sum())} parcels)")
+
+    for ax in axes:
+        ax.set_xlim(0, 9.6)
+        ax.set_ylim(0.8, 8.4)
+        ax.set_aspect("equal")
+        ax.axis("off")
+
+    fig.suptitle("Disaggregate to parcels, then reaggregate to a different area",
+                 fontsize=14, fontweight="bold", color=pal["ink"])
+    return _save(fig, "fig_disaggregation.png")
+
+
 ALL_FIGURES = [
     fig_maup,
     fig_transformation_3panel,
@@ -259,6 +325,7 @@ ALL_FIGURES = [
     fig_income_parcels,
     fig_income_diff,
     fig_scatter_area_vs_parcel,
+    fig_disaggregation,
 ]
 
 

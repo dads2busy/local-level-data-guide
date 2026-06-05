@@ -346,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, left=2mm, colback=white, toptitle=1mm, coltitle=black, breakable, opacitybacktitle=0.6, toprule=.15mm, opacityback=0, bottomtitle=1mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, opacityback=0, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, colback=white, toprule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, left=2mm, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, coltitle=black]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -721,7 +721,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, left=2mm, colback=white, toptitle=1mm, coltitle=black, breakable, opacitybacktitle=0.6, toprule=.15mm, opacityback=0, bottomtitle=1mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, opacityback=0, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, colback=white, toprule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, left=2mm, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, coltitle=black]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -882,7 +882,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, left=2mm, colback=white, toptitle=1mm, coltitle=black, breakable, opacitybacktitle=0.6, toprule=.15mm, opacityback=0, bottomtitle=1mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, breakable, opacityback=0, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, colback=white, toprule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, left=2mm, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, coltitle=black]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1245,7 +1245,29 @@ to civic associations in proportion to the number of unit points that
 fall within each association, weighted by their source block-group
 membership.
 
-\begin{tcolorbox}[enhanced jigsaw, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, left=2mm, colback=white, toptitle=1mm, coltitle=black, breakable, opacitybacktitle=0.6, toprule=.15mm, opacityback=0, bottomtitle=1mm, titlerule=0mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm]
+Figure~\ref{fig-disaggregation} shows the spatial logic. A source block
+group's total is divided across the parcels inside it, and those parcels
+are then collected under whatever target boundary we care about, here a
+civic association that overlaps the block group only partially. Only the
+parcels falling inside the target contribute to its estimate.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{figures/fig_disaggregation.png}
+
+}
+
+\caption{\label{fig-disaggregation}Parcel-based redistribution in three
+steps. A source area and its parcels (1); the source total disaggregated
+across those parcels (2); and the parcels reaggregated under a different
+target boundary, where only the parcels inside the target (highlighted)
+contribute to its estimate (3).}
+
+\end{figure}%
+
+\begin{tcolorbox}[enhanced jigsaw, breakable, opacityback=0, titlerule=0mm, arc=.35mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, colback=white, toprule=.15mm, toptitle=1mm, opacitybacktitle=0.6, bottomtitle=1mm, left=2mm, leftrule=.75mm, bottomrule=.15mm, rightrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, coltitle=black]
 
 \begin{Shaded}
 \begin{Highlighting}[]
