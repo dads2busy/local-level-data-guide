@@ -280,12 +280,22 @@
 \begin{document}
 \maketitle
 
-\renewcommand*\contentsname{Table of contents}
-{
-\hypersetup{linkcolor=}
-\setcounter{tocdepth}{2}
-\tableofcontents
-}
+
+\bookmarksetup{startatroot}
+
+\chapter*{Creating Local-Level Geographic Datasets}\label{cover-title}
+\addcontentsline{toc}{chapter}{Creating Local-Level Geographic Datasets}
+
+\markboth{Creating Local-Level Geographic Datasets}{Creating Local-Level
+Geographic Datasets}
+
+\begin{center}
+\includegraphics[width=0.8\linewidth,height=\textheight,keepaspectratio]{figures/map_bivariate.png}
+\end{center}
+
+\begin{center}
+\itshape\small Digital equity across Arlington's 62 civic associations: median household income against broadband download speed.
+\end{center}
 
 \bookmarksetup{startatroot}
 
@@ -363,7 +373,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, bottomrule=.15mm, bottomtitle=1mm, colback=white, titlerule=0mm, colframe=quarto-callout-note-color-frame, toptitle=1mm, left=2mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, opacitybacktitle=0.6, arc=.35mm, toprule=.15mm, rightrule=.15mm, leftrule=.75mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -738,7 +748,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, bottomrule=.15mm, bottomtitle=1mm, colback=white, titlerule=0mm, colframe=quarto-callout-note-color-frame, toptitle=1mm, left=2mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, opacitybacktitle=0.6, arc=.35mm, toprule=.15mm, rightrule=.15mm, leftrule=.75mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -899,7 +909,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, bottomrule=.15mm, bottomtitle=1mm, colback=white, titlerule=0mm, colframe=quarto-callout-note-color-frame, toptitle=1mm, left=2mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, opacitybacktitle=0.6, arc=.35mm, toprule=.15mm, rightrule=.15mm, leftrule=.75mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1284,7 +1294,7 @@ contribute to its estimate (3).}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, breakable, bottomrule=.15mm, bottomtitle=1mm, colback=white, titlerule=0mm, colframe=quarto-callout-note-color-frame, toptitle=1mm, left=2mm, opacityback=0, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, opacitybacktitle=0.6, arc=.35mm, toprule=.15mm, rightrule=.15mm, leftrule=.75mm, coltitle=black]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]

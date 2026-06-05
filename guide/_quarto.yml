@@ -12,6 +12,7 @@ book:
   date: "2026-06-04"
   chapters:
     - index.qmd
+    - the-gap.qmd
     - 01-boundary-problem.qmd
     - 02-the-data.qmd
     - 03-method.qmd
