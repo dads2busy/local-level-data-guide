@@ -72,6 +72,9 @@ OOKLA_TILES = DATA / "ookla_tiles_arlington.geojson"        # existing/refreshab
 CIVIC_INCOME = DATA / "civic_income.csv"                    # produced by redistribute_income
 CIVIC_BROADBAND = DATA / "civic_broadband.csv"             # produced by redistribute_broadband
 CIVIC_COMBINED = DATA / "civic_combined.geojson"           # produced by combine
+PARCELS = DATA / "va013_parcels.geojson"                   # produced by acquire_parcels
+CIVIC_INCOME_PARCELS = DATA / "civic_income_parcels.csv"   # produced by redistribute_income_parcels
+CIVIC_INCOME_COMPARISON = DATA / "civic_income_comparison.geojson"  # produced by compare_methods
 ```
 
 
@@ -432,6 +435,216 @@ def main() -> None:
     gdf = gpd.GeoDataFrame(merged, geometry="geometry", crs=civ.crs)
     gdf.to_file(config.CIVIC_COMBINED, driver="GeoJSON")
     print(f"Wrote {len(gdf)} combined civic-association rows → {config.CIVIC_COMBINED}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+## Acquire parcels
+
+Page through the Arlington MHUD FeatureServer and reduce parcel polygons to unit-bearing centroids.
+
+**`pipeline/acquire_parcels.py`**
+
+```python
+"""Acquire Arlington MHUD parcel polygons and reduce them to unit-bearing centroids."""
+from __future__ import annotations
+
+import json
+import urllib.parse
+import urllib.request
+
+import geopandas as gpd
+import pandas as pd
+
+from pipeline import config
+
+LAYER = (
+    "https://arlgis.arlingtonva.us/arcgis/rest/services/Open_Data/"
+    "od_MHUD_Polygons/FeatureServer/0/query"
+)
+PAGE = 2000
+
+
+def _fetch_page(offset: int) -> gpd.GeoDataFrame | None:
+    params = {
+        "where": "1=1",
+        "outFields": "Total_Units,Unit_Type",
+        "outSR": "4326",
+        "resultOffset": str(offset),
+        "resultRecordCount": str(PAGE),
+        "f": "geojson",
+    }
+    url = LAYER + "?" + urllib.parse.urlencode(params)
+    with urllib.request.urlopen(url, timeout=60) as resp:  # noqa: S310
+        data = json.load(resp)
+    feats = data.get("features", [])
+    if not feats:
+        return None
+    return gpd.GeoDataFrame.from_features(feats, crs="EPSG:4326")
+
+
+def fetch_parcels() -> gpd.GeoDataFrame:
+    """Page through the MHUD FeatureServer and return all parcel polygons."""
+    parts: list[gpd.GeoDataFrame] = []
+    offset = 0
+    while True:
+        page = _fetch_page(offset)
+        if page is None or len(page) == 0:
+            break
+        parts.append(page)
+        if len(page) < PAGE:
+            break
+        offset += PAGE
+    gdf = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), crs="EPSG:4326")
+    return gdf
+
+
+def to_centroids(polys: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Reduce parcel polygons to centroids, keeping Total_Units and Unit_Type."""
+    cent = polys.copy()
+    # representative_point() is guaranteed inside the polygon (unlike centroid)
+    cent["geometry"] = cent.geometry.representative_point()
+    return cent[["Total_Units", "Unit_Type", "geometry"]]
+
+
+def main() -> None:
+    polys = fetch_parcels()
+    pts = to_centroids(polys)
+    pts.to_file(config.PARCELS, driver="GeoJSON")
+    print(f"Wrote {len(pts)} parcel centroids → {config.PARCELS}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+## Redistribute income through parcels
+
+Explode parcels into per-unit points and redistribute block-group income through them (the dasymetric second approach).
+
+**`pipeline/redistribute_income_parcels.py`**
+
+```python
+"""Redistribute income through unit-weighted parcels (dasymetric), derive mean income."""
+from __future__ import annotations
+
+from pathlib import Path
+
+import geopandas as gpd
+import pandas as pd
+from sdc_redistribute import redistribute_parcels
+
+from pipeline import config
+
+
+def explode_by_units(parcels: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    """Replicate each parcel into Total_Units identical points; drop units <= 0."""
+    p = parcels[parcels["Total_Units"] > 0].copy()
+    reps = p["Total_Units"].astype(int).to_numpy()
+    out = p.loc[p.index.repeat(reps)].reset_index(drop=True)
+    return out
+
+
+def redistribute_income_parcels(
+    counts_long: pd.DataFrame,
+    parcels: gpd.GeoDataFrame,
+    source_geo: Path,
+    target_geo: Path,
+) -> pd.DataFrame:
+    """Return per-civic-association agg_income, households, derived mean_income."""
+    points = explode_by_units(parcels)
+    result = redistribute_parcels(
+        source_df=counts_long,
+        parcel_centroids=points,
+        source_geo=source_geo,
+        target_geos={"civic_association": target_geo},
+        count_cols=["agg_income", "households"],
+        source_id="geoid",
+    )
+    wide = result.pivot_table(
+        index="geoid", columns="measure", values="value", aggfunc="first"
+    ).reset_index()
+    wide.columns.name = None
+    wide = wide.rename(
+        columns={"agg_income_parcels": "agg_income", "households_parcels": "households"}
+    )
+    wide["mean_income"] = wide["agg_income"] / wide["households"].where(
+        wide["households"] > 0
+    )
+    return wide[["geoid", "agg_income", "households", "mean_income"]]
+
+
+def main() -> None:
+    parcels = gpd.read_file(config.PARCELS)
+    bg = gpd.read_file(config.ACS_COUNTS).rename(columns={"GEOID": "geoid"})
+    long = bg[["geoid", "agg_income", "households"]].melt(
+        id_vars="geoid", var_name="measure", value_name="value"
+    )
+    long["year"] = config.ACS_YEAR
+
+    src_path = config.DATA / "_acs_src_parcels.geojson"
+    bg[["geoid", "geometry"]].to_file(src_path, driver="GeoJSON")
+    out = redistribute_income_parcels(long, parcels, src_path, config.CIVIC_ASSOC)
+    src_path.unlink(missing_ok=True)
+
+    out.to_csv(config.CIVIC_INCOME_PARCELS, index=False)
+    print(f"Wrote {len(out)} parcel-weighted income rows → {config.CIVIC_INCOME_PARCELS}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+## Compare methods
+
+Join the area-weighted and parcel-weighted income and quantify the difference per civic association.
+
+**`pipeline/compare_methods.py`**
+
+```python
+"""Compare area-weighted vs parcel-weighted income per civic association."""
+from __future__ import annotations
+
+import geopandas as gpd
+import pandas as pd
+
+from pipeline import config
+
+
+def compare_income(area: pd.DataFrame, parcel: pd.DataFrame) -> pd.DataFrame:
+    """Join the two methods' mean income; add diff (parcel - area) and pct_diff."""
+    a = area[["geoid", "mean_income"]].rename(columns={"mean_income": "mean_income_area"})
+    p = parcel[["geoid", "mean_income"]].rename(columns={"mean_income": "mean_income_parcel"})
+    out = a.merge(p, on="geoid", how="outer")
+    out["diff"] = out["mean_income_parcel"] - out["mean_income_area"]
+    out["pct_diff"] = 100 * out["diff"] / out["mean_income_area"].where(
+        out["mean_income_area"] > 0
+    )
+    return out
+
+
+def main() -> None:
+    civ = gpd.read_file(config.CIVIC_ASSOC)[["geoid", "region_name", "geometry"]]
+    area = pd.read_csv(config.CIVIC_INCOME, dtype={"geoid": str})
+    parcel = pd.read_csv(config.CIVIC_INCOME_PARCELS, dtype={"geoid": str})
+    cmp = compare_income(area, parcel)
+    gdf = civ.merge(cmp, on="geoid", how="left")
+    gdf = gpd.GeoDataFrame(gdf, geometry="geometry", crs=civ.crs)
+
+    # Honest accounting: report parcel-method household total vs ACS source.
+    acs = gpd.read_file(config.ACS_COUNTS)
+    src_hh = float(acs["households"].sum())
+    parcel_hh = float(pd.read_csv(config.CIVIC_INCOME_PARCELS)["households"].sum())
+    pct = 100 * (parcel_hh - src_hh) / src_hh if src_hh else 0.0
+    print(f"Household totals — ACS source: {src_hh:,.0f}; parcel method: {parcel_hh:,.0f} ({pct:+.1f}%)")
+
+    gdf.to_file(config.CIVIC_INCOME_COMPARISON, driver="GeoJSON")
+    print(f"Wrote {len(gdf)} comparison rows → {config.CIVIC_INCOME_COMPARISON}")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ book:
     - 03-method.qmd
     - 04-worked-example.qmd
     - 05-results.qmd
+    - parcel-approach.qmd
     - 06-limitations.qmd
     - 07-apply-it.qmd
     - 08-code.qmd
