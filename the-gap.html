@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>7&nbsp; A Second Approach: Parcel-Based Redistribution – Creating Local-Level Geographic Datasets</title>
+<title>1&nbsp; The Sub-County Data Gap – Creating Local-Level Geographic Datasets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 /* CSS for citations */
 div.csl-bib-body { }
@@ -85,8 +50,8 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./06-limitations.html" rel="next">
-<link href="./05-results.html" rel="prev">
+<link href="./01-boundary-problem.html" rel="next">
+<link href="./index.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -140,7 +105,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./parcel-approach.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./the-gap.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Sub-County Data Gap</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -173,7 +138,7 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./the-gap.html" class="sidebar-item-text sidebar-link">
+  <a href="./the-gap.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Sub-County Data Gap</span></span></a>
   </div>
 </li>
@@ -209,7 +174,7 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./parcel-approach.html" class="sidebar-item-text sidebar-link active">
+  <a href="./parcel-approach.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></span></a>
   </div>
 </li>
@@ -247,10 +212,8 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-parcel-data" id="toc-the-parcel-data" class="nav-link active" data-scroll-target="#the-parcel-data"><span class="header-section-number">7.1</span> The parcel data</a></li>
-  <li><a href="#the-method-unit-weighted-redistribution" id="toc-the-method-unit-weighted-redistribution" class="nav-link" data-scroll-target="#the-method-unit-weighted-redistribution"><span class="header-section-number">7.2</span> The method: unit-weighted redistribution</a></li>
-  <li><a href="#results-a-close-agreement-with-the-area-weighted-estimates" id="toc-results-a-close-agreement-with-the-area-weighted-estimates" class="nav-link" data-scroll-target="#results-a-close-agreement-with-the-area-weighted-estimates"><span class="header-section-number">7.3</span> Results: a close agreement with the area-weighted estimates</a></li>
-  <li><a href="#leakage-and-the-case-for-parcel-weighting-on-count-measures" id="toc-leakage-and-the-case-for-parcel-weighting-on-count-measures" class="nav-link" data-scroll-target="#leakage-and-the-case-for-parcel-weighting-on-count-measures"><span class="header-section-number">7.4</span> Leakage and the case for parcel weighting on count measures</a></li>
+  <li><a href="#why-sub-county-data-is-scarce" id="toc-why-sub-county-data-is-scarce" class="nav-link active" data-scroll-target="#why-sub-county-data-is-scarce"><span class="header-section-number">1.1</span> Why sub-county data is scarce</a></li>
+  <li><a href="#what-this-guide-demonstrates" id="toc-what-this-guide-demonstrates" class="nav-link" data-scroll-target="#what-this-guide-demonstrates"><span class="header-section-number">1.2</span> What this guide demonstrates</a></li>
   </ul>
 </nav>
     </div>
@@ -259,7 +222,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-parcels" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></span></h1>
+<h1 class="title"><span id="sec-gap" class="quarto-section-identifier"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Sub-County Data Gap</span></span></h1>
 </div>
 
 
@@ -276,109 +239,56 @@ div.csl-indent {
 </header>
 
 
-<p>The area-weighted method introduced in <a href="03-method.html" class="quarto-xref"><span>Chapter 4</span></a> works well, but it rests on a simplifying assumption worth examining: that each variable of interest is distributed uniformly across a block group’s entire polygon. In practice, a block group’s polygon includes roads, parks, parking lots, commercial strips, and other land that contains no housing at all. For measures tied to where people actually live, this matters. Dasymetric methods replace the uniform-distribution assumption by using an ancillary layer (in this case, parcel locations) to concentrate redistributed values where housing actually sits <span class="citation" data-cites="ref139"><a href="references.html#ref-ref139" role="doc-biblioref">[1]</a></span>.</p>
-<p>This chapter implements that alternative and then asks directly: how much does the choice of method change the result?</p>
-<section id="the-parcel-data" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="the-parcel-data"><span class="header-section-number">7.1</span> The parcel data</h2>
-<p>Arlington County’s Master Housing Unit Database (MHUD) provides a parcel-level inventory of every residential unit in the county. The layer used here contains <strong>34,340 parcels</strong> carrying roughly <strong>127,000 housing units</strong> in total. The vast majority of those parcels (<strong>33,665</strong>) are single-family detached or attached (SFD/SFA) structures, typically carrying one or two units apiece. The remaining <strong>675</strong> parcels are classified as multifamily (MULTI), and they account for a disproportionate share of the county’s housing stock: the multifamily parcels are concentrated along the Rosslyn–Ballston corridor and the Route 1 spine, where high-rise and mid-rise buildings each contribute hundreds of units to the total.</p>
-<div id="fig-parcels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<div id="fig-gap" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-parcels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/map_parcels.png" class="img-fluid figure-img" style="width:90.0%">
+<div aria-describedby="fig-gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig_gap_reveal.png" class="img-fluid figure-img" style="width:100.0%">
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-parcels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.1: Arlington housing units by parcel. Point size is unit count; the few multifamily parcels carry most of the county’s housing units, concentrated in the Rosslyn–Ballston and Route 1 corridors.
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1.1: The same county at two resolutions. Reported as a single county-wide figure (left), Arlington’s broadband download speed is one number, about 250 Mbps. Estimated at the civic-association level (right), the same measure ranges from 101 to 344 Mbps across 62 neighborhoods. This guide builds that sub-county view from source data that was never collected at the neighborhood scale.
 </figcaption>
 </figure>
 </div>
-<p><a href="#fig-parcels" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> makes the spatial concentration vivid. A small number of large dots, each representing a multifamily building, account for a large fraction of the county’s residential footprint. The single-family parcels are numerous but individually small, spread across the county’s lower-density northern and western neighbourhoods. This heterogeneity is precisely what dasymetric redistribution is designed to exploit: instead of spreading a block group’s household counts uniformly across its entire polygon, we concentrate them where the housing units are.</p>
+<p>Local officials make decisions at the neighborhood level, but the data they rely on is usually reported at the county level. A county-wide broadband adoption rate, a county-wide income figure, a county-wide health outcome: these statistics obscure the variation that actually matters for policy. A neighborhood with near-universal high-speed service and an adjacent neighborhood with almost none look identical in a county aggregate. The officials who need to target investment, design interventions, or justify budget requests are working blind.</p>
+<p>The units that drive real decisions are not counties. They are neighborhood associations, service districts, planning corridors, school catchment zones, and utility territories. These are the geographies where residents organize, where services are delivered, and where disparities become visible. County-level data cannot answer the questions local officials are actually asking.</p>
+<section id="why-sub-county-data-is-scarce" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="why-sub-county-data-is-scarce"><span class="header-section-number">1.1</span> Why sub-county data is scarce</h2>
+<p>The scarcity of reliable sub-county data has three overlapping causes. First, small-area estimates carry large statistical uncertainty: when a sample is divided into dozens of small geographic units, the counts per unit shrink, and margins of error grow until estimates become unreliable <span class="citation" data-cites="ref1"><a href="references.html#ref-ref1" role="doc-biblioref">[1]</a></span>. Second, statistical agencies and data providers apply geographic suppression or aggregation to protect individual confidentiality; the smaller the area, the more likely a cell will be suppressed <span class="citation" data-cites="ref4"><a href="references.html#ref-ref4" role="doc-biblioref">[2]</a></span>. Third, there is no standardized collection infrastructure at the sub-county level. Unlike counties or census tracts, neighborhood and civic-association boundaries are locally defined, vary across jurisdictions, and change over time, so no national data program routinely publishes estimates for them <span class="citation" data-cites="ref32"><a href="references.html#ref-ref32" role="doc-biblioref">[3]</a></span>.</p>
+<p>The result is a persistent data gap between the geographic scale at which data is collected and reported and the geographic scale at which local government operates. Analysts working inside local government (and researchers trying to support them) must construct the sub-county datasets they need rather than retrieve them from a shelf <span class="citation" data-cites="ref45"><a href="references.html#ref-ref45" role="doc-biblioref">[4]</a></span>.</p>
 </section>
-<section id="the-method-unit-weighted-redistribution" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="the-method-unit-weighted-redistribution"><span class="header-section-number">7.2</span> The method: unit-weighted redistribution</h2>
-<p>The implementation follows a straightforward unit-weighting scheme. Each parcel is “exploded” into a number of identical point records equal to its <code>Total_Units</code> count: a 300-unit multifamily building contributes 300 identical centroid points, while a single-family parcel contributes one. That pool of unit points is then passed to <code>redistribute_parcels</code> from the <code>sdc-redistribute</code> package, which uses the point locations as the dasymetric control layer. The block-group aggregate income and household counts are redistributed to civic associations in proportion to the number of unit points that fall within each association, weighted by their source block-group membership.</p>
-<p><a href="#fig-disaggregation" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> shows the spatial logic. A source block group’s total is divided across the parcels inside it, and those parcels are then collected under whatever target boundary we care about, here a civic association that overlaps the block group only partially. Only the parcels falling inside the target contribute to its estimate.</p>
-<div id="fig-disaggregation" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-disaggregation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/fig_disaggregation.png" class="img-fluid figure-img" style="width:100.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disaggregation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.2: Parcel-based redistribution in three steps. A source area and its parcels (1); the source total disaggregated across those parcels (2); and the parcels reaggregated under a different target boundary, where only the parcels inside the target (highlighted) contribute to its estimate (3).
-</figcaption>
-</figure>
-</div>
-<div class="callout callout-style-default callout-note callout-titled" title="Python: parcel redistribution">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<section id="what-this-guide-demonstrates" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="what-this-guide-demonstrates"><span class="header-section-number">1.2</span> What this guide demonstrates</h2>
+<p>This guide works through a concrete example: estimating mean household income and fixed-broadband download speeds for each of Arlington County, Virginia’s <strong>62 civic associations</strong>, which together cover approximately <strong>109,528 households</strong>. The two source datasets (Ookla fixed-broadband speed-test tiles and American Community Survey block-group income and household counts) arrive on entirely different geographic footprints that match neither each other nor the civic-association boundaries. The guide shows, step by step, how to align those footprints through areal-weighted interpolation and produce estimates at the policy-relevant geography.</p>
+<p>The worked example is implemented in <strong>Python</strong>. An <strong>R</strong> implementation is forthcoming.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Who this guide is for">
+<div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Python: parcel redistribution
+Who this guide is for
 </div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdc_redistribute <span class="im">import</span> redistribute_parcels</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># explode each parcel into Total_Units identical points first, then:</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> redistribute_parcels(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    source_df<span class="op">=</span>counts_long, parcel_centroids<span class="op">=</span>unit_points,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    source_geo<span class="op">=</span><span class="st">"block_groups.geojson"</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    target_geos<span class="op">=</span>{<span class="st">"civic_association"</span>: <span class="st">"civic_assoc.geojson"</span>},</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    count_cols<span class="op">=</span>[<span class="st">"agg_income"</span>, <span class="st">"households"</span>], source_id<span class="op">=</span><span class="st">"geoid"</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Local government analysts</strong> will find a reproducible workflow they can adapt to their own jurisdiction, data sources, and policy geographies. The method generalizes beyond broadband and income to any pair of spatially misaligned datasets.</p>
+<p><strong>Decision-makers and program managers</strong> can read the prose and figures without engaging the code. The key takeaways are in the chapter narratives and maps. The technical sections are clearly marked.</p>
+<p>Some background in geographic data is helpful but not required. The guide explains each concept as it arises.</p>
 </div>
 </div>
-</div>
-<p>The logic is the same as the area-weighted approach (redistribute extensive counts, derive intensive rates afterward), with one structural difference: the implicit population surface has changed from a uniform density within each block group to a density proportional to the spatial distribution of housing units within that block group.</p>
-</section>
-<section id="results-a-close-agreement-with-the-area-weighted-estimates" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="results-a-close-agreement-with-the-area-weighted-estimates"><span class="header-section-number">7.3</span> Results: a close agreement with the area-weighted estimates</h2>
-<div id="fig-income-parcels" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-income-parcels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/map_income_parcels.png" class="img-fluid figure-img" style="width:85.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-income-parcels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.3: Mean household income by civic association, parcel-based redistribution.
-</figcaption>
-</figure>
-</div>
-<div id="fig-income-diff" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-income-diff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/map_income_diff.png" class="img-fluid figure-img" style="width:85.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-income-diff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.4: Difference in mean household income: parcel minus area-weighted (dollars).
-</figcaption>
-</figure>
-</div>
-<p><a href="#fig-income-parcels" class="quarto-xref">Figure&nbsp;<span>7.3</span></a> and <a href="#fig-income-diff" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> tell a consistent story. The parcel map looks nearly identical to its area-weighted counterpart, and the difference map is dominated by values close to zero.</p>
-<div id="fig-area-parcel" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-area-parcel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="figures/scatter_area_vs_parcel.png" class="img-fluid figure-img" style="width:85.0%">
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-area-parcel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.5: Area-weighted vs.&nbsp;parcel-weighted mean income across the 62 civic associations.
-</figcaption>
-</figure>
-</div>
-<p>The scatter plot in <a href="#fig-area-parcel" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> makes the relationship explicit: the two methods produce a Pearson r = 1.00 across the 62 associations. The largest per-association shift in either direction is approximately ±$22,000, a few percent on six-figure incomes. The three biggest gainers under parcel weighting are <strong>Arlington Forest (+$22,306)</strong>, <strong>Cherrydale (+$15,347)</strong>, and <strong>Foxcroft Heights (+$13,047)</strong>. The three biggest losers are <strong>Lyon Park (−$6,118)</strong>, <strong>John M Langston (−$4,960)</strong>, and <strong>Douglas Park (−$3,781)</strong>.</p>
-<p>Why do the methods agree so closely? Mean household income is a smooth, intensive measure: it describes a characteristic of households, not a count of things that accumulate over area. When a block group’s income is fairly evenly distributed among its housing stock, as it generally is in Arlington at the block-group scale, then <em>where</em> within the block group the housing sits barely changes the weighted average that reaches each civic association. Parcel placement shifts modest fractions of the income count from one association to an adjacent one, but because the income levels on both sides of any given boundary are similar, the effect on the mean nearly cancels. The ±$22,000 maximum shift represents the cases where a multifamily building with an unusually different household composition sits near a boundary: a real effect, but a small one relative to the income range in the data.</p>
-</section>
-<section id="leakage-and-the-case-for-parcel-weighting-on-count-measures" class="level2" data-number="7.4">
-<h2 data-number="7.4" class="anchored" data-anchor-id="leakage-and-the-case-for-parcel-weighting-on-count-measures"><span class="header-section-number">7.4</span> Leakage and the case for parcel weighting on count measures</h2>
-<p>One honest limitation deserves direct statement. Approximately <strong>3,032 households</strong> (about <strong>2.8%</strong> of the county total) sit in parcels whose centroids fall outside any civic association boundary. These households contribute to the block-group totals but are not allocated to any association under the parcel method. The parcel approach therefore slightly underestimates total households compared with the area-weighted method, which allocates every square metre of a block group to some association. Analysts using this method for official estimates should be aware of this leakage and decide whether to redistribute orphaned parcels to the nearest association or treat them as a separate “unassigned” category.</p>
-<p>For mean income, which is what this guide measures, the 2.8% household leakage has a negligible effect on the ratio. For <strong>count measures</strong> (total population, total housing units), the answer is different. Dasymetric and parcel-based redistribution earn their keep precisely when the placement of housing within a block group drives the allocation of counts across target boundaries. If you want to know how many housing units fall within a specific civic association’s polygon, point-in-polygon counting on the parcel layer is more accurate than area weighting; the difference can be substantial in associations with compact boundaries or with multifamily buildings near their edges.</p>
-<p>The natural next step in this direction is <strong>household-size weighting</strong>: single-family and multifamily units have systematically different average household sizes, and a redistribution that treats all units as interchangeable conflates these. The <code>sdc-redistribute</code> package’s <code>redistribute_parcel_pums_adj</code> function implements this extension by drawing on Public Use Microdata Sample (PUMS) household-size distributions, stratified by unit type, to weight single-family parcels differently from multifamily ones. Applying that method to Arlington’s MHUD data, and assessing whether the household-size correction changes the civic-association estimates meaningfully, is a planned extension of this work.</p>
-<p>For the income analysis in this guide, the two methods are interchangeable in practice. The parcel approach is presented here to establish the infrastructure and to make a broader point: method choice matters most when the variable in question is a count and when housing is unevenly distributed within source units. When the variable is a smooth intensive measure like mean income, and when the redistribution is operating at the block-group-to-neighbourhood scale, area weighting and parcel weighting converge.</p>
 
 
 <div id="refs" class="references csl-bib-body" data-entry-spacing="0" role="list" style="display: none">
-<div id="ref-ref139" class="csl-entry" role="listitem">
-<div class="csl-left-margin">[1] </div><div class="csl-right-inline"><span>“Spatial interpolation using areal features: A review of methods and ...”</span> Accessed: Jun. 04, 2026. [Online]. Available: <a href="https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465">https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465</a></div>
+<div id="ref-ref1" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline"><span>“Stacks.cdc.gov.”</span> Accessed: Jun. 04, 2026. [Online]. Available: <a href="https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf">https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf</a></div>
+</div>
+<div id="ref-ref4" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline"><span>“Github.com.”</span> Accessed: Jun. 04, 2026. [Online]. Available: <a href="https://github.com/CDCgov/EPHTracking-Subcounty">https://github.com/CDCgov/EPHTracking-Subcounty</a></div>
+</div>
+<div id="ref-ref32" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline"><span>“results4america.org.”</span> Accessed: Jun. 04, 2026. [Online]. Available: <a href="https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf">https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf</a></div>
+</div>
+<div id="ref-ref45" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline"><span>“Iecam.illinois.edu.”</span> Accessed: Jun. 04, 2026. [Online]. Available: <a href="https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations">https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations</a></div>
 </div>
 </div>
 </section>
@@ -803,13 +713,13 @@ window.addEventListener("DOMContentLoaded", function () {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./05-results.html" class="pagination-link" aria-label="Results &amp; Interpretation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Results &amp; Interpretation</span></span>
+      <a href="./index.html" class="pagination-link" aria-label="Creating Local-Level Geographic Datasets">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Creating Local-Level Geographic Datasets</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./06-limitations.html" class="pagination-link" aria-label="Limitations &amp; Uncertainty">
-        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./01-boundary-problem.html" class="pagination-link" aria-label="The Problem of Misaligned Boundaries">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">The Problem of Misaligned Boundaries</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

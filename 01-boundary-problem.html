@@ -51,7 +51,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./02-the-data.html" rel="next">
-<link href="./index.html" rel="prev">
+<link href="./the-gap.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -61,7 +61,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-69201317a74ee3f5d518f2f8cad4f100.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f9e2c94537f8b283317da2547a3f872f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-eb6178cd9cdcda02b593b6bbf0a9cf85.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -133,6 +133,12 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Creating Local-Level Geographic Datasets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./the-gap.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Sub-County Data Gap</span></span></a>
   </div>
 </li>
@@ -286,6 +292,10 @@ Figure&nbsp;2.2: Transforming misaligned source data (Ookla tiles, ACS block gro
 // Place the project sponsorship logo at the bottom of the left sidebar,
 // below the table of contents. Injected into every book page.
 window.addEventListener("DOMContentLoaded", function () {
+  // The cover page features the sponsor in its own footer; skip the sidebar
+  // copy there to avoid showing the logo twice.
+  var path = window.location.pathname;
+  if (path === "/" || /\/index\.html$/.test(path)) return;
   var sidebar = document.querySelector("#quarto-sidebar");
   if (!sidebar || document.querySelector(".sidebar-sponsor")) return;
   var wrap = document.createElement("div");
@@ -697,7 +707,7 @@ window.addEventListener("DOMContentLoaded", function () {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./index.html" class="pagination-link" aria-label="The Sub-County Data Gap">
+      <a href="./the-gap.html" class="pagination-link" aria-label="The Sub-County Data Gap">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">The Sub-County Data Gap</span></span>
       </a>          
   </div>
