@@ -54,3 +54,12 @@ cd guide && quarto render          # PDF (primary) + HTML site -> guide/_output/
 ```
 
 Figures come from `pipeline.build_figures`; the data from `pipeline.run`.
+
+The final chapter is the full pipeline source, generated from `pipeline/*.py`.
+Regenerate it after changing pipeline code:
+
+```bash
+uv run python scripts/build_code_appendix.py   # rewrites guide/08-code.qmd
+```
+
+Published site: <https://dads2busy.github.io/local-level-data-guide/>
