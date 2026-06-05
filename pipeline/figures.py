@@ -311,7 +311,78 @@ def fig_disaggregation() -> Path:
     return _save(fig, "fig_disaggregation.png")
 
 
+def fig_gap_reveal() -> Path:
+    """Index hero: one county-wide number vs the 62-neighborhood reality.
+
+    The left panel fills all of Arlington with a single household-weighted
+    county mean; the right panel colors each civic association on the identical
+    scale. A shared colorbar (with the county value marked) makes the left read
+    as a single point on a range the right panel spans. Broadband download
+    speed, the example the landing page itself opens with.
+    """
+    civ = maps.to_plot_crs(_combined())
+    col = "download_mbps"
+    vmin, vmax = float(civ[col].min()), float(civ[col].max())
+    county_val = float((civ[col] * civ["households"]).sum() / civ["households"].sum())
+    cmap = plt.get_cmap(style.SEQUENTIAL)
+    norm = plt.Normalize(vmin, vmax)
+    ink, gray = style.PALETTE["ink"], style.PALETTE["gray"]
+    box = dict(boxstyle="round,pad=0.4", fc="white", ec="none", alpha=0.9)
+
+    fig, axes = plt.subplots(
+        1, 3, figsize=(13.5, 6.0), gridspec_kw={"width_ratios": [1, 0.22, 1]}
+    )
+    left, mid, right = axes
+
+    from shapely.geometry import MultiPolygon, Polygon
+
+    def _solid(geom):
+        """Drop interior holes so the county reads as one solid silhouette."""
+        if geom.geom_type == "Polygon":
+            return Polygon(geom.exterior)
+        return MultiPolygon([Polygon(p.exterior) for p in geom.geoms])
+
+    county = civ.dissolve()
+    county["geometry"] = county.geometry.apply(_solid)
+    county.plot(ax=left, color=cmap(norm(county_val)), edgecolor=ink, linewidth=1.4)
+    pt = county.geometry.iloc[0].representative_point()
+    left.annotate(
+        f"{county_val:.0f} Mbps\ncounty-wide average", xy=(pt.x, pt.y),
+        ha="center", va="center", color=ink, fontsize=15, fontweight="bold", bbox=box,
+    )
+    left.set_title("What county data shows")
+    left.text(0.5, -0.01, "one value for the whole county", transform=left.transAxes,
+              ha="center", va="top", color=gray, fontsize=10)
+
+    civ.plot(ax=right, column=col, cmap=cmap, norm=norm, edgecolor="white", linewidth=0.4)
+    right.set_title("What's actually there")
+    right.text(0.5, -0.01, f"{vmin:.0f} to {vmax:.0f} Mbps across 62 civic associations",
+               transform=right.transAxes, ha="center", va="top", color=gray, fontsize=10)
+
+    mid.set_xlim(0, 1)
+    mid.set_ylim(0, 1)
+    mid.annotate("", xy=(0.96, 0.52), xytext=(0.04, 0.52),
+                 arrowprops=dict(arrowstyle="-|>", color=ink, lw=2.5))
+
+    for ax in (left, right, mid):
+        ax.set_axis_off()
+
+    sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
+    cbar = fig.colorbar(sm, ax=axes, orientation="horizontal",
+                        fraction=0.05, pad=0.07, shrink=0.55)
+    cbar.set_label("Broadband download speed (Mbps)")
+    cbar.ax.axvline(county_val, color=ink, lw=2.5)
+    cbar.ax.annotate("county avg", xy=(county_val, 1), xytext=(county_val, 2.2),
+                     textcoords=("data", "axes fraction"), ha="center", va="bottom",
+                     color=ink, fontsize=8, fontweight="bold")
+
+    fig.suptitle("One county-wide number hides 62 different neighborhoods",
+                 fontsize=15, fontweight="bold", color=ink)
+    return _save(fig, "fig_gap_reveal.png")
+
+
 ALL_FIGURES = [
+    fig_gap_reveal,
     fig_maup,
     fig_transformation_3panel,
     fig_locator,

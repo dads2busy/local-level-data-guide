@@ -1,5 +1,7 @@
 # The Sub-County Data Gap {#sec-gap}
 
+![The same county at two resolutions. Reported as a single county-wide figure (left), Arlington's broadband download speed is one number, about 250 Mbps. Estimated at the civic-association level (right), the same measure ranges from 101 to 344 Mbps across 62 neighborhoods. This guide builds that sub-county view from source data that was never collected at the neighborhood scale.](figures/fig_gap_reveal.png){#fig-gap width=100%}
+
 Local officials make decisions at the neighborhood level, but the data they rely on is usually reported at the county level. A county-wide broadband adoption rate, a county-wide income figure, a county-wide health outcome: these statistics obscure the variation that actually matters for policy. A neighborhood with near-universal high-speed service and an adjacent neighborhood with almost none look identical in a county aggregate. The officials who need to target investment, design interventions, or justify budget requests are working blind.
 
 The units that drive real decisions are not counties. They are neighborhood associations, service districts, planning corridors, school catchment zones, and utility territories. These are the geographies where residents organize, where services are delivered, and where disparities become visible. County-level data cannot answer the questions local officials are actually asking.
