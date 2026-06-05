@@ -99,6 +99,42 @@ def locator_map(
     return fig
 
 
+def points_map(
+    gdf: gpd.GeoDataFrame,
+    *,
+    size_col: str,
+    cat_col: str,
+    title: str,
+    ax=None,
+):
+    """Return a Figure of points sized by ``size_col`` and coloured by ``cat_col``."""
+    g = to_plot_crs(gdf)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(7, 8))
+    else:
+        fig = ax.figure
+    cats = list(g[cat_col].unique())
+    colors = {cats[0]: style.PALETTE["blue"]}
+    for c in cats[1:]:
+        colors[c] = style.PALETTE["amber"]
+    # draw the smaller-count category last so it sits on top
+    order = sorted(cats, key=lambda c: -(g[cat_col] == c).sum())
+    for c in order:
+        sub = g[g[cat_col] == c]
+        ax.scatter(
+            sub.geometry.x, sub.geometry.y,
+            s=2 + (sub[size_col].clip(lower=1) ** 0.5),
+            c=colors[c], label=str(c), alpha=0.5, edgecolor="none",
+        )
+    ax.set_aspect("equal")
+    ax.set_title(title)
+    ax.set_axis_off()
+    ax.legend(loc="lower right", frameon=True, markerscale=2)
+    style.add_north_arrow(ax)
+    style.add_scale_bar(ax)
+    return fig
+
+
 def scatter(
     df,
     x: str,

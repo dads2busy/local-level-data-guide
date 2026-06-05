@@ -126,6 +126,52 @@ def fig_transformation_3panel() -> Path:
     return _save(fig, "fig_transformation_3panel.png")
 
 
+def fig_parcels() -> Path:
+    parcels = gpd.read_file(config.PARCELS)
+    parcels["category"] = parcels["Unit_Type"].where(
+        parcels["Unit_Type"] == "MULTI", "Single-family"
+    ).replace({"MULTI": "Multifamily"})
+    fig = maps.points_map(
+        parcels, size_col="Total_Units", cat_col="category",
+        title="Arlington Housing Units by Parcel (size = units)",
+    )
+    return _save(fig, "map_parcels.png")
+
+
+def fig_income_parcels() -> Path:
+    cmp = gpd.read_file(config.CIVIC_INCOME_COMPARISON)
+    fig = maps.choropleth(
+        cmp, "mean_income_parcel",
+        title="Mean Household Income — Parcel Method",
+        legend_label="Mean income ($)", fmt="${:,.0f}",
+    )
+    return _save(fig, "map_income_parcels.png")
+
+
+def fig_income_diff() -> Path:
+    cmp = gpd.read_file(config.CIVIC_INCOME_COMPARISON)
+    fig = maps.choropleth(
+        cmp, "diff",
+        title="Income Difference: Parcel − Area Method",
+        legend_label="$ difference", cmap=style.DIVERGING, fmt="${:,.0f}",
+    )
+    return _save(fig, "map_income_diff.png")
+
+
+def fig_scatter_area_vs_parcel() -> Path:
+    cmp = gpd.read_file(config.CIVIC_INCOME_COMPARISON)
+    fig = maps.scatter(
+        cmp, "mean_income_area", "mean_income_parcel",
+        title="Area vs. Parcel Mean Income",
+        xlabel="Area-weighted ($)", ylabel="Parcel-weighted ($)",
+    )
+    ax = fig.axes[0]
+    lo = float(min(cmp["mean_income_area"].min(), cmp["mean_income_parcel"].min()))
+    hi = float(max(cmp["mean_income_area"].max(), cmp["mean_income_parcel"].max()))
+    ax.plot([lo, hi], [lo, hi], color=style.PALETTE["gray"], ls="--", lw=1)
+    return _save(fig, "scatter_area_vs_parcel.png")
+
+
 ALL_FIGURES = [
     fig_transformation_3panel,
     fig_locator,
@@ -135,6 +181,10 @@ ALL_FIGURES = [
     fig_ratio,
     fig_bivariate,
     fig_scatter,
+    fig_parcels,
+    fig_income_parcels,
+    fig_income_diff,
+    fig_scatter_area_vs_parcel,
 ]
 
 
