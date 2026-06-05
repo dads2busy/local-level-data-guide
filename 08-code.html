@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-69201317a74ee3f5d518f2f8cad4f100.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-73fcd8b1684cb1f782485aab5eaac3d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d073e9d7283f811bfad35ee8430eb48e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -947,6 +947,17 @@ window.addEventListener("DOMContentLoaded", function () {
     author.className = "sidebar-author";
     author.textContent = "Aaron Schroeder";
     title.insertAdjacentElement("afterend", author);
+  }
+
+  // Navy continuity bar across the top of every page except the cover, which
+  // already opens with the full navy banner. Sits in normal flow so it
+  // scrolls away with the page.
+  var path = window.location.pathname;
+  var isCover = path === "/" || /\/index\.html$/.test(path);
+  if (!isCover && !document.querySelector(".top-bar")) {
+    var bar = document.createElement("div");
+    bar.className = "top-bar";
+    document.body.insertAdjacentElement("afterbegin", bar);
   }
 });
 </script>
