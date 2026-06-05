@@ -235,6 +235,17 @@ div.csl-indent {
 <h2 data-number="2.1" class="anchored" data-anchor-id="the-modifiable-areal-unit-problem"><span class="header-section-number">2.1</span> The Modifiable Areal Unit Problem</h2>
 <p>This mismatch has a formal name in spatial statistics: the <strong>Modifiable Areal Unit Problem</strong>, or MAUP <span class="citation" data-cites="ref50"><a href="references.html#ref-ref50" role="doc-biblioref">[1]</a></span>. The MAUP has two related components. The <em>scale effect</em> describes how statistical summaries (means, correlations, rates) change when the same underlying data is aggregated to larger or smaller units. The <em>zonation effect</em> describes how the same summary statistics change when you redraw boundaries at the same scale but in a different configuration. Neither effect is a modeling error; both are inherent properties of spatially aggregated data.</p>
 <p>The practical consequence for local policy work is significant: the relationship you observe between two variables can change substantially depending solely on the geographic units you use to measure it <span class="citation" data-cites="ref79"><a href="references.html#ref-ref79" role="doc-biblioref">[2]</a></span>. A correlation between income and broadband access that appears strong at the block-group level may weaken, strengthen, or reverse at the civic-association level, not because the underlying relationship changed, but because the boundary choice changed. Analysts who do not account for this can draw conclusions that are artifacts of the data’s packaging rather than reflections of reality.</p>
+<p>To see why, consider a single variable measured across one small area and summarised under two district schemes (<a href="#fig-maup" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>). The underlying values are identical in both cases; only the boundaries differ. One scheme cuts across the gradient and reports a nearly uniform figure of about 220 Mbps in every district, erasing the variation entirely. The other aligns with the gradient and reports districts ranging from 138 to 302 Mbps. Same data, opposite conclusions, with nothing changed but where the lines were drawn.</p>
+<div id="fig-maup" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-maup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig_maup.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-maup-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: The Modifiable Areal Unit Problem in miniature. A single east-to-west speed gradient (left) is summarised under two district schemes covering the identical area. Boundaries A (centre) cut across the gradient, so every district averages about 220 Mbps and the variation disappears. Boundaries B (right) align with the gradient, so district averages range from 138 to 302 Mbps. The choice of geography is an analytical decision, not a clerical one.
+</figcaption>
+</figure>
+</div>
 </section>
 <section id="three-misaligned-geographies" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="three-misaligned-geographies"><span class="header-section-number">2.2</span> Three misaligned geographies</h2>
@@ -249,11 +260,11 @@ div.csl-indent {
 <img src="figures/fig_transformation_3panel.png" class="img-fluid figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-transform-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2.1: Transforming misaligned source data (Ookla tiles, ACS block groups) onto the policy-relevant civic-association geography.
+Figure&nbsp;2.2: Transforming misaligned source data (Ookla tiles, ACS block groups) onto the policy-relevant civic-association geography.
 </figcaption>
 </figure>
 </div>
-<p>As <a href="#fig-transform" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> shows, a single civic association may overlap dozens of Ookla tiles and several block groups simultaneously. No one-to-one correspondence exists between any pair of these three geographies. The method described in subsequent chapters, areal-weighted interpolation, handles this overlap systematically by distributing each source observation across target units in proportion to the share of its area that falls within each target unit.</p>
+<p>As <a href="#fig-transform" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> shows, a single civic association may overlap dozens of Ookla tiles and several block groups simultaneously. No one-to-one correspondence exists between any pair of these three geographies. The method described in subsequent chapters, areal-weighted interpolation, handles this overlap systematically by distributing each source observation across target units in proportion to the share of its area that falls within each target unit.</p>
 <p>The key assumption underlying this approach is that the quantity of interest is distributed uniformly within each source unit. That assumption is never perfectly true, but it is a principled and auditable starting point, and far preferable to ignoring the boundary problem altogether.</p>
 
 
