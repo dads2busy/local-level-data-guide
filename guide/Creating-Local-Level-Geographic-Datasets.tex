@@ -346,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, rightrule=.15mm, left=2mm, leftrule=.75mm, opacitybacktitle=0.6, breakable, colback=white, bottomtitle=1mm, toptitle=1mm, arc=.35mm, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, titlerule=0mm, colbacktitle=quarto-callout-note-color!10!white, opacityback=0, bottomrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -694,7 +694,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, rightrule=.15mm, left=2mm, leftrule=.75mm, opacitybacktitle=0.6, breakable, colback=white, bottomtitle=1mm, toptitle=1mm, arc=.35mm, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, titlerule=0mm, colbacktitle=quarto-callout-note-color!10!white, opacityback=0, bottomrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -856,7 +856,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, coltitle=black, rightrule=.15mm, left=2mm, leftrule=.75mm, opacitybacktitle=0.6, breakable, colback=white, bottomtitle=1mm, toptitle=1mm, arc=.35mm, toprule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, titlerule=0mm, colbacktitle=quarto-callout-note-color!10!white, opacityback=0, bottomrule=.15mm]
+\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1384,6 +1384,559 @@ Analysts working with other speed-test or coverage datasets will need to
 identify the analogous extensive quantity --- typically a count that,
 when summed and divided into a product column, recovers the intensive
 rate of interest --- and follow the same pattern.
+
+\bookmarksetup{startatroot}
+
+\chapter{The Complete Pipeline Code}\label{sec-code}
+
+This appendix reproduces the full, runnable Python pipeline behind the
+worked example --- the actual source, not a simplified sketch. It is
+generated directly from the \texttt{pipeline/} package in the companion
+repository, so it always matches the code that produced every figure and
+number in this guide.
+
+The pipeline is built on the
+\href{https://pypi.org/project/sdc-redistribute/}{\texttt{sdc-redistribute}}
+package and runs end to end with a single command:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ExtensionTok{uv}\NormalTok{ run python }\AttributeTok{{-}m}\NormalTok{ pipeline.run}
+\end{Highlighting}
+\end{Shaded}
+
+The modules below appear in execution order. Figure generation
+(\texttt{pipeline/style.py}, \texttt{pipeline/maps.py},
+\texttt{pipeline/figures.py}) lives in the same repository and is
+omitted here to keep the focus on the data method.
+
+\section{Configuration}\label{configuration}
+
+Central settings --- the Arlington FIPS codes, the ACS count variables
+(aggregate income and households), and the dataset paths every other
+module reads.
+
+\textbf{\texttt{pipeline/config.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Central configuration: geographies, CRS, source identifiers, paths."""}
+\ImportTok{from}\NormalTok{ pathlib }\ImportTok{import}\NormalTok{ Path}
+
+\ImportTok{from}\NormalTok{ dotenv }\ImportTok{import}\NormalTok{ load\_dotenv}
+
+\CommentTok{\# Load secrets (e.g. CENSUS\_API\_KEY) from a local .env if present. The file is}
+\CommentTok{\# gitignored; loading it here makes the key available to any pipeline module.}
+\NormalTok{load\_dotenv()}
+
+\CommentTok{\# Arlington County, Virginia}
+\NormalTok{STATE\_FIPS }\OperatorTok{=} \StringTok{"51"}
+\NormalTok{COUNTY\_FIPS }\OperatorTok{=} \StringTok{"013"}
+\NormalTok{ACS\_YEAR }\OperatorTok{=} \DecValTok{2021}          \CommentTok{\# 5{-}year ACS vintage used throughout}
+\NormalTok{OOKLA\_YEAR }\OperatorTok{=} \DecValTok{2023}
+\NormalTok{OOKLA\_QUARTER }\OperatorTok{=} \DecValTok{2}
+
+\CommentTok{\# Area weighting is handled inside sdc{-}redistribute, which reprojects geographic}
+\CommentTok{\# inputs to EPSG:3857 before computing intersection areas. At county scale the}
+\CommentTok{\# choice of projected CRS is immaterial (\textless{}0.3\% area{-}ratio spread vs State Plane),}
+\CommentTok{\# so the pipeline does not impose its own projected CRS.}
+
+\CommentTok{\# ACS variables are EXTENSIVE COUNTS (never redistribute the median directly).}
+\CommentTok{\# Mean household income is derived later as agg\_income / households.}
+\NormalTok{ACS\_VARS }\OperatorTok{=}\NormalTok{ \{}
+    \StringTok{"agg\_income"}\NormalTok{: }\StringTok{"B19025\_001"}\NormalTok{,   }\CommentTok{\# Aggregate household income (dollars)}
+    \StringTok{"households"}\NormalTok{: }\StringTok{"B11001\_001"}\NormalTok{,   }\CommentTok{\# Total households (count)}
+\NormalTok{\}}
+
+\CommentTok{\# Ookla open data S3 parquet path template}
+\NormalTok{OOKLA\_S3 }\OperatorTok{=}\NormalTok{ (}
+    \StringTok{"s3://ookla{-}open{-}data/parquet/performance/type=fixed/"}
+    \StringTok{"year=}\SpecialCharTok{\{year\}}\StringTok{/quarter=}\SpecialCharTok{\{quarter\}}\StringTok{/"}
+    \StringTok{"}\SpecialCharTok{\{year\}}\StringTok{{-}}\SpecialCharTok{\{month:02d\}}\StringTok{{-}01\_performance\_fixed\_tiles.parquet"}
+\NormalTok{)}
+
+\CommentTok{\# Paths}
+\NormalTok{ROOT }\OperatorTok{=}\NormalTok{ Path(}\VariableTok{\_\_file\_\_}\NormalTok{).resolve().parent.parent}
+\NormalTok{DATA }\OperatorTok{=}\NormalTok{ ROOT }\OperatorTok{/} \StringTok{"data"}
+
+\CommentTok{\# Source / output dataset paths}
+\NormalTok{CIVIC\_ASSOC }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"va013\_geo\_arl\_2021\_civic\_associations.geojson"}
+\NormalTok{BLOCK\_GROUPS }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"va013\_block\_groups.geojson"}          \CommentTok{\# produced by acquire\_geographies}
+\NormalTok{BLOCKS }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"va013\_geo\_blocks.geojson"}                  \CommentTok{\# existing}
+\NormalTok{ACS\_COUNTS }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"va013\_acs\_income\_counts.geojson"}       \CommentTok{\# produced by acquire\_acs}
+\NormalTok{OOKLA\_TILES }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"ookla\_tiles\_arlington.geojson"}        \CommentTok{\# existing/refreshable}
+\NormalTok{CIVIC\_INCOME }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_income.csv"}                    \CommentTok{\# produced by redistribute\_income}
+\NormalTok{CIVIC\_BROADBAND }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_broadband.csv"}             \CommentTok{\# produced by redistribute\_broadband}
+\NormalTok{CIVIC\_COMBINED }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_combined.geojson"}           \CommentTok{\# produced by combine}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Acquire census geographies}\label{acquire-census-geographies}
+
+Download Arlington's census block groups --- the source geography for
+the income redistribution.
+
+\textbf{\texttt{pipeline/acquire\_geographies.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Acquire Arlington census block{-}group geometries via pygris."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{from}\NormalTok{ pygris }\ImportTok{import}\NormalTok{ block\_groups}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+
+\KeywordTok{def}\NormalTok{ fetch\_block\_groups() }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame:}
+    \CommentTok{"""Download Arlington County (VA/013) block groups for the ACS vintage."""}
+\NormalTok{    bg }\OperatorTok{=}\NormalTok{ block\_groups(}
+\NormalTok{        state}\OperatorTok{=}\NormalTok{config.STATE\_FIPS,}
+\NormalTok{        county}\OperatorTok{=}\NormalTok{config.COUNTY\_FIPS,}
+\NormalTok{        year}\OperatorTok{=}\NormalTok{config.ACS\_YEAR,}
+\NormalTok{        cb}\OperatorTok{=}\VariableTok{True}\NormalTok{,}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ bg}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    bg }\OperatorTok{=}\NormalTok{ fetch\_block\_groups()}
+\NormalTok{    bg.to\_file(config.BLOCK\_GROUPS, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(bg)}\SpecialCharTok{\}}\SpecialStringTok{ block groups → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{BLOCK\_GROUPS}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Acquire ACS income counts}\label{acquire-acs-income-counts}
+
+Pull aggregate household income and household counts from the Census
+API. These are \emph{counts} (extensive measures); mean income is
+derived later.
+
+\textbf{\texttt{pipeline/acquire\_acs.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Acquire Arlington ACS aggregate income + household counts (block group)."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ os}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ census }\ImportTok{import}\NormalTok{ Census}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+\ImportTok{from}\NormalTok{ pipeline.acquire\_geographies }\ImportTok{import}\NormalTok{ fetch\_block\_groups}
+
+
+\KeywordTok{def}\NormalTok{ \_sanitize\_counts(df: pd.DataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Replace Census negative sentinels (e.g. {-}666666666) with 0.}
+
+\CommentTok{    Aggregate income and household counts are non{-}negative by definition; the}
+\CommentTok{    Census API returns large negative sentinel codes for suppressed or}
+\CommentTok{    not{-}applicable cells (typically zero{-}household block groups). Left in place,}
+\CommentTok{    these sentinels would propagate through area{-}weighted redistribution and}
+\CommentTok{    produce negative incomes. Treating them as 0 is correct for the}
+\CommentTok{    zero{-}household areas they mark.}
+\CommentTok{    """}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ df.copy()}
+    \ControlFlowTok{for}\NormalTok{ col }\KeywordTok{in}\NormalTok{ (}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{):}
+\NormalTok{        out[col] }\OperatorTok{=}\NormalTok{ out[col].mask(out[col] }\OperatorTok{\textless{}} \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ out}
+
+
+\KeywordTok{def}\NormalTok{ fetch\_acs\_counts(api\_key: }\BuiltInTok{str} \OperatorTok{|} \VariableTok{None} \OperatorTok{=} \VariableTok{None}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Return a DataFrame: GEOID, agg\_income, households for Arlington block groups."""}
+\NormalTok{    key }\OperatorTok{=}\NormalTok{ api\_key }\KeywordTok{or}\NormalTok{ os.environ.get(}\StringTok{"CENSUS\_API\_KEY"}\NormalTok{)}
+\NormalTok{    c }\OperatorTok{=}\NormalTok{ Census(key, year}\OperatorTok{=}\NormalTok{config.ACS\_YEAR)}
+    \CommentTok{\# The census library needs the API estimate suffix "E" on each variable}
+    \CommentTok{\# (e.g. B19025\_001E), unlike tidycensus which strips it.}
+\NormalTok{    agg\_var }\OperatorTok{=}\NormalTok{ config.ACS\_VARS[}\StringTok{"agg\_income"}\NormalTok{] }\OperatorTok{+} \StringTok{"E"}
+\NormalTok{    hh\_var }\OperatorTok{=}\NormalTok{ config.ACS\_VARS[}\StringTok{"households"}\NormalTok{] }\OperatorTok{+} \StringTok{"E"}
+\NormalTok{    rows }\OperatorTok{=}\NormalTok{ c.acs5.state\_county\_blockgroup(}
+\NormalTok{        fields}\OperatorTok{=}\NormalTok{(}\StringTok{"NAME"}\NormalTok{, agg\_var, hh\_var),}
+\NormalTok{        state\_fips}\OperatorTok{=}\NormalTok{config.STATE\_FIPS,}
+\NormalTok{        county\_fips}\OperatorTok{=}\NormalTok{config.COUNTY\_FIPS,}
+\NormalTok{        blockgroup}\OperatorTok{=}\NormalTok{Census.ALL,}
+\NormalTok{        tract}\OperatorTok{=}\NormalTok{Census.ALL,}
+\NormalTok{    )}
+\NormalTok{    df }\OperatorTok{=}\NormalTok{ pd.DataFrame(rows)}
+\NormalTok{    df[}\StringTok{"GEOID"}\NormalTok{] }\OperatorTok{=}\NormalTok{ df[}\StringTok{"state"}\NormalTok{] }\OperatorTok{+}\NormalTok{ df[}\StringTok{"county"}\NormalTok{] }\OperatorTok{+}\NormalTok{ df[}\StringTok{"tract"}\NormalTok{] }\OperatorTok{+}\NormalTok{ df[}\StringTok{"block group"}\NormalTok{]}
+\NormalTok{    df }\OperatorTok{=}\NormalTok{ df.rename(columns}\OperatorTok{=}\NormalTok{\{agg\_var: }\StringTok{"agg\_income"}\NormalTok{, hh\_var: }\StringTok{"households"}\NormalTok{\})}
+\NormalTok{    df }\OperatorTok{=}\NormalTok{ \_sanitize\_counts(df)}
+    \ControlFlowTok{return}\NormalTok{ df[[}\StringTok{"GEOID"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{]]}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    counts }\OperatorTok{=}\NormalTok{ fetch\_acs\_counts()}
+\NormalTok{    bg }\OperatorTok{=}\NormalTok{ fetch\_block\_groups()[[}\StringTok{"GEOID"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]]}
+\NormalTok{    merged }\OperatorTok{=}\NormalTok{ bg.merge(counts, on}\OperatorTok{=}\StringTok{"GEOID"}\NormalTok{, how}\OperatorTok{=}\StringTok{"left"}\NormalTok{)}
+\NormalTok{    gdf }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(merged, geometry}\OperatorTok{=}\StringTok{"geometry"}\NormalTok{, crs}\OperatorTok{=}\NormalTok{bg.crs)}
+\NormalTok{    gdf.to\_file(config.ACS\_COUNTS, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(gdf)}\SpecialCharTok{\}}\SpecialStringTok{ block groups with income counts → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{ACS\_COUNTS}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Acquire Ookla broadband
+tiles}\label{acquire-ookla-broadband-tiles}
+
+Read the Ookla open-data broadband tiles from S3 and clip them to
+Arlington.
+
+\textbf{\texttt{pipeline/acquire\_ookla.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Acquire Ookla fixed{-}broadband tiles for Arlington from S3 open data."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ shapely }\ImportTok{import}\NormalTok{ wkt}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+\ImportTok{from}\NormalTok{ pipeline.acquire\_geographies }\ImportTok{import}\NormalTok{ fetch\_block\_groups}
+
+
+\KeywordTok{def}\NormalTok{ \_s3\_path() }\OperatorTok{{-}\textgreater{}} \BuiltInTok{str}\NormalTok{:}
+\NormalTok{    month }\OperatorTok{=}\NormalTok{ config.OOKLA\_QUARTER }\OperatorTok{*} \DecValTok{3} \OperatorTok{{-}} \DecValTok{2}  \CommentTok{\# Q1{-}\textgreater{}01, Q2{-}\textgreater{}04, Q3{-}\textgreater{}07, Q4{-}\textgreater{}10}
+    \ControlFlowTok{return}\NormalTok{ config.OOKLA\_S3.}\BuiltInTok{format}\NormalTok{(}
+\NormalTok{        year}\OperatorTok{=}\NormalTok{config.OOKLA\_YEAR, quarter}\OperatorTok{=}\NormalTok{config.OOKLA\_QUARTER, month}\OperatorTok{=}\NormalTok{month}
+\NormalTok{    )}
+
+
+\KeywordTok{def}\NormalTok{ fetch\_ookla\_tiles() }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame:}
+    \CommentTok{"""Download and bbox{-}filter Ookla tiles to Arlington County."""}
+\NormalTok{    df }\OperatorTok{=}\NormalTok{ pd.read\_parquet(\_s3\_path(), storage\_options}\OperatorTok{=}\NormalTok{\{}\StringTok{"anon"}\NormalTok{: }\VariableTok{True}\NormalTok{\})}
+\NormalTok{    df[}\StringTok{"geometry"}\NormalTok{] }\OperatorTok{=}\NormalTok{ df[}\StringTok{"tile"}\NormalTok{].}\BuiltInTok{apply}\NormalTok{(wkt.loads)}
+\NormalTok{    tiles }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(df, geometry}\OperatorTok{=}\StringTok{"geometry"}\NormalTok{, crs}\OperatorTok{=}\StringTok{"EPSG:4326"}\NormalTok{)}
+
+\NormalTok{    bbox }\OperatorTok{=}\NormalTok{ fetch\_block\_groups().to\_crs(}\StringTok{"EPSG:4326"}\NormalTok{).total\_bounds  }\CommentTok{\# minx,miny,maxx,maxy}
+\NormalTok{    minx, miny, maxx, maxy }\OperatorTok{=}\NormalTok{ bbox}
+    \ControlFlowTok{return}\NormalTok{ tiles.cx[minx:maxx, miny:maxy].copy()}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    tiles }\OperatorTok{=}\NormalTok{ fetch\_ookla\_tiles()}
+\NormalTok{    cols }\OperatorTok{=}\NormalTok{ [}\StringTok{"quadkey"}\NormalTok{, }\StringTok{"avg\_d\_kbps"}\NormalTok{, }\StringTok{"avg\_u\_kbps"}\NormalTok{, }\StringTok{"avg\_lat\_ms"}\NormalTok{, }\StringTok{"tests"}\NormalTok{, }\StringTok{"devices"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]}
+\NormalTok{    tiles[cols].to\_file(config.OOKLA\_TILES, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(tiles)}\SpecialCharTok{\}}\SpecialStringTok{ Ookla tiles → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{OOKLA\_TILES}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute income}\label{redistribute-income}
+
+Area-weight the income and household counts onto civic associations with
+\texttt{sdc-redistribute}, then derive mean household income.
+
+\textbf{\texttt{pipeline/redistribute\_income.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Redistribute ACS income counts to civic associations and derive mean income."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ pathlib }\ImportTok{import}\NormalTok{ Path}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ sdc\_redistribute }\ImportTok{import}\NormalTok{ redistribute\_direct}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+
+\KeywordTok{def}\NormalTok{ redistribute\_income(}
+\NormalTok{    counts\_long: pd.DataFrame, source\_geo: Path, target\_geo: Path}
+\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Return per{-}civic{-}association agg\_income, households, and derived mean\_income.}
+
+\CommentTok{    \textasciigrave{}\textasciigrave{}counts\_long\textasciigrave{}\textasciigrave{} is long format (geoid, year, measure, value) with measures}
+\CommentTok{    \textasciigrave{}\textasciigrave{}agg\_income\textasciigrave{}\textasciigrave{} and \textasciigrave{}\textasciigrave{}households\textasciigrave{}\textasciigrave{}.}
+\CommentTok{    """}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ redistribute\_direct(}
+\NormalTok{        source\_df}\OperatorTok{=}\NormalTok{counts\_long,}
+\NormalTok{        source\_geo}\OperatorTok{=}\NormalTok{source\_geo,}
+\NormalTok{        target\_geos}\OperatorTok{=}\NormalTok{\{}\StringTok{"civic\_association"}\NormalTok{: target\_geo\},}
+\NormalTok{        count\_cols}\OperatorTok{=}\NormalTok{[}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{],}
+\NormalTok{        source\_id}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{,}
+\NormalTok{    )}
+    \CommentTok{\# result is long with measures agg\_income\_direct / households\_direct}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ result.pivot\_table(}
+\NormalTok{        index}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, columns}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, values}\OperatorTok{=}\StringTok{"value"}\NormalTok{, aggfunc}\OperatorTok{=}\StringTok{"first"}
+\NormalTok{    ).reset\_index()}
+\NormalTok{    wide.columns.name }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ wide.rename(}
+\NormalTok{        columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"agg\_income\_direct"}\NormalTok{: }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households\_direct"}\NormalTok{: }\StringTok{"households"}\NormalTok{\}}
+\NormalTok{    )}
+    \CommentTok{\# Mean household income is an INTENSIVE quantity derived from two counts.}
+\NormalTok{    wide[}\StringTok{"mean\_income"}\NormalTok{] }\OperatorTok{=}\NormalTok{ wide[}\StringTok{"agg\_income"}\NormalTok{] }\OperatorTok{/}\NormalTok{ wide[}\StringTok{"households"}\NormalTok{].where(}
+\NormalTok{        wide[}\StringTok{"households"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ wide[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{]]}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+    \CommentTok{\# ACS counts GeoJSON uses uppercase GEOID; rename to the lowercase \textasciigrave{}geoid\textasciigrave{}}
+    \CommentTok{\# that redistribute\_direct expects, for both the long{-}format counts and the}
+    \CommentTok{\# source geometry. Write a geoid{-}keyed source file for redistribute\_direct.}
+\NormalTok{    bg }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.ACS\_COUNTS).rename(columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"GEOID"}\NormalTok{: }\StringTok{"geoid"}\NormalTok{\})}
+    \BuiltInTok{long} \OperatorTok{=}\NormalTok{ bg[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{]].melt(}
+\NormalTok{        id\_vars}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, var\_name}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, value\_name}\OperatorTok{=}\StringTok{"value"}
+\NormalTok{    )}
+    \BuiltInTok{long}\NormalTok{[}\StringTok{"year"}\NormalTok{] }\OperatorTok{=}\NormalTok{ config.ACS\_YEAR}
+
+\NormalTok{    src\_path }\OperatorTok{=}\NormalTok{ config.DATA }\OperatorTok{/} \StringTok{"\_acs\_src.geojson"}
+\NormalTok{    bg[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]].to\_file(src\_path, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ redistribute\_income(}\BuiltInTok{long}\NormalTok{, src\_path, config.CIVIC\_ASSOC)}
+\NormalTok{    src\_path.unlink(missing\_ok}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\NormalTok{    out.to\_csv(config.CIVIC\_INCOME, index}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(out)}\SpecialCharTok{\}}\SpecialStringTok{ civic{-}association income rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_INCOME}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute broadband}\label{redistribute-broadband}
+
+Redistribute test counts and the speed×tests product, then derive the
+count-weighted mean download and upload speeds.
+
+\textbf{\texttt{pipeline/redistribute\_broadband.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Redistribute Ookla broadband to civic associations; derive mean speeds."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ pathlib }\ImportTok{import}\NormalTok{ Path}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ sdc\_redistribute }\ImportTok{import}\NormalTok{ redistribute\_direct}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+\NormalTok{MIN\_TESTS }\OperatorTok{=} \DecValTok{5}  \CommentTok{\# statistical{-}reliability filter on source tiles}
+
+
+\KeywordTok{def}\NormalTok{ redistribute\_broadband(}
+\NormalTok{    counts\_long: pd.DataFrame, source\_geo: Path, target\_geo: Path}
+\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Return per{-}civic{-}association tests and derived download/upload Mbps."""}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ redistribute\_direct(}
+\NormalTok{        source\_df}\OperatorTok{=}\NormalTok{counts\_long,}
+\NormalTok{        source\_geo}\OperatorTok{=}\NormalTok{source\_geo,}
+\NormalTok{        target\_geos}\OperatorTok{=}\NormalTok{\{}\StringTok{"civic\_association"}\NormalTok{: target\_geo\},}
+\NormalTok{        count\_cols}\OperatorTok{=}\NormalTok{[}\StringTok{"tests"}\NormalTok{, }\StringTok{"d\_product"}\NormalTok{, }\StringTok{"u\_product"}\NormalTok{],}
+\NormalTok{        source\_id}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{,}
+\NormalTok{    )}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ result.pivot\_table(}
+\NormalTok{        index}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, columns}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, values}\OperatorTok{=}\StringTok{"value"}\NormalTok{, aggfunc}\OperatorTok{=}\StringTok{"first"}
+\NormalTok{    ).reset\_index()}
+\NormalTok{    wide.columns.name }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ wide.rename(}
+\NormalTok{        columns}\OperatorTok{=}\NormalTok{\{}
+            \StringTok{"tests\_direct"}\NormalTok{: }\StringTok{"tests"}\NormalTok{,}
+            \StringTok{"d\_product\_direct"}\NormalTok{: }\StringTok{"d\_product"}\NormalTok{,}
+            \StringTok{"u\_product\_direct"}\NormalTok{: }\StringTok{"u\_product"}\NormalTok{,}
+\NormalTok{        \}}
+\NormalTok{    )}
+\NormalTok{    valid }\OperatorTok{=}\NormalTok{ wide[}\StringTok{"tests"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}
+\NormalTok{    wide[}\StringTok{"download\_mbps"}\NormalTok{] }\OperatorTok{=}\NormalTok{ (wide[}\StringTok{"d\_product"}\NormalTok{] }\OperatorTok{/}\NormalTok{ wide[}\StringTok{"tests"}\NormalTok{].where(valid)) }\OperatorTok{/} \DecValTok{1000}
+\NormalTok{    wide[}\StringTok{"upload\_mbps"}\NormalTok{] }\OperatorTok{=}\NormalTok{ (wide[}\StringTok{"u\_product"}\NormalTok{] }\OperatorTok{/}\NormalTok{ wide[}\StringTok{"tests"}\NormalTok{].where(valid)) }\OperatorTok{/} \DecValTok{1000}
+    \ControlFlowTok{return}\NormalTok{ wide[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"tests"}\NormalTok{, }\StringTok{"download\_mbps"}\NormalTok{, }\StringTok{"upload\_mbps"}\NormalTok{]]}
+
+
+\KeywordTok{def}\NormalTok{ build\_counts\_long(tiles: gpd.GeoDataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Build the long{-}format count frame from raw Ookla tiles."""}
+\NormalTok{    t }\OperatorTok{=}\NormalTok{ tiles[tiles[}\StringTok{"tests"}\NormalTok{] }\OperatorTok{\textgreater{}=}\NormalTok{ MIN\_TESTS].copy()}
+\NormalTok{    t[}\StringTok{"d\_product"}\NormalTok{] }\OperatorTok{=}\NormalTok{ t[}\StringTok{"avg\_d\_kbps"}\NormalTok{] }\OperatorTok{*}\NormalTok{ t[}\StringTok{"tests"}\NormalTok{]}
+\NormalTok{    t[}\StringTok{"u\_product"}\NormalTok{] }\OperatorTok{=}\NormalTok{ t[}\StringTok{"avg\_u\_kbps"}\NormalTok{] }\OperatorTok{*}\NormalTok{ t[}\StringTok{"tests"}\NormalTok{]}
+    \BuiltInTok{long} \OperatorTok{=}\NormalTok{ t[[}\StringTok{"quadkey"}\NormalTok{, }\StringTok{"tests"}\NormalTok{, }\StringTok{"d\_product"}\NormalTok{, }\StringTok{"u\_product"}\NormalTok{]].melt(}
+\NormalTok{        id\_vars}\OperatorTok{=}\StringTok{"quadkey"}\NormalTok{, var\_name}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, value\_name}\OperatorTok{=}\StringTok{"value"}
+\NormalTok{    )}
+    \BuiltInTok{long} \OperatorTok{=} \BuiltInTok{long}\NormalTok{.rename(columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"quadkey"}\NormalTok{: }\StringTok{"geoid"}\NormalTok{\})}
+    \BuiltInTok{long}\NormalTok{[}\StringTok{"year"}\NormalTok{] }\OperatorTok{=}\NormalTok{ config.OOKLA\_YEAR}
+    \ControlFlowTok{return} \BuiltInTok{long}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    tiles }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.OOKLA\_TILES)}
+\NormalTok{    tiles[}\StringTok{"geoid"}\NormalTok{] }\OperatorTok{=}\NormalTok{ tiles[}\StringTok{"quadkey"}\NormalTok{].astype(}\BuiltInTok{str}\NormalTok{)}
+    \BuiltInTok{long} \OperatorTok{=}\NormalTok{ build\_counts\_long(tiles)}
+    \CommentTok{\# Write a geoid{-}keyed source file for redistribute\_direct}
+\NormalTok{    src }\OperatorTok{=}\NormalTok{ tiles[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]].copy()}
+\NormalTok{    src\_path }\OperatorTok{=}\NormalTok{ config.DATA }\OperatorTok{/} \StringTok{"\_ookla\_src.geojson"}
+\NormalTok{    src.to\_file(src\_path, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ redistribute\_broadband(}\BuiltInTok{long}\NormalTok{, src\_path, config.CIVIC\_ASSOC)}
+\NormalTok{    out.to\_csv(config.CIVIC\_BROADBAND, index}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+\NormalTok{    src\_path.unlink(missing\_ok}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(out)}\SpecialCharTok{\}}\SpecialStringTok{ civic{-}association broadband rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_BROADBAND}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Combine and derive metrics}\label{combine-and-derive-metrics}
+
+Join the redistributed income and broadband measures onto the civic
+association polygons and compute the income-to-speed ratio and the
+bivariate income×speed classes.
+
+\textbf{\texttt{pipeline/combine.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Combine income + broadband and compute derived policy metrics."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+
+\KeywordTok{def}\NormalTok{ \_tercile(series: pd.Series) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.Series:}
+    \CommentTok{"""Return 1/2/3 tercile labels by rank (robust to ties and NaN)."""}
+\NormalTok{    ranks }\OperatorTok{=}\NormalTok{ series.rank(method}\OperatorTok{=}\StringTok{"first"}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ pd.qcut(ranks, }\DecValTok{3}\NormalTok{, labels}\OperatorTok{=}\NormalTok{[}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{]).astype(}\StringTok{"Int64"}\NormalTok{)}
+
+
+\KeywordTok{def}\NormalTok{ add\_derived\_metrics(df: pd.DataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Add income\_speed\_ratio and bivariate\_class (income{-}speed terciles)."""}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ df.copy()}
+\NormalTok{    out[}\StringTok{"income\_speed\_ratio"}\NormalTok{] }\OperatorTok{=}\NormalTok{ out[}\StringTok{"mean\_income"}\NormalTok{] }\OperatorTok{/}\NormalTok{ out[}\StringTok{"download\_mbps"}\NormalTok{].where(}
+\NormalTok{        out[}\StringTok{"download\_mbps"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}
+\NormalTok{    )}
+\NormalTok{    inc }\OperatorTok{=}\NormalTok{ \_tercile(out[}\StringTok{"mean\_income"}\NormalTok{])}
+\NormalTok{    spd }\OperatorTok{=}\NormalTok{ \_tercile(out[}\StringTok{"download\_mbps"}\NormalTok{])}
+\NormalTok{    out[}\StringTok{"bivariate\_class"}\NormalTok{] }\OperatorTok{=}\NormalTok{ inc.astype(}\BuiltInTok{str}\NormalTok{) }\OperatorTok{+} \StringTok{"{-}"} \OperatorTok{+}\NormalTok{ spd.astype(}\BuiltInTok{str}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ out}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    civ }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.CIVIC\_ASSOC)[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"region\_name"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]]}
+\NormalTok{    income }\OperatorTok{=}\NormalTok{ pd.read\_csv(config.CIVIC\_INCOME, dtype}\OperatorTok{=}\NormalTok{\{}\StringTok{"geoid"}\NormalTok{: }\BuiltInTok{str}\NormalTok{\})}
+\NormalTok{    broadband }\OperatorTok{=}\NormalTok{ pd.read\_csv(config.CIVIC\_BROADBAND, dtype}\OperatorTok{=}\NormalTok{\{}\StringTok{"geoid"}\NormalTok{: }\BuiltInTok{str}\NormalTok{\})}
+\NormalTok{    merged }\OperatorTok{=}\NormalTok{ civ.merge(income, on}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, how}\OperatorTok{=}\StringTok{"left"}\NormalTok{).merge(}
+\NormalTok{        broadband, on}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, how}\OperatorTok{=}\StringTok{"left"}
+\NormalTok{    )}
+\NormalTok{    merged }\OperatorTok{=}\NormalTok{ add\_derived\_metrics(merged)}
+\NormalTok{    gdf }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(merged, geometry}\OperatorTok{=}\StringTok{"geometry"}\NormalTok{, crs}\OperatorTok{=}\NormalTok{civ.crs)}
+\NormalTok{    gdf.to\_file(config.CIVIC\_COMBINED, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(gdf)}\SpecialCharTok{\}}\SpecialStringTok{ combined civic{-}association rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_COMBINED}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Validate}\label{validate}
+
+Confirm household totals are preserved by the redistribution and that no
+speeds or incomes are negative.
+
+\textbf{\texttt{pipeline/validate.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Integrity checks on redistributed outputs."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+
+\KeywordTok{def}\NormalTok{ check\_total\_preserved(source\_total: }\BuiltInTok{float}\NormalTok{, target\_total: }\BuiltInTok{float}\NormalTok{, tol: }\BuiltInTok{float} \OperatorTok{=} \FloatTok{0.01}\NormalTok{) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+    \CommentTok{"""Assert target total matches source total within relative tolerance \textasciigrave{}\textasciigrave{}tol\textasciigrave{}\textasciigrave{}."""}
+    \ControlFlowTok{if}\NormalTok{ source\_total }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+        \ControlFlowTok{return}
+\NormalTok{    rel }\OperatorTok{=} \BuiltInTok{abs}\NormalTok{(target\_total }\OperatorTok{{-}}\NormalTok{ source\_total) }\OperatorTok{/} \BuiltInTok{abs}\NormalTok{(source\_total)}
+    \ControlFlowTok{assert}\NormalTok{ rel }\OperatorTok{\textless{}=}\NormalTok{ tol, }\SpecialStringTok{f"total drift }\SpecialCharTok{\{}\NormalTok{rel}\SpecialCharTok{:.3\%\}}\SpecialStringTok{ exceeds }\SpecialCharTok{\{}\NormalTok{tol}\SpecialCharTok{:.3\%\}}\SpecialStringTok{"}
+
+
+\KeywordTok{def}\NormalTok{ check\_ranges(df: pd.DataFrame) }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+    \CommentTok{"""Assert speed/income columns are non{-}negative where present."""}
+    \ControlFlowTok{for}\NormalTok{ col }\KeywordTok{in}\NormalTok{ (}\StringTok{"download\_mbps"}\NormalTok{, }\StringTok{"upload\_mbps"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{):}
+        \ControlFlowTok{if}\NormalTok{ col }\KeywordTok{in}\NormalTok{ df.columns:}
+\NormalTok{            vals }\OperatorTok{=}\NormalTok{ df[col].dropna()}
+            \ControlFlowTok{assert}\NormalTok{ (vals }\OperatorTok{\textgreater{}=} \DecValTok{0}\NormalTok{).}\BuiltInTok{all}\NormalTok{(), }\SpecialStringTok{f"}\SpecialCharTok{\{}\NormalTok{col}\SpecialCharTok{\}}\SpecialStringTok{ has negative values"}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+    \ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+    \ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+\NormalTok{    combined }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.CIVIC\_COMBINED)}
+\NormalTok{    acs }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.ACS\_COUNTS)}
+\NormalTok{    check\_total\_preserved(}
+\NormalTok{        acs[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{(), combined[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{(), tol}\OperatorTok{=}\FloatTok{0.02}
+\NormalTok{    )}
+\NormalTok{    check\_ranges(combined)}
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"Validation passed."}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Run the full pipeline}\label{run-the-full-pipeline}
+
+Wire every stage into one command:
+\texttt{uv\ run\ python\ -m\ pipeline.run}.
+
+\textbf{\texttt{pipeline/run.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Run the full pipeline end to end (acquisition → outputs → validation)."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ (}
+\NormalTok{    acquire\_acs,}
+\NormalTok{    acquire\_geographies,}
+\NormalTok{    acquire\_ookla,}
+\NormalTok{    combine,}
+\NormalTok{    redistribute\_broadband,}
+\NormalTok{    redistribute\_income,}
+\NormalTok{    validate,}
+\NormalTok{)}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    acquire\_geographies.main()}
+\NormalTok{    acquire\_acs.main()}
+\NormalTok{    acquire\_ookla.main()}
+\NormalTok{    redistribute\_income.main()}
+\NormalTok{    redistribute\_broadband.main()}
+\NormalTok{    combine.main()}
+\NormalTok{    validate.main()}
+    \BuiltInTok{print}\NormalTok{(}\StringTok{"Pipeline complete."}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
 
 \bookmarksetup{startatroot}
 

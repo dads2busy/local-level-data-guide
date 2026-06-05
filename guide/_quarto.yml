@@ -17,6 +17,7 @@ book:
     - 05-results.qmd
     - 06-limitations.qmd
     - 07-apply-it.qmd
+    - 08-code.qmd
     - references.qmd
 
 bibliography: references.bib
