@@ -22,7 +22,7 @@ Income follows the pattern described in @sec-extensive-intensive. The two ACS va
 
 @fig-acs illustrates the transformation. The source (block groups) carries two count columns, and the target (civic associations) receives redistributed versions of both.
 
-![Income transform: redistribute aggregate income + households, then derive mean income.](../figures/diagrams/acs_transform.png){#fig-acs width=95%}
+![Income transform: redistribute aggregate income + households, then derive mean income.](figures/diagrams/acs_transform.png){#fig-acs width=95%}
 
 Once redistribution is complete, mean household income for each civic association is a simple arithmetic step:
 
@@ -46,7 +46,7 @@ The division by 1,000 converts kilobits per second to megabits per second for pr
 
 @fig-ookla shows the broadband transform. Notice the structural parallel with the income transform in @fig-acs: in both cases, the intensive output (mean income, mean speed) appears only after redistribution, never before.
 
-![Broadband transform: redistribute tests and speed×tests, then derive count-weighted speed.](../figures/diagrams/ookla_transform.png){#fig-ookla width=95%}
+![Broadband transform: redistribute tests and speed×tests, then derive count-weighted speed.](figures/diagrams/ookla_transform.png){#fig-ookla width=95%}
 
 ::: {.callout-note collapse="true" title="Python: count-weighting broadband speed"}
 ```python

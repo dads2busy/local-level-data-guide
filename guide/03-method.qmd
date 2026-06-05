@@ -36,7 +36,7 @@ Getting this distinction wrong is the single most common error in areal interpol
 
 @fig-dataflow summarizes the full redistribution workflow: extensive counts enter the redistribution, area weights are applied, and intensive rates are computed only at the end from the redistributed count totals.
 
-![The redistribution method: extensive counts move area-weighted; intensive rates are derived from them.](../figures/diagrams/dataflow.png){#fig-dataflow width=100%}
+![The redistribution method: extensive counts move area-weighted; intensive rates are derived from them.](figures/diagrams/dataflow.png){#fig-dataflow width=100%}
 
 ## The `sdc-redistribute` implementation
 
