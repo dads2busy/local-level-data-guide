@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>8&nbsp; Apply It to Your Own Jurisdiction – Creating Local-Level Geographic Datasets</title>
+<title>9&nbsp; Apply It to Your Own Jurisdiction – Creating Local-Level Geographic Datasets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -117,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./07-apply-it.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./07-apply-it.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -180,20 +180,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./parcel-approach.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./06-limitations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07-apply-it.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08-code.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -212,10 +218,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#the-six-step-recipe" id="toc-the-six-step-recipe" class="nav-link active" data-scroll-target="#the-six-step-recipe"><span class="header-section-number">8.1</span> The six-step recipe</a></li>
-  <li><a href="#running-the-companion-pipeline" id="toc-running-the-companion-pipeline" class="nav-link" data-scroll-target="#running-the-companion-pipeline"><span class="header-section-number">8.2</span> Running the companion pipeline</a></li>
-  <li><a href="#r-implementation" id="toc-r-implementation" class="nav-link" data-scroll-target="#r-implementation"><span class="header-section-number">8.3</span> R implementation</a></li>
-  <li><a href="#adapting-to-other-variables" id="toc-adapting-to-other-variables" class="nav-link" data-scroll-target="#adapting-to-other-variables"><span class="header-section-number">8.4</span> Adapting to other variables</a></li>
+  <li><a href="#the-six-step-recipe" id="toc-the-six-step-recipe" class="nav-link active" data-scroll-target="#the-six-step-recipe"><span class="header-section-number">9.1</span> The six-step recipe</a></li>
+  <li><a href="#running-the-companion-pipeline" id="toc-running-the-companion-pipeline" class="nav-link" data-scroll-target="#running-the-companion-pipeline"><span class="header-section-number">9.2</span> Running the companion pipeline</a></li>
+  <li><a href="#r-implementation" id="toc-r-implementation" class="nav-link" data-scroll-target="#r-implementation"><span class="header-section-number">9.3</span> R implementation</a></li>
+  <li><a href="#adapting-to-other-variables" id="toc-adapting-to-other-variables" class="nav-link" data-scroll-target="#adapting-to-other-variables"><span class="header-section-number">9.4</span> Adapting to other variables</a></li>
   </ul>
 </nav>
     </div>
@@ -224,7 +230,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-apply" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></h1>
+<h1 class="title"><span id="sec-apply" class="quarto-section-identifier"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></h1>
 </div>
 
 
@@ -242,8 +248,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>The Arlington analysis is a worked illustration of a general workflow. Any jurisdiction with civic associations, planning districts, school attendance zones, or other custom geographies can follow the same steps to estimate income and broadband speed — or any other combination of an ACS count variable and an Ookla speed-test variable — at the sub-county level. This chapter distils the pipeline into a numbered recipe and points to the tools needed to run it.</p>
-<section id="the-six-step-recipe" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="the-six-step-recipe"><span class="header-section-number">8.1</span> The six-step recipe</h2>
+<section id="the-six-step-recipe" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="the-six-step-recipe"><span class="header-section-number">9.1</span> The six-step recipe</h2>
 <p><strong>1. Define your target geography as a GeoJSON with a stable identifier.</strong> Your target polygons — the units you want estimates for — must be stored as a GeoJSON (or any format readable by GeoPandas) and must include a column that uniquely identifies each polygon. The companion repository uses <code>geoid</code> by convention, but any string or integer key works as long as it is stable and unique. The polygons must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is the safe default) and should tile the jurisdiction without meaningful gaps or overlaps. Gaps will cause households and tests near the edges to be unallocated; overlaps will cause double-counting.</p>
 <p><strong>2. Obtain source counts on their native geography.</strong> For income, retrieve ACS block-group estimates for the county of interest via the Census API. The two variables needed are B19025_001E (aggregate household income) and B11001_001E (number of households). Both must be five-year estimates aligned with the same ACS vintage. For broadband, download the relevant Ookla quarterly fixed-broadband tile from Ookla’s public S3 bucket. Clip the tile to your jurisdiction’s bounding box to reduce memory usage. Retain <code>tests</code> and <code>avg_d_kbps</code>. Both datasets must be in the same CRS as your target geography before redistribution.</p>
 <p><strong>3. Redistribute the source counts to your target geography.</strong> Call <code>redistribute_direct</code> (from the <code>sda_areal</code> Python package, or its R equivalent once available) with your source GeoDataFrame and target GeoDataFrame. For ACS, redistribute <code>agg_income</code> and <code>households</code>. For Ookla, first construct <code>d_product = avg_d_kbps * tests</code>, then redistribute <code>tests</code> and <code>d_product</code>. Each call preserves the source total within floating-point tolerance.</p>
@@ -251,20 +257,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>5. Validate that totals are preserved.</strong> Before proceeding to analysis, compare the sum of redistributed households across all target polygons to the sum of ACS households across all source block groups. They should agree within a few percent. A larger discrepancy indicates a geometry problem (gaps, overlaps, CRS mismatch) that will bias every downstream estimate. Similarly check that redistributed test counts sum to within a few percent of source tile test counts. Both checks are implemented in the companion repository’s <code>pipeline.validate</code> module.</p>
 <p><strong>6. Map, analyse, and interpret.</strong> Join the income and speed estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or whatever format your visualisation or analysis tool requires. The companion repository builds all five result figures — choropleth maps, scatter plot, and bivariate map — through a single command.</p>
 </section>
-<section id="running-the-companion-pipeline" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="running-the-companion-pipeline"><span class="header-section-number">8.2</span> Running the companion pipeline</h2>
+<section id="running-the-companion-pipeline" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="running-the-companion-pipeline"><span class="header-section-number">9.2</span> Running the companion pipeline</h2>
 <p>The full pipeline is executed with a single command from the repository root:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-m</span> pipeline.run</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This command fetches the Census and Ookla data, performs both redistributions, validates totals, and writes the output GeoJSON. To regenerate the result figures from the pipeline output:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">uv</span> run python <span class="at">-m</span> pipeline.build_figures</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Both commands require <code>uv</code> (the Python package manager), a Census API key in the environment variable <code>CENSUS_API_KEY</code>, and an internet connection. The repository README provides setup instructions. All code is open-source and MIT-licensed.</p>
 </section>
-<section id="r-implementation" class="level2" data-number="8.3">
-<h2 data-number="8.3" class="anchored" data-anchor-id="r-implementation"><span class="header-section-number">8.3</span> R implementation</h2>
+<section id="r-implementation" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="r-implementation"><span class="header-section-number">9.3</span> R implementation</h2>
 <p>The areal interpolation logic in the Python pipeline mirrors the <code>sdc-redistribute</code> family of functions available in R. An R implementation of the full Arlington pipeline — using <code>tigris</code> for Census geometries, <code>censusapi</code> or <code>tidycensus</code> for ACS data, <code>ooklaOpenDataR</code> for speed-test tiles, and <code>areal</code> or a direct port of <code>redistribute_direct</code> for the interpolation step — is forthcoming. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.</p>
 </section>
-<section id="adapting-to-other-variables" class="level2" data-number="8.4">
-<h2 data-number="8.4" class="anchored" data-anchor-id="adapting-to-other-variables"><span class="header-section-number">8.4</span> Adapting to other variables</h2>
+<section id="adapting-to-other-variables" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="adapting-to-other-variables"><span class="header-section-number">9.4</span> Adapting to other variables</h2>
 <p>The recipe generalises beyond income and broadband. Any ACS extensive variable (counts of people, households, housing units, workers) can be redistributed in step 3 by substituting the appropriate B-table variables. Any Ookla variable that can be expressed as a count-weighted product (upload speed follows the same <code>avg_u_kbps * tests</code> construction as download speed) can be substituted in the same step. Analysts working with other speed-test or coverage datasets will need to identify the analogous extensive quantity — typically a count that, when summed and divided into a product column, recovers the intensive rate of interest — and follow the same pattern.</p>
 
 
@@ -673,12 +679,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./06-limitations.html" class="pagination-link" aria-label="Limitations &amp; Uncertainty">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./08-code.html" class="pagination-link" aria-label="The Complete Pipeline Code">
-        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

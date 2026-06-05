@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>7&nbsp; Limitations &amp; Uncertainty – Creating Local-Level Geographic Datasets</title>
+<title>8&nbsp; Limitations &amp; Uncertainty – Creating Local-Level Geographic Datasets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -51,7 +51,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
 <link href="./07-apply-it.html" rel="next">
-<link href="./05-results.html" rel="prev">
+<link href="./parcel-approach.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -102,7 +102,7 @@ div.csl-indent {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06-limitations.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./06-limitations.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -165,20 +165,26 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./parcel-approach.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./06-limitations.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./07-apply-it.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></a>
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08-code.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -197,10 +203,10 @@ div.csl-indent {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#area-weighting-assumes-uniform-internal-distribution" id="toc-area-weighting-assumes-uniform-internal-distribution" class="nav-link active" data-scroll-target="#area-weighting-assumes-uniform-internal-distribution"><span class="header-section-number">7.1</span> Area-weighting assumes uniform internal distribution</a></li>
-  <li><a href="#ookla-data-reflects-active-test-takers-not-all-households" id="toc-ookla-data-reflects-active-test-takers-not-all-households" class="nav-link" data-scroll-target="#ookla-data-reflects-active-test-takers-not-all-households"><span class="header-section-number">7.2</span> Ookla data reflects active test-takers, not all households</a></li>
-  <li><a href="#acs-income-carries-sampling-error" id="toc-acs-income-carries-sampling-error" class="nav-link" data-scroll-target="#acs-income-carries-sampling-error"><span class="header-section-number">7.3</span> ACS income carries sampling error</a></li>
-  <li><a href="#redistribute_direct-rescales-measures-independently" id="toc-redistribute_direct-rescales-measures-independently" class="nav-link" data-scroll-target="#redistribute_direct-rescales-measures-independently"><span class="header-section-number">7.4</span> <code>redistribute_direct</code> rescales measures independently</a></li>
+  <li><a href="#area-weighting-assumes-uniform-internal-distribution" id="toc-area-weighting-assumes-uniform-internal-distribution" class="nav-link active" data-scroll-target="#area-weighting-assumes-uniform-internal-distribution"><span class="header-section-number">8.1</span> Area-weighting assumes uniform internal distribution</a></li>
+  <li><a href="#ookla-data-reflects-active-test-takers-not-all-households" id="toc-ookla-data-reflects-active-test-takers-not-all-households" class="nav-link" data-scroll-target="#ookla-data-reflects-active-test-takers-not-all-households"><span class="header-section-number">8.2</span> Ookla data reflects active test-takers, not all households</a></li>
+  <li><a href="#acs-income-carries-sampling-error" id="toc-acs-income-carries-sampling-error" class="nav-link" data-scroll-target="#acs-income-carries-sampling-error"><span class="header-section-number">8.3</span> ACS income carries sampling error</a></li>
+  <li><a href="#redistribute_direct-rescales-measures-independently" id="toc-redistribute_direct-rescales-measures-independently" class="nav-link" data-scroll-target="#redistribute_direct-rescales-measures-independently"><span class="header-section-number">8.4</span> <code>redistribute_direct</code> rescales measures independently</a></li>
   </ul>
 </nav>
     </div>
@@ -209,7 +215,7 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span id="sec-limits" class="quarto-section-identifier"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></h1>
+<h1 class="title"><span id="sec-limits" class="quarto-section-identifier"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Limitations &amp; Uncertainty</span></span></h1>
 </div>
 
 
@@ -227,26 +233,26 @@ div.csl-indent {
 
 
 <p>The results in <a href="05-results.html" class="quarto-xref"><span>Chapter 6</span></a> are derived estimates, not direct measurements. Every step of the pipeline — from the source data to the redistribution to the final ratio calculations — introduces uncertainty. This chapter itemises the four most important sources and explains what each implies for interpreting and extending the analysis.</p>
-<section id="area-weighting-assumes-uniform-internal-distribution" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="area-weighting-assumes-uniform-internal-distribution"><span class="header-section-number">7.1</span> Area-weighting assumes uniform internal distribution</h2>
+<section id="area-weighting-assumes-uniform-internal-distribution" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="area-weighting-assumes-uniform-internal-distribution"><span class="header-section-number">8.1</span> Area-weighting assumes uniform internal distribution</h2>
 <p>The core assumption of area-weighted interpolation is that the quantity being redistributed is distributed uniformly within each source unit. For ACS income, the source units are census block groups; for Ookla broadband, the source units are 610-metre speed-test tiles. Wherever that uniformity assumption is wrong — wherever households or speed-test activity are spatially clustered within a unit — the redistribution will misallocate a fraction of the value.</p>
 <p>In practice, both income and population density vary within block groups, particularly at the edges where block groups straddle the civic-association boundary. The effect is largest for target associations that are small relative to the source units they overlap, and smallest for large associations that wholly contain many source units. Analysts should treat estimates for the smallest associations with additional caution and, where possible, validate against parcel-level or point-level data.</p>
 <p>This limitation is not unique to this workflow; it is inherent to any area-weighted interpolation approach <span class="citation" data-cites="ref99 ref100"><a href="references.html#ref-ref99" role="doc-biblioref">[1]</a>, <a href="references.html#ref-ref100" role="doc-biblioref">[2]</a></span>. The <code>redistribute_direct</code> function used here, like all area-weighting methods, cannot recover sub-unit spatial variation that is not encoded in the source data.</p>
 </section>
-<section id="ookla-data-reflects-active-test-takers-not-all-households" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="ookla-data-reflects-active-test-takers-not-all-households"><span class="header-section-number">7.2</span> Ookla data reflects active test-takers, not all households</h2>
+<section id="ookla-data-reflects-active-test-takers-not-all-households" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="ookla-data-reflects-active-test-takers-not-all-households"><span class="header-section-number">8.2</span> Ookla data reflects active test-takers, not all households</h2>
 <p>The Ookla speed-test tiles record the average performance of users who actively ran a speed test during the measurement quarter. This introduces a form of self-selection bias: test-takers are not a random sample of all internet subscribers. People who run speed tests are more likely to be technically engaged, more likely to be troubleshooting a slow connection, and possibly more concentrated in particular building types or demographic groups <span class="citation" data-cites="ref137"><a href="references.html#ref-ref137" role="doc-biblioref">[3]</a></span>.</p>
 <p>The direction of this bias is not straightforwardly predictable. If frustrated users test more frequently, the Ookla data may understate typical speeds. If technically sophisticated users dominate the test pool, the data may overstate typical speeds. For the purposes of a comparative analysis across civic associations within a single county, what matters is whether the bias is spatially systematic — that is, whether the test-taker population differs in structure across associations in ways that would distort the between-association comparisons. That cannot be fully evaluated without ground-truth data.</p>
 <p>Users of this analysis should treat the download speeds as indicative of infrastructure capacity at the high end of the user experience distribution, not as estimates of median or typical household experience.</p>
 </section>
-<section id="acs-income-carries-sampling-error" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="acs-income-carries-sampling-error"><span class="header-section-number">7.3</span> ACS income carries sampling error</h2>
+<section id="acs-income-carries-sampling-error" class="level2" data-number="8.3">
+<h2 data-number="8.3" class="anchored" data-anchor-id="acs-income-carries-sampling-error"><span class="header-section-number">8.3</span> ACS income carries sampling error</h2>
 <p>The ACS five-year block-group estimates are not administrative records; they are survey estimates with associated margins of error. At the block-group level, particularly for smaller block groups, the coefficient of variation on income variables can be substantial. The guide uses aggregate household income (B19025_001E) and household count (B11001_001E) rather than median income precisely because both are extensive, summable measures that survive redistribution with interpretable units.</p>
 <p>However, the mean income ultimately derived for each civic association is still the ratio of two redistributed survey estimates. Both the numerator (aggregate income) and denominator (household count) carry ACS sampling uncertainty. In well-populated block groups this uncertainty is modest; in smaller block groups it can be large enough to materially affect the redistributed estimate. Arlington’s relatively high response rates and the use of five-year pooled estimates (2017–2021) mitigate but do not eliminate this concern <span class="citation" data-cites="ref156"><a href="references.html#ref-ref156" role="doc-biblioref">[4]</a></span>.</p>
 <p>The redistribution does not propagate formal uncertainty bounds. An analyst who needs confidence intervals on the civic-association estimates would need to request the block-group-level margins of error from the Census API and carry them through the redistribution algebra — a non-trivial extension that is beyond the scope of the current pipeline.</p>
 </section>
-<section id="redistribute_direct-rescales-measures-independently" class="level2" data-number="7.4">
-<h2 data-number="7.4" class="anchored" data-anchor-id="redistribute_direct-rescales-measures-independently"><span class="header-section-number">7.4</span> <code>redistribute_direct</code> rescales measures independently</h2>
+<section id="redistribute_direct-rescales-measures-independently" class="level2" data-number="8.4">
+<h2 data-number="8.4" class="anchored" data-anchor-id="redistribute_direct-rescales-measures-independently"><span class="header-section-number">8.4</span> <code>redistribute_direct</code> rescales measures independently</h2>
 <p>The <code>redistribute_direct</code> function rescales each source column independently to ensure its total is preserved in the target geography. When two columns are redistributed independently and then combined into a ratio — as happens with both income (aggregate income / households) and broadband (speed-product / tests) — the rescaling applied to each column need not be identical. Near the county boundary, where tile clipping and block-group edge effects are most pronounced, the two columns may be rescaled by slightly different factors, producing a ratio that is not perfectly equivalent to what a joint redistribution would yield.</p>
 <p>In the Arlington validation, the household total is preserved within approximately 2% of the source total — well within the ACS sampling error, and acceptable for a comparative county-level analysis. For applications where ratio precision at the county boundary is critical, analysts should consider masking associations that have more than a threshold fraction of their area outside the source coverage, or running a sensitivity check that compares estimates from independent and joint redistribution paths.</p>
 
@@ -669,13 +675,13 @@ div.csl-indent {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./05-results.html" class="pagination-link" aria-label="Results &amp; Interpretation">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Results &amp; Interpretation</span></span>
+      <a href="./parcel-approach.html" class="pagination-link" aria-label="A Second Approach: Parcel-Based Redistribution">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">A Second Approach: Parcel-Based Redistribution</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./07-apply-it.html" class="pagination-link" aria-label="Apply It to Your Own Jurisdiction">
-        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Apply It to Your Own Jurisdiction</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
