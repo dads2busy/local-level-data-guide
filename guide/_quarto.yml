@@ -45,4 +45,5 @@ format:
     toc: true
     fig-cap-location: bottom
     code-fold: true
+    include-in-header: head-fonts.html
     include-after-body: sidebar-logo.html

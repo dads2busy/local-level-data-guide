@@ -1,29 +1,141 @@
 /*-- scss:defaults --*/
 $font-family-sans-serif: "Libre Franklin", system-ui, sans-serif;
 $font-family-serif: "Source Serif 4", Georgia, serif;
+$font-family-monospace: "JetBrains Mono", ui-monospace, monospace;
 $body-color: #1B2A4A;
 $link-color: #2166AC;
 $primary: #2166AC;
 
 /*-- scss:rules --*/
-body { font-family: $font-family-serif; line-height: 1.6; }
-h1, h2, h3, h4, .sidebar, .quarto-title-block { font-family: $font-family-sans-serif; color: #1B2A4A; }
-h2 { border-bottom: 2px solid #E5E7EB; padding-bottom: .3rem; }
-.callout { border-left-color: #2A7F7F; }
-a { color: #2166AC; }
-figure figcaption { color: #6B7280; font-size: .9rem; }
+// Data-journalism-bold identity: navy ink, amber as the structural accent.
+$ink: #1B2A4A;
+$accent: #D8732E;
+$gray: #6B7280;
+$light: #E5E7EB;
+$muted: #3D4A66;
 
+body { font-family: $font-family-serif; line-height: 1.7; color: $ink; }
+.sidebar, .quarto-title-block { font-family: $font-family-sans-serif; color: $ink; }
+
+#quarto-document-content {
+  h1, h2, h3, h4, h5 { font-family: $font-family-sans-serif; color: $ink; }
+
+  // Book title (landing header)
+  h1.title { font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+
+  // Chapter title: heavy, tight, with the signature amber top rule
+  section.level1 > h1 {
+    font-weight: 800;
+    font-size: 2.7rem;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-top: 0.4rem;
+    padding-top: 1.1rem;
+    border-top: 6px solid $accent;
+  }
+
+  // Section headings: bold with an amber underrule
+  h2 {
+    font-weight: 700;
+    font-size: 1.7rem;
+    margin-top: 2.4rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 3px solid $accent;
+  }
+  h3 { font-weight: 600; font-size: 1.3rem; margin-top: 1.6rem; }
+
+  // Standfirst: the chapter's opening paragraph reads larger and lighter
+  section.level1 > p:first-of-type {
+    font-size: 1.22rem;
+    line-height: 1.6;
+    color: $muted;
+  }
+
+  a {
+    color: $link-color;
+    text-underline-offset: 2px;
+    &:hover { color: $accent; }
+  }
+
+  // Figures: framed image, sans caption with an amber left rule
+  figure.quarto-float-fig {
+    margin: 2rem 0 2.2rem;
+    img {
+      border: 1px solid $light;
+      border-radius: 2px;
+      background: #fff;
+    }
+    figcaption {
+      font-family: $font-family-sans-serif;
+      color: $gray;
+      font-size: 0.86rem;
+      line-height: 1.5;
+      text-align: left;
+      margin-top: 0.7rem;
+      padding-left: 0.85rem;
+      border-left: 3px solid $accent;
+    }
+  }
+
+  // Pull-quote treatment for any blockquotes
+  blockquote {
+    border-left: 4px solid $accent;
+    padding-left: 1.1rem;
+    font-family: $font-family-serif;
+    font-size: 1.3rem;
+    font-weight: 500;
+    font-style: normal;
+    color: $ink;
+  }
+
+  // Code: tinted block, quiet inline chips
+  pre, code { font-family: $font-family-monospace; }
+  div.sourceCode {
+    border: 1px solid $light;
+    border-radius: 4px;
+    background: #f8f9fb;
+  }
+  code:not(.sourceCode) {
+    color: $ink;
+    background: rgba($ink, 0.06);
+    padding: 0.1em 0.32em;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+}
+
+// Callouts: amber accent edge and a tinted, bolder header
+.callout { border-left-color: $accent; }
+.callout.callout-style-default > .callout-header {
+  background: rgba($accent, 0.10);
+  font-family: $font-family-sans-serif;
+  font-weight: 700;
+}
+
+// Left navigation: heavier title, amber-accented active chapter
+.sidebar-title { font-weight: 800; color: $ink; }
+.sidebar-navigation .sidebar-link { color: $ink; }
+.sidebar-navigation .sidebar-link.active { color: $accent; font-weight: 700; }
+
+// Right "On this page" TOC: amber active marker
+nav[role="doc-toc"] a.active {
+  color: $accent;
+  font-weight: 600;
+  border-left-color: $accent;
+}
+
+// Sponsorship logo at the bottom of the left sidebar
 .sidebar-sponsor {
   margin-top: 1.5rem;
   padding: 1rem 0.5rem 0.5rem;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid $light;
   text-align: center;
 }
 .sidebar-sponsor img { max-width: 80%; height: auto; }
 .sidebar-sponsor-label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #6B7280;
+  color: $gray;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
