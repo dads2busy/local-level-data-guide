@@ -1,18 +1,13 @@
 <script>
-// Place the project sponsorship logo at the bottom of the left sidebar,
-// below the table of contents. Injected into every book page.
 window.addEventListener("DOMContentLoaded", function () {
-  // The cover page features the sponsor in its own footer; skip the sidebar
-  // copy there to avoid showing the logo twice.
-  var path = window.location.pathname;
-  if (path === "/" || /\/index\.html$/.test(path)) return;
-  var sidebar = document.querySelector("#quarto-sidebar");
-  if (!sidebar || document.querySelector(".sidebar-sponsor")) return;
-  var wrap = document.createElement("div");
-  wrap.className = "sidebar-sponsor";
-  wrap.innerHTML =
-    '<span class="sidebar-sponsor-label">Project sponsor</span>' +
-    '<img src="figures/partners-mclogo.png" alt="Project sponsor logo" />';
-  sidebar.appendChild(wrap);
+  // Author line directly under the book title in the left sidebar (all pages).
+  // The sponsor logo lives on the landing page only, not in the sidebar.
+  var title = document.querySelector(".sidebar-title");
+  if (title && !document.querySelector(".sidebar-author")) {
+    var author = document.createElement("div");
+    author.className = "sidebar-author";
+    author.textContent = "Aaron Schroeder";
+    title.insertAdjacentElement("afterend", author);
+  }
 });
 </script>
