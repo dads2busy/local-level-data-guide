@@ -1,0 +1,14 @@
+<script>
+// Place the project sponsorship logo at the bottom of the left sidebar,
+// below the table of contents. Injected into every book page.
+window.addEventListener("DOMContentLoaded", function () {
+  var sidebar = document.querySelector("#quarto-sidebar");
+  if (!sidebar || document.querySelector(".sidebar-sponsor")) return;
+  var wrap = document.createElement("div");
+  wrap.className = "sidebar-sponsor";
+  wrap.innerHTML =
+    '<span class="sidebar-sponsor-label">Project sponsor</span>' +
+    '<img src="figures/partners-mclogo.png" alt="Project sponsor logo" />';
+  sidebar.appendChild(wrap);
+});
+</script>

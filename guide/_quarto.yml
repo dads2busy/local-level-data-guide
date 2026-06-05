@@ -2,6 +2,8 @@ project:
   type: book
   output-dir: _output
   pre-render: copy_figures.py
+  resources:
+    - figures/partners-mclogo.png
 
 book:
   title: "Creating Local-Level Geographic Datasets"
@@ -43,3 +45,4 @@ format:
     toc: true
     fig-cap-location: bottom
     code-fold: true
+    include-after-body: sidebar-logo.html

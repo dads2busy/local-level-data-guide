@@ -12,3 +12,19 @@ h2 { border-bottom: 2px solid #E5E7EB; padding-bottom: .3rem; }
 .callout { border-left-color: #2A7F7F; }
 a { color: #2166AC; }
 figure figcaption { color: #6B7280; font-size: .9rem; }
+
+.sidebar-sponsor {
+  margin-top: 1.5rem;
+  padding: 1rem 0.5rem 0.5rem;
+  border-top: 1px solid #E5E7EB;
+  text-align: center;
+}
+.sidebar-sponsor img { max-width: 80%; height: auto; }
+.sidebar-sponsor-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #6B7280;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
