@@ -287,6 +287,17 @@ Figure&nbsp;7.1: Arlington housing units by parcel. Point size is unit count; th
 <section id="the-method-unit-weighted-redistribution" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="the-method-unit-weighted-redistribution"><span class="header-section-number">7.2</span> The method: unit-weighted redistribution</h2>
 <p>The implementation follows a straightforward unit-weighting scheme. Each parcel is “exploded” into a number of identical point records equal to its <code>Total_Units</code> count: a 300-unit multifamily building contributes 300 identical centroid points, while a single-family parcel contributes one. That pool of unit points is then passed to <code>redistribute_parcels</code> from the <code>sdc-redistribute</code> package, which uses the point locations as the dasymetric control layer. The block-group aggregate income and household counts are redistributed to civic associations in proportion to the number of unit points that fall within each association, weighted by their source block-group membership.</p>
+<p><a href="#fig-disaggregation" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> shows the spatial logic. A source block group’s total is divided across the parcels inside it, and those parcels are then collected under whatever target boundary we care about, here a civic association that overlaps the block group only partially. Only the parcels falling inside the target contribute to its estimate.</p>
+<div id="fig-disaggregation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-disaggregation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="figures/fig_disaggregation.png" class="img-fluid figure-img" style="width:100.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-disaggregation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7.2: Parcel-based redistribution in three steps. A source area and its parcels (1); the source total disaggregated across those parcels (2); and the parcels reaggregated under a different target boundary, where only the parcels inside the target (highlighted) contribute to its estimate (3).
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled" title="Python: parcel redistribution">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -320,7 +331,7 @@ Python: parcel redistribution
 <img src="figures/map_income_parcels.png" class="img-fluid figure-img" style="width:85.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-income-parcels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.2: Mean household income by civic association, parcel-based redistribution.
+Figure&nbsp;7.3: Mean household income by civic association, parcel-based redistribution.
 </figcaption>
 </figure>
 </div>
@@ -330,22 +341,22 @@ Figure&nbsp;7.2: Mean household income by civic association, parcel-based redist
 <img src="figures/map_income_diff.png" class="img-fluid figure-img" style="width:85.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-income-diff-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.3: Difference in mean household income: parcel minus area-weighted (dollars).
+Figure&nbsp;7.4: Difference in mean household income: parcel minus area-weighted (dollars).
 </figcaption>
 </figure>
 </div>
-<p><a href="#fig-income-parcels" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> and <a href="#fig-income-diff" class="quarto-xref">Figure&nbsp;<span>7.3</span></a> tell a consistent story. The parcel map looks nearly identical to its area-weighted counterpart, and the difference map is dominated by values close to zero.</p>
+<p><a href="#fig-income-parcels" class="quarto-xref">Figure&nbsp;<span>7.3</span></a> and <a href="#fig-income-diff" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> tell a consistent story. The parcel map looks nearly identical to its area-weighted counterpart, and the difference map is dominated by values close to zero.</p>
 <div id="fig-area-parcel" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-area-parcel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/scatter_area_vs_parcel.png" class="img-fluid figure-img" style="width:85.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-area-parcel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7.4: Area-weighted vs.&nbsp;parcel-weighted mean income across the 62 civic associations.
+Figure&nbsp;7.5: Area-weighted vs.&nbsp;parcel-weighted mean income across the 62 civic associations.
 </figcaption>
 </figure>
 </div>
-<p>The scatter plot in <a href="#fig-area-parcel" class="quarto-xref">Figure&nbsp;<span>7.4</span></a> makes the relationship explicit: the two methods produce a Pearson r = 1.00 across the 62 associations. The largest per-association shift in either direction is approximately ±$22,000, a few percent on six-figure incomes. The three biggest gainers under parcel weighting are <strong>Arlington Forest (+$22,306)</strong>, <strong>Cherrydale (+$15,347)</strong>, and <strong>Foxcroft Heights (+$13,047)</strong>. The three biggest losers are <strong>Lyon Park (−$6,118)</strong>, <strong>John M Langston (−$4,960)</strong>, and <strong>Douglas Park (−$3,781)</strong>.</p>
+<p>The scatter plot in <a href="#fig-area-parcel" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> makes the relationship explicit: the two methods produce a Pearson r = 1.00 across the 62 associations. The largest per-association shift in either direction is approximately ±$22,000, a few percent on six-figure incomes. The three biggest gainers under parcel weighting are <strong>Arlington Forest (+$22,306)</strong>, <strong>Cherrydale (+$15,347)</strong>, and <strong>Foxcroft Heights (+$13,047)</strong>. The three biggest losers are <strong>Lyon Park (−$6,118)</strong>, <strong>John M Langston (−$4,960)</strong>, and <strong>Douglas Park (−$3,781)</strong>.</p>
 <p>Why do the methods agree so closely? Mean household income is a smooth, intensive measure: it describes a characteristic of households, not a count of things that accumulate over area. When a block group’s income is fairly evenly distributed among its housing stock, as it generally is in Arlington at the block-group scale, then <em>where</em> within the block group the housing sits barely changes the weighted average that reaches each civic association. Parcel placement shifts modest fractions of the income count from one association to an adjacent one, but because the income levels on both sides of any given boundary are similar, the effect on the mean nearly cancels. The ±$22,000 maximum shift represents the cases where a multifamily building with an unusually different household composition sits near a boundary: a real effect, but a small one relative to the income range in the data.</p>
 </section>
 <section id="leakage-and-the-case-for-parcel-weighting-on-count-measures" class="level2" data-number="7.4">
