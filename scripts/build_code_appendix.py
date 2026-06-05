@@ -18,11 +18,11 @@ OUT = ROOT / "guide" / "08-code.qmd"
 # Modules in pipeline-run order, each with a short subsection blurb.
 MODULES: list[tuple[str, str, str]] = [
     ("config.py", "Configuration",
-     "Central settings — the Arlington FIPS codes, the ACS count variables "
+     "Central settings: the Arlington FIPS codes, the ACS count variables "
      "(aggregate income and households), and the dataset paths every other "
      "module reads."),
     ("acquire_geographies.py", "Acquire census geographies",
-     "Download Arlington's census block groups — the source geography for the "
+     "Download Arlington's census block groups, the source geography for the "
      "income redistribution."),
     ("acquire_acs.py", "Acquire ACS income counts",
      "Pull aggregate household income and household counts from the Census API. "
@@ -60,7 +60,7 @@ HEADER = """\
 # The Complete Pipeline Code {#sec-code}
 
 This appendix reproduces the full, runnable Python pipeline behind the worked
-example — the actual source, not a simplified sketch. It is generated directly
+example: the actual source, not a simplified sketch. It is generated directly
 from the `pipeline/` package in the companion repository, so it always matches
 the code that produced every figure and number in this guide.
 
@@ -84,7 +84,7 @@ def main() -> None:
         # NOTE: plain ```python blocks (not the `filename=` attribute). The
         # filename attribute wraps each block in a captioned float
         # (\begin{codelisting}), and floats taller than a page are silently
-        # dropped by LaTeX — so long modules vanish from the PDF. A plain code
+        # dropped by LaTeX, so long modules vanish from the PDF. A plain code
         # block renders in a framed (Shaded) environment that breaks across
         # pages. The filename is shown as a bold label instead.
         parts.append(f"\n## {title}\n\n{blurb}\n")

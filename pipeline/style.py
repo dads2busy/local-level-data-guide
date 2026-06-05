@@ -27,7 +27,7 @@ BIVARIATE_COLORS = {
 }
 
 FIG_DPI = 300
-MAP_CRS = "EPSG:26918"   # UTM 18N (metres) — accurate scale bars for Arlington
+MAP_CRS = "EPSG:26918"   # UTM 18N (metres): accurate scale bars for Arlington
 
 _FONTS_DIR = Path(__file__).resolve().parent.parent / "fonts"
 _HEADING_FAMILY = "Libre Franklin"

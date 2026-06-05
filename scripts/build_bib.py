@@ -35,7 +35,7 @@ def clean_title(title: str) -> str:
     title = title.replace("{", "(").replace("}", ")")
     # Escape & for LaTeX/BibTeX (but not if already escaped)
     title = re.sub(r"(?<!\\)&", r"\\&", title)
-    # Escape % for LaTeX/BibTeX (only in non-URL portions — handled after URL removal)
+    # Escape % for LaTeX/BibTeX (only in non-URL portions; handled after URL removal)
     title = re.sub(r"(?<!\\)%", r"\\%", title)
     # Clean up leading/trailing punctuation and whitespace
     return title.strip(" -[]")
@@ -60,7 +60,7 @@ def main() -> None:
             raw_title = rest
         title = clean_title(raw_title)
         if not title:
-            # No descriptive title in the archive — use the URL host (e.g.
+            # No descriptive title in the archive; use the URL host (e.g.
             # "stacks.cdc.gov") rather than a meaningless "Source N" placeholder.
             if url:
                 title = re.sub(r"^https?://(www\.)?", "", url).split("/")[0]

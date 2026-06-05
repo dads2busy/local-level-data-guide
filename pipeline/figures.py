@@ -142,7 +142,7 @@ def fig_income_parcels() -> Path:
     cmp = gpd.read_file(config.CIVIC_INCOME_COMPARISON)
     fig = maps.choropleth(
         cmp, "mean_income_parcel",
-        title="Mean Household Income — Parcel Method",
+        title="Mean Household Income (Parcel Method)",
         legend_label="Mean income ($)", fmt="${:,.0f}",
     )
     return _save(fig, "map_income_parcels.png")

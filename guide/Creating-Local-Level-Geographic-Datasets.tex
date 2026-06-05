@@ -294,7 +294,7 @@
 Local officials make decisions at the neighborhood level, but the data
 they rely on is usually reported at the county level. A county-wide
 broadband adoption rate, a county-wide income figure, a county-wide
-health outcome --- these statistics obscure the variation that actually
+health outcome: these statistics obscure the variation that actually
 matters for policy. A neighborhood with near-universal high-speed
 service and an adjacent neighborhood with almost none look identical in
 a county aggregate. The officials who need to target investment, design
@@ -325,8 +325,8 @@ data program routinely publishes estimates for them {[}3{]}.
 
 The result is a persistent data gap between the geographic scale at
 which data is collected and reported and the geographic scale at which
-local government operates. Analysts working inside local government ---
-and researchers trying to support them --- must construct the sub-county
+local government operates. Analysts working inside local government (and
+researchers trying to support them) must construct the sub-county
 datasets they need rather than retrieve them from a shelf {[}4{]}.
 
 \section{What this guide
@@ -335,9 +335,9 @@ demonstrates}\label{what-this-guide-demonstrates}
 This guide works through a concrete example: estimating mean household
 income and fixed-broadband download speeds for each of Arlington County,
 Virginia's \textbf{62 civic associations}, which together cover
-approximately \textbf{109,528 households}. The two source datasets ---
-Ookla fixed-broadband speed-test tiles and American Community Survey
-block-group income and household counts --- arrive on entirely different
+approximately \textbf{109,528 households}. The two source datasets
+(Ookla fixed-broadband speed-test tiles and American Community Survey
+block-group income and household counts) arrive on entirely different
 geographic footprints that match neither each other nor the
 civic-association boundaries. The guide shows, step by step, how to
 align those footprints through areal-weighted interpolation and produce
@@ -346,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -367,7 +367,7 @@ guide explains each concept as it arises.
 \chapter{The Problem of Misaligned Boundaries}\label{sec-maup}
 
 Every geographic dataset comes packaged in a particular set of spatial
-units --- the shapes that define where each observation applies. Census
+units: the shapes that define where each observation applies. Census
 estimates arrive at the block-group or tract level. Speed-test tiles
 come in a fixed web-mercator grid. Administrative records attach to
 parcels, precincts, or service zones. The problem is that the boundaries
@@ -381,8 +381,8 @@ Problem}\label{the-modifiable-areal-unit-problem}
 This mismatch has a formal name in spatial statistics: the
 \textbf{Modifiable Areal Unit Problem}, or MAUP {[}5{]}. The MAUP has
 two related components. The \emph{scale effect} describes how
-statistical summaries --- means, correlations, rates --- change when the
-same underlying data is aggregated to larger or smaller units. The
+statistical summaries (means, correlations, rates) change when the same
+underlying data is aggregated to larger or smaller units. The
 \emph{zonation effect} describes how the same summary statistics change
 when you redraw boundaries at the same scale but in a different
 configuration. Neither effect is a modeling error; both are inherent
@@ -393,7 +393,7 @@ relationship you observe between two variables can change substantially
 depending solely on the geographic units you use to measure it {[}6{]}.
 A correlation between income and broadband access that appears strong at
 the block-group level may weaken, strengthen, or reverse at the
-civic-association level --- not because the underlying relationship
+civic-association level, not because the underlying relationship
 changed, but because the boundary choice changed. Analysts who do not
 account for this can draw conclusions that are artifacts of the data's
 packaging rather than reflections of reality.
@@ -405,7 +405,7 @@ This guide works with three source geographies, none of which aligns
 with the others.
 
 \textbf{Ookla speed-test tiles} are delivered on a zoom-level-16
-web-mercator grid. Each tile is approximately 610 meters on a side --- a
+web-mercator grid. Each tile is approximately 610 meters on a side: a
 fixed, global grid with no relationship to any political or
 administrative boundary. Tiles do not respect county lines, block-group
 edges, or neighborhood borders.
@@ -417,10 +417,10 @@ area and population density; their boundaries follow streets, water
 features, and other physical markers that predate any local policy unit.
 
 \textbf{Arlington civic associations} are community-defined
-neighborhoods that serve as the county's formal channels for resident
-input and local governance. Their 62 boundaries were drawn through local
-political and historical processes, not by any statistical agency, and
-they bear no systematic relationship to the Census hierarchy.
+neighborhoods and the county's formal channels for resident input and
+local governance. Their 62 boundaries were drawn through local political
+and historical processes, not by any statistical agency, and they bear
+no systematic relationship to the Census hierarchy.
 
 The figure below illustrates the transformation this guide performs:
 taking source data packaged in two incompatible grids and producing
@@ -443,15 +443,15 @@ geography.}
 As Figure~\ref{fig-transform} shows, a single civic association may
 overlap dozens of Ookla tiles and several block groups simultaneously.
 No one-to-one correspondence exists between any pair of these three
-geographies. The method described in subsequent chapters ---
-areal-weighted interpolation --- handles this overlap systematically by
-distributing each source observation across target units in proportion
-to the share of its area that falls within each target unit.
+geographies. The method described in subsequent chapters, areal-weighted
+interpolation, handles this overlap systematically by distributing each
+source observation across target units in proportion to the share of its
+area that falls within each target unit.
 
 The key assumption underlying this approach is that the quantity of
 interest is distributed uniformly within each source unit. That
 assumption is never perfectly true, but it is a principled and auditable
-starting point --- and far preferable to ignoring the boundary problem
+starting point, and far preferable to ignoring the boundary problem
 altogether.
 
 \bookmarksetup{startatroot}
@@ -467,7 +467,7 @@ civic-association boundaries. Each is publicly available.
 
 Ookla publishes quarterly snapshots of aggregated speed-test performance
 through its open-data program {[}7{]}, {[}8{]}. The fixed-broadband
-dataset contains one record per zoom-level-16 web-mercator tile --- a
+dataset contains one record per zoom-level-16 web-mercator tile, a
 global grid in which each cell is approximately 610 meters on a side at
 mid-latitudes. For each tile that received at least one test in a
 quarter, the dataset reports the median download speed (Mbps), median
@@ -514,14 +514,14 @@ five-year release:
 \begin{itemize}
 \tightlist
 \item
-  \textbf{Table B19025} --- Aggregate household income. This is the sum
-  of all household incomes within the block group, expressed in dollars.
+  \textbf{Table B19025:} Aggregate household income. This is the sum of
+  all household incomes within the block group, expressed in dollars.
   Unlike the median, aggregate income is an additive quantity: totals
   from sub-areas can be summed to produce a total for any containing
   area.
 \item
-  \textbf{Table B11001} --- Household count. The number of occupied
-  housing units in the block group.
+  \textbf{Table B11001:} Household count. The number of occupied housing
+  units in the block group.
 \end{itemize}
 
 We use these two counts together rather than median income because mean
@@ -534,9 +534,9 @@ any aggregated geographic unit.
 \section{Arlington Civic
 Associations}\label{arlington-civic-associations}
 
-Arlington County, Virginia is divided into 62 civic associations ---
-community-defined neighborhoods that serve as the county's primary
-formal mechanism for organized resident input {[}11{]}, {[}12{]}. Each
+Arlington County, Virginia is divided into 62 civic associations:
+community-defined neighborhoods that are the county's primary formal
+mechanism for organized resident input {[}11{]}, {[}12{]}. Each
 association elects officers and engages with county government on land
 use, transportation, infrastructure, and community services. Membership
 in the Arlington County Civic Federation, which coordinates the
@@ -558,7 +558,7 @@ meaningful, formally recognized, and together exhaustive.
 
 }
 
-\caption{\label{fig-locator}Arlington's 62 civic associations --- the
+\caption{\label{fig-locator}Arlington's 62 civic associations, the
 policy-relevant target geography.}
 
 \end{figure}%
@@ -575,8 +575,8 @@ guide demonstrates.
 The fundamental challenge of local-level data work is geometric: you
 have numbers attached to one set of polygons and questions about a
 different set of polygons. Areal interpolation is the family of methods
-that bridges that gap. The specific technique used throughout this guide
---- area-weighted redistribution --- is the most transparent and widely
+that bridges that gap. The specific technique used throughout this
+guide, area-weighted redistribution, is the most transparent and widely
 applicable member of that family {[}14{]}, {[}15{]}.
 
 \section{How area-weighted redistribution
@@ -586,10 +586,10 @@ The governing idea is simple: if a source area's polygon overlaps 40\%
 of a target area's polygon, then 40\% of that source area's count is
 assigned to that target area. More precisely, for each pair of source
 and target polygons that intersect, the method computes the fractional
-overlap --- the ratio of intersection area to source area --- and
-multiplies the source value by that fraction. When a target polygon
-overlaps multiple source polygons, the contributions from each source
-are summed to produce the target estimate.
+overlap (the ratio of intersection area to source area) and multiplies
+the source value by that fraction. When a target polygon overlaps
+multiple source polygons, the contributions from each source are summed
+to produce the target estimate.
 
 Formally, the weight \(w_{ij}\) applied when transferring a value from
 source polygon \(i\) to target polygon \(j\) is:
@@ -606,7 +606,7 @@ The method rests on one explicit assumption: the variable of interest is
 distributed uniformly within each source polygon. Population is not
 perfectly uniform within a Census block group, and download speed is not
 perfectly uniform across a 610-meter Ookla tile. But the assumption is
-transparent, auditable, and consistent --- and it systematically
+transparent, auditable, and consistent, and it systematically
 outperforms simply ignoring the boundary problem altogether {[}16{]}.
 
 \section{Extensive vs.~intensive
@@ -631,8 +631,8 @@ household income, total speed-test count.
 \emph{do not scale with area}. Mean income is the same whether you
 measure it for the whole block group or for a one-block sliver of it. If
 you split a block group and assign each half 40\% of its mean income,
-you have made a category error --- you are treating a rate as if it were
-a count. Examples: mean income, mean download speed, population density,
+you have made a category error: you are treating a rate as if it were a
+count. Examples: mean income, mean download speed, population density,
 any ratio.
 
 The practical rule is therefore:
@@ -649,8 +649,8 @@ never redistribute mean income directly.
 
 The same logic applies to a statistic that analysts sometimes want but
 cannot obtain this way: \textbf{the median}. Median household income is
-fundamentally a positional statistic --- it describes the midpoint of a
-distribution --- and it has no additive decomposition. There is no
+fundamentally a positional statistic (it describes the midpoint of a
+distribution) and it has no additive decomposition. There is no
 arithmetic operation on two partial medians that recovers the median of
 their union. If you areally redistribute a median, the result is
 numerically meaningless. This guide uses aggregate income precisely
@@ -658,11 +658,11 @@ because medians cannot be handled this way.
 
 Getting this distinction wrong is the single most common error in areal
 interpolation. It produces estimates that look plausible but are quietly
-incorrect --- typically biased toward area-weighted means of the
+incorrect, typically biased toward area-weighted means of the
 \emph{rate} rather than the \emph{population-weighted} mean that the
 underlying counts would produce. In areas with uneven population density
-(as Arlington has --- denser urban corridors alongside lower-density
-suburban neighborhoods), this error can be substantial.
+(Arlington has denser urban corridors alongside lower-density suburban
+neighborhoods), this error can be substantial.
 
 Figure~\ref{fig-dataflow} summarizes the full redistribution workflow:
 extensive counts enter the redistribution, area weights are applied, and
@@ -694,7 +694,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -716,7 +716,7 @@ divided to produce any desired derived measure.
 
 The collapsible snippet above shows the essential pattern: only
 extensive counts are passed to \texttt{count\_cols}. The intensive
-quantity --- mean income --- is not a parameter to the function; it is
+quantity, mean income, is not a parameter to the function; it is
 computed by the analyst on the output. This design makes the
 extensive-vs-intensive distinction architecturally explicit: the
 function cannot produce a rate; it can only redistribute counts.
@@ -731,8 +731,8 @@ before proceeding to analysis.
 \chapter{Worked Example: Arlington, Step by Step}\label{sec-example}
 
 This chapter walks the full pipeline from raw source files to validated
-civic-association estimates. The five stages --- acquire, redistribute
-income, redistribute broadband, combine, and validate --- correspond
+civic-association estimates. The five stages (acquire, redistribute
+income, redistribute broadband, combine, and validate) correspond
 directly to the pipeline modules in the companion repository. By the
 end, each of Arlington's 62 civic associations has an estimated mean
 household income and an estimated mean download speed derived from the
@@ -756,7 +756,7 @@ provides the source geometry for the ACS redistribution step.
 \textbf{ACS income variables} are retrieved through the Census API using
 a Census API key. The two variables used are B19025\_001E (aggregate
 household income in the past 12 months) and B11001\_001E (number of
-occupied housing units --- households). Both are block-group-level
+occupied housing units, i.e., households). Both are block-group-level
 estimates from the ACS 2021 five-year release. Neither is a median; both
 are extensive counts that can be legitimately redistributed. A Census
 API key is required; the pipeline reads it from the environment variable
@@ -771,20 +771,20 @@ in each tile during the quarter) and \texttt{avg\_d\_kbps} (the average
 download speed across those tests, in kilobits per second). Both are
 used in the broadband redistribution below.
 
-With these three inputs in hand --- block-group polygons, ACS counts,
-and Ookla tiles --- the pipeline is ready to redistribute.
+With these three inputs in hand (block-group polygons, ACS counts, and
+Ookla tiles), the pipeline is ready to redistribute.
 
 \section{Stage 2: Redistribute
 income}\label{stage-2-redistribute-income}
 
 Income follows the pattern described in
-Section~\ref{sec-extensive-intensive}. The two ACS variables ---
-aggregate household income and household count --- are extensive
-measures. Both are redistributed independently to civic associations
-using area-weighted interpolation. The redistribution preserves their
-totals: whatever aggregate income exists across all block groups flows,
-in its entirety, to the set of civic associations (since civic
-associations tile the county without gaps or overlaps).
+Section~\ref{sec-extensive-intensive}. The two ACS variables, aggregate
+household income and household count, are extensive measures. Both are
+redistributed independently to civic associations using area-weighted
+interpolation. The redistribution preserves their totals: whatever
+aggregate income exists across all block groups flows, in its entirety,
+to the set of civic associations (since civic associations tile the
+county without gaps or overlaps).
 
 Figure~\ref{fig-acs} illustrates the transformation. The source (block
 groups) carries two count columns, and the target (civic associations)
@@ -808,19 +808,18 @@ association is a simple arithmetic step:
 
 \[\text{mean income}_j = \frac{\text{agg. income}_j}{\text{households}_j}\]
 
-The result is a population-weighted mean --- accurate in the sense that
-larger block groups (more households) contribute more to the civic
-association's estimate than smaller ones, scaled continuously by the
-fraction of their area that falls within the association's boundary.
+The result is a population-weighted mean: larger block groups (more
+households) contribute more to the civic association's estimate than
+smaller ones, scaled continuously by the fraction of their area that
+falls within the association's boundary.
 
 \section{Stage 3: Redistribute
 broadband}\label{stage-3-redistribute-broadband}
 
 Broadband speed requires one additional preparatory step because
 download speed, like income, is an intensive measure. The variable
-reported in the Ookla tiles --- \texttt{avg\_d\_kbps} --- cannot be
-directly redistributed. The count that makes it meaningful ---
-\texttt{tests} --- can.
+reported in the Ookla tiles, \texttt{avg\_d\_kbps}, cannot be directly
+redistributed. The count that makes it meaningful, \texttt{tests}, can.
 
 The solution is to reconstruct the extensive quantity that, when divided
 by test count, recovers average speed. For each tile:
@@ -856,11 +855,11 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Speed is INTENSIVE — redistribute counts, then derive the rate.}
+\CommentTok{\# Speed is INTENSIVE: redistribute counts, then derive the rate.}
 \NormalTok{tiles[}\StringTok{"d\_product"}\NormalTok{] }\OperatorTok{=}\NormalTok{ tiles[}\StringTok{"avg\_d\_kbps"}\NormalTok{] }\OperatorTok{*}\NormalTok{ tiles[}\StringTok{"tests"}\NormalTok{]   }\CommentTok{\# extensive}
 \CommentTok{\# ... redistribute tests + d\_product to civic associations ...}
 \NormalTok{civic[}\StringTok{"download\_mbps"}\NormalTok{] }\OperatorTok{=}\NormalTok{ (civic[}\StringTok{"d\_product"}\NormalTok{] }\OperatorTok{/}\NormalTok{ civic[}\StringTok{"tests"}\NormalTok{]) }\OperatorTok{/} \DecValTok{1000}
@@ -873,17 +872,17 @@ The collapsible snippet above captures the key lines. Creating
 \texttt{d\_product} before redistribution is the move that makes
 everything else valid. An analyst who skipped this step and
 redistributed \texttt{avg\_d\_kbps} directly would produce a speed
-estimate weighted by \emph{area}, not by \emph{test count} --- a
-different and less meaningful quantity, and one that systematically
-overstates speed in low-density tiles with few tests.
+estimate weighted by \emph{area}, not by \emph{test count}: a different
+and less meaningful quantity that systematically overstates speed in
+low-density tiles with few tests.
 
 \section{Stage 4: Combine}\label{stage-4-combine}
 
 With both redistributions complete, the income and broadband results are
 joined to the civic-association GeoDataFrame on the association
-identifier. The four intermediate columns --- redistributed aggregate
+identifier. The four intermediate columns (redistributed aggregate
 income, redistributed households, redistributed test count, and
-redistributed speed-product --- are used to compute the two final output
+redistributed speed-product) are used to compute the two final output
 columns: \texttt{mean\_income} and \texttt{download\_mbps}. All 62 civic
 associations receive a value for both measures.
 
@@ -899,8 +898,8 @@ associations are), these totals should be identical up to floating-point
 rounding.
 
 In practice, the redistributed household total is preserved within
-\textbf{2\%} of the source total --- a result of minor edge effects at
-the county boundary where tile clipping introduces small geometric
+\textbf{2\%} of the source total, a result of minor edge effects at the
+county boundary where tile clipping introduces small geometric
 imprecision. This tolerance is well within the margin of the ACS
 sampling error itself, and it confirms that the redistribution has not
 created or destroyed households at any meaningful scale.
@@ -913,7 +912,7 @@ target layers, or a geometric validity problem in one of the input
 files.
 
 With validation passed, the pipeline writes its output and the data is
-ready for mapping and analysis --- the subject of the next chapter.
+ready for mapping and analysis, the subject of the next chapter.
 
 \bookmarksetup{startatroot}
 
@@ -923,9 +922,8 @@ The pipeline described in the preceding chapters produces two estimates
 for each of Arlington's 62 civic associations: a mean household income
 derived from ACS block-group counts, and a mean download speed derived
 from Ookla speed-test tiles. This chapter presents both distributions,
-compares them, and draws out the central finding --- a finding that runs
-counter to the most common assumption analysts bring to digital-divide
-work.
+compares them, and draws out the central finding, which runs counter to
+the most common assumption analysts bring to digital-divide work.
 
 \section{Income distribution}\label{income-distribution}
 
@@ -933,13 +931,12 @@ Mean household income across the 62 associations spans from roughly
 \textbf{\$73,000} (Arlington Mill) to \textbf{\$468,000} (Gulf Branch),
 with a mean of association means near \textbf{\$215,600} and a median
 near \textbf{\$191,500}. The roughly \textbf{109,500} households
-represented in the data are not evenly spread: Arlington's geography
+represented in the data are not evenly spread. Arlington's geography
 concentrates its highest incomes in low-density, single-family
-neighbourhoods in the northern and western portions of the county ---
-Gulf Branch, Rivercrest, Bellevue Forest, and Old Glebe all exceed
-\$447,000. Denser, more mixed-use corridors in the south and east ---
-Columbia Heights, Arlington Mill, Forest Glen --- cluster toward the
-lower end.
+neighbourhoods in the northern and western portions of the county: Gulf
+Branch, Rivercrest, Bellevue Forest, and Old Glebe all exceed \$447,000.
+Denser, more mixed-use corridors in the south and east (Columbia
+Heights, Arlington Mill, Forest Glen) cluster toward the lower end.
 
 \begin{figure}[H]
 
@@ -989,12 +986,12 @@ association.}
 The spatial pattern in Figure~\ref{fig-speed} is striking and largely
 inverts the income map. The fastest associations are concentrated in the
 denser southern and central corridors. Columbia Forest reaches 320.8
-Mbps; Long Branch Creek 307.9 Mbps; \textbf{Arlington Mill --- the
-lowest-income association in the dataset at approximately \$73,000 ---
+Mbps; Long Branch Creek 307.9 Mbps; \textbf{Arlington Mill, the
+lowest-income association in the dataset at approximately \$73,000,
 records the third-fastest speed at 307.0 Mbps}. Fairlington follows at
-293.4 Mbps. Conversely, the slowest associations --- Foxcroft Heights
-(100.8 Mbps), Arlingwood (117.3 Mbps), Dominion Hills (176.2 Mbps) ---
-are not low-income enclaves; they are mid-to-high-income, low-density,
+293.4 Mbps. Conversely, the slowest associations (Foxcroft Heights at
+100.8 Mbps, Arlingwood at 117.3 Mbps, Dominion Hills at 176.2 Mbps) are
+not low-income enclaves; they are mid-to-high-income, low-density,
 single-family neighbourhoods in the county's outer northern tier.
 
 \section{The central finding: income and speed are
@@ -1019,14 +1016,14 @@ the 62 civic associations (r = −0.11).}
 \end{figure}%
 
 The scatter plot in Figure~\ref{fig-scatter} makes the absence of a
-relationship visually plain. There is no line --- positive or negative
---- that summarises the cloud in any useful way. Analysts who arrive at
-this data expecting the standard ``rich neighbourhoods get faster
-internet'' finding will not find it here. The naive expectation,
-plausible on its face and documented in national-scale studies of access
-gaps {[}18{]}, does not hold inside a uniformly affluent jurisdiction
-where income variation is high but where the key driver of
-infrastructure investment operates on a different dimension entirely.
+relationship visually plain. There is no line, positive or negative,
+that summarises the cloud in any useful way. Analysts who arrive at this
+data expecting the standard ``rich neighbourhoods get faster internet''
+finding will not find it here. The naive expectation, plausible on its
+face and documented in national-scale studies of access gaps {[}18{]},
+does not hold inside a uniformly affluent jurisdiction where income
+variation is high but where the key driver of infrastructure investment
+operates on a different dimension entirely.
 
 That dimension is \textbf{housing density}. Dense multifamily corridors
 generate the subscriber concentration that makes competitive fibre and
@@ -1035,8 +1032,7 @@ Arlington's Rosslyn--Ballston spine and the Route 1 corridor have both
 density and the infrastructure investment that follows from it.
 Low-density single-family enclaves in northern Arlington have neither
 the building stock to attract the same level of competitive investment
-nor the resulting speeds --- regardless of how wealthy their residents
-are.
+nor the resulting speeds, regardless of how wealthy their residents are.
 
 \section{Income-to-speed ratio}\label{income-to-speed-ratio}
 
@@ -1044,8 +1040,8 @@ To quantify the mismatch between income and infrastructure, consider the
 income-to-speed ratio: dollars of mean household income per Mbps of mean
 download speed. Across the 62 associations this ratio ranges from
 \textbf{\$238 per Mbps} (Arlington Mill, high speed, lower income) to
-\textbf{\$2,490 per Mbps} (Arlingwood, low speed, higher income) ---
-more than a ten-fold span.
+\textbf{\$2,490 per Mbps} (Arlingwood, low speed, higher income), more
+than a ten-fold span.
 
 \begin{figure}[H]
 
@@ -1062,14 +1058,14 @@ income per Mbps of download speed).}
 
 The map in Figure~\ref{fig-ratio} is effectively a map of which
 associations are getting the least broadband for their economic
-standing. The highest-ratio associations --- Arlingwood (\$2,490),
-Bellevue Forest (\$2,107), Gulf Branch (\$1,752), Old Glebe (\$1,713)
---- are all wealthy, low-density, northern-tier communities. They are
-not suffering a crisis of unaffordability; they are simply not served by
-the same density of competitive infrastructure as their southern
-counterparts. The lowest-ratio association, Arlington Mill, has the
-strongest infrastructure relative to its income level precisely because
-dense multifamily housing attracted competitive carriers.
+standing. The highest-ratio associations (Arlingwood at \$2,490,
+Bellevue Forest at \$2,107, Gulf Branch at \$1,752, Old Glebe at
+\$1,713) are all wealthy, low-density, northern-tier communities. They
+are not suffering a crisis of unaffordability; they are simply not
+served by the same density of competitive infrastructure as their
+southern counterparts. The lowest-ratio association, Arlington Mill, has
+the strongest infrastructure relative to its income level precisely
+because dense multifamily housing attracted competitive carriers.
 
 \section{Bivariate synthesis}\label{bivariate-synthesis}
 
@@ -1103,12 +1099,12 @@ tercile across the 62 civic associations.}
 \end{figure}%
 
 The \textbf{largest single cell is high-income / low-speed, with 11
-associations} --- Williamsburg, Maywood, Dominion Hills, Arlingwood,
+associations}: Williamsburg, Maywood, Dominion Hills, Arlingwood,
 Bellevue Forest, Donaldson Run, and their neighbours. This cell alone
 falsifies the ``rich areas get fast internet'' hypothesis. At the
 opposite corner, \textbf{9 associations fall in the low-income /
-high-speed cell} --- Columbia Heights, Forest Glen, Columbia Forest,
-Westover Village, Long Branch Creek, and Arlington Mill --- the dense
+high-speed cell}: Columbia Heights, Forest Glen, Columbia Forest,
+Westover Village, Long Branch Creek, and Arlington Mill, the dense
 multifamily corridors already identified as speed leaders.
 
 The bivariate map in Figure~\ref{fig-bivariate} makes the geography
@@ -1116,7 +1112,7 @@ legible. The high-income/low-speed cluster occupies the low-density
 northern and western portions of the county. The low-income/high-speed
 cluster wraps around the denser central and southern corridors. The
 pattern is structurally coherent and consistent across all three ways of
-visualising it --- the scatter, the ratio map, and the bivariate class
+visualising it: the scatter plot, the ratio map, and the bivariate class
 map.
 
 \section{Policy implications}\label{policy-implications}
@@ -1126,7 +1122,7 @@ density and infrastructure build-out, not household income}, has direct
 implications for how jurisdictions should design broadband equity
 interventions {[}19{]}, {[}20{]}.
 
-Income-based subsidy targeting --- the most common policy tool --- would
+Income-based subsidy targeting, the most common policy tool, would
 direct resources toward low-income households while leaving the actual
 speed gaps unaddressed. The households that experience the weakest
 broadband performance in Arlington are, on average, high-income
@@ -1145,9 +1141,9 @@ density-and-competition gap that the data actually reveal.
 
 The Arlington case cannot be assumed to generalise directly to
 jurisdictions with lower overall incomes or with genuine gaps in
-physical access infrastructure. But the methodological lesson --- that
-one should verify the relationship between income and speed empirically
-before designing income-based interventions --- applies everywhere.
+physical access infrastructure. But the methodological lesson applies
+everywhere: verify the relationship between income and speed empirically
+before designing income-based interventions.
 
 \bookmarksetup{startatroot}
 
@@ -1161,9 +1157,9 @@ group's entire polygon. In practice, a block group's polygon includes
 roads, parks, parking lots, commercial strips, and other land that
 contains no housing at all. For measures tied to where people actually
 live, this matters. Dasymetric methods replace the uniform-distribution
-assumption by using an ancillary layer --- in this case, parcel
-locations --- to concentrate redistributed values where housing actually
-sits {[}16{]}.
+assumption by using an ancillary layer (in this case, parcel locations)
+to concentrate redistributed values where housing actually sits
+{[}16{]}.
 
 This chapter implements that alternative and then asks directly: how
 much does the choice of method change the result?
@@ -1174,7 +1170,7 @@ Arlington County's Master Housing Unit Database (MHUD) provides a
 parcel-level inventory of every residential unit in the county. The
 layer used here contains \textbf{34,340 parcels} carrying roughly
 \textbf{127,000 housing units} in total. The vast majority of those
-parcels --- \textbf{33,665} --- are single-family detached or attached
+parcels (\textbf{33,665}) are single-family detached or attached
 (SFD/SFA) structures, typically carrying one or two units apiece. The
 remaining \textbf{675} parcels are classified as multifamily (MULTI),
 and they account for a disproportionate share of the county's housing
@@ -1190,7 +1186,7 @@ mid-rise buildings each contribute hundreds of units to the total.
 
 }
 
-\caption{\label{fig-parcels}Arlington housing units by parcel --- point
+\caption{\label{fig-parcels}Arlington housing units by parcel. Point
 size is unit count; the few multifamily parcels carry most of the
 county's housing units, concentrated in the Rosslyn--Ballston and Route
 1 corridors.}
@@ -1198,8 +1194,8 @@ county's housing units, concentrated in the Rosslyn--Ballston and Route
 \end{figure}%
 
 Figure~\ref{fig-parcels} makes the spatial concentration vivid. A small
-number of large dots --- each representing a multifamily building ---
-account for a large fraction of the county's residential footprint. The
+number of large dots, each representing a multifamily building, account
+for a large fraction of the county's residential footprint. The
 single-family parcels are numerous but individually small, spread across
 the county's lower-density northern and western neighbourhoods. This
 heterogeneity is precisely what dasymetric redistribution is designed to
@@ -1212,7 +1208,7 @@ redistribution}\label{the-method-unit-weighted-redistribution}
 
 The implementation follows a straightforward unit-weighting scheme. Each
 parcel is ``exploded'' into a number of identical point records equal to
-its \texttt{Total\_Units} count --- so a 300-unit multifamily building
+its \texttt{Total\_Units} count: a 300-unit multifamily building
 contributes 300 identical centroid points, while a single-family parcel
 contributes one. That pool of unit points is then passed to
 \texttt{redistribute\_parcels} from the \texttt{sdc-redistribute}
@@ -1222,7 +1218,7 @@ to civic associations in proportion to the number of unit points that
 fall within each association, weighted by their source block-group
 membership.
 
-\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
+\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1239,11 +1235,11 @@ membership.
 
 \end{tcolorbox}
 
-The logic is the same as the area-weighted approach --- redistribute
-extensive counts, derive intensive rates afterward --- with one
-structural difference: the implicit population surface has changed from
-a uniform density within each block group to a density proportional to
-the spatial distribution of housing units within that block group.
+The logic is the same as the area-weighted approach (redistribute
+extensive counts, derive intensive rates afterward), with one structural
+difference: the implicit population surface has changed from a uniform
+density within each block group to a density proportional to the spatial
+distribution of housing units within that block group.
 
 \section{Results: a close agreement with the area-weighted
 estimates}\label{results-a-close-agreement-with-the-area-weighted-estimates}
@@ -1257,7 +1253,7 @@ estimates}\label{results-a-close-agreement-with-the-area-weighted-estimates}
 }
 
 \caption{\label{fig-income-parcels}Mean household income by civic
-association --- parcel-based redistribution.}
+association, parcel-based redistribution.}
 
 \end{figure}%
 
@@ -1295,35 +1291,35 @@ income across the 62 civic associations.}
 The scatter plot in Figure~\ref{fig-area-parcel} makes the relationship
 explicit: the two methods produce a Pearson r = 1.00 across the 62
 associations. The largest per-association shift in either direction is
-approximately ±\$22,000 --- a few percent on six-figure incomes. The
-three biggest gainers under parcel weighting are \textbf{Arlington
-Forest (+\$22,306)}, \textbf{Cherrydale (+\$15,347)}, and
-\textbf{Foxcroft Heights (+\$13,047)}. The three biggest losers are
-\textbf{Lyon Park (−\$6,118)}, \textbf{John M Langston (−\$4,960)}, and
-\textbf{Douglas Park (−\$3,781)}.
+approximately ±\$22,000, a few percent on six-figure incomes. The three
+biggest gainers under parcel weighting are \textbf{Arlington Forest
+(+\$22,306)}, \textbf{Cherrydale (+\$15,347)}, and \textbf{Foxcroft
+Heights (+\$13,047)}. The three biggest losers are \textbf{Lyon Park
+(−\$6,118)}, \textbf{John M Langston (−\$4,960)}, and \textbf{Douglas
+Park (−\$3,781)}.
 
 Why do the methods agree so closely? Mean household income is a smooth,
 intensive measure: it describes a characteristic of households, not a
 count of things that accumulate over area. When a block group's income
-is fairly evenly distributed among its housing stock --- which holds in
-Arlington at the block-group scale --- then \emph{where} within the
+is fairly evenly distributed among its housing stock, as it generally is
+in Arlington at the block-group scale, then \emph{where} within the
 block group the housing sits barely changes the weighted average that
 reaches each civic association. Parcel placement shifts modest fractions
 of the income count from one association to an adjacent one, but because
 the income levels on both sides of any given boundary are similar, the
 effect on the mean nearly cancels. The ±\$22,000 maximum shift
 represents the cases where a multifamily building with an unusually
-different household composition sits near a boundary --- a real effect,
-but a small one relative to the income range in the data.
+different household composition sits near a boundary: a real effect, but
+a small one relative to the income range in the data.
 
 \section{Leakage and the case for parcel weighting on count
 measures}\label{leakage-and-the-case-for-parcel-weighting-on-count-measures}
 
 One honest limitation deserves direct statement. Approximately
-\textbf{3,032 households} --- about \textbf{2.8\%} of the county total
---- sit in parcels whose centroids fall outside any civic association
-boundary. These households contribute to the block-group totals but are
-not allocated to any association under the parcel method. The parcel
+\textbf{3,032 households} (about \textbf{2.8\%} of the county total) sit
+in parcels whose centroids fall outside any civic association boundary.
+These households contribute to the block-group totals but are not
+allocated to any association under the parcel method. The parcel
 approach therefore slightly underestimates total households compared
 with the area-weighted method, which allocates every square metre of a
 block group to some association. Analysts using this method for official
@@ -1333,7 +1329,7 @@ as a separate ``unassigned'' category.
 
 For mean income, which is what this guide measures, the 2.8\% household
 leakage has a negligible effect on the ratio. For \textbf{count
-measures} --- total population, total housing units --- the answer is
+measures} (total population, total housing units), the answer is
 different. Dasymetric and parcel-based redistribution earn their keep
 precisely when the placement of housing within a block group drives the
 allocation of counts across target boundaries. If you want to know how
@@ -1350,9 +1346,9 @@ package's \texttt{redistribute\_parcel\_pums\_adj} function implements
 this extension by drawing on Public Use Microdata Sample (PUMS)
 household-size distributions, stratified by unit type, to weight
 single-family parcels differently from multifamily ones. Applying that
-method to Arlington's MHUD data --- and assessing whether the
+method to Arlington's MHUD data, and assessing whether the
 household-size correction changes the civic-association estimates
-meaningfully --- is a planned extension of this work.
+meaningfully, is a planned extension of this work.
 
 For the income analysis in this guide, the two methods are
 interchangeable in practice. The parcel approach is presented here to
@@ -1368,8 +1364,8 @@ and parcel weighting converge.
 \chapter{Limitations \& Uncertainty}\label{sec-limits}
 
 The results in Chapter~\ref{sec-results} are derived estimates, not
-direct measurements. Every step of the pipeline --- from the source data
-to the redistribution to the final ratio calculations --- introduces
+direct measurements. Every step of the pipeline, from the source data to
+the redistribution to the final ratio calculations, introduces
 uncertainty. This chapter itemises the four most important sources and
 explains what each implies for interpreting and extending the analysis.
 
@@ -1380,9 +1376,9 @@ The core assumption of area-weighted interpolation is that the quantity
 being redistributed is distributed uniformly within each source unit.
 For ACS income, the source units are census block groups; for Ookla
 broadband, the source units are 610-metre speed-test tiles. Wherever
-that uniformity assumption is wrong --- wherever households or
-speed-test activity are spatially clustered within a unit --- the
-redistribution will misallocate a fraction of the value.
+that uniformity assumption is wrong, wherever households or speed-test
+activity are spatially clustered within a unit, the redistribution will
+misallocate a fraction of the value.
 
 In practice, both income and population density vary within block
 groups, particularly at the edges where block groups straddle the
@@ -1415,10 +1411,10 @@ frustrated users test more frequently, the Ookla data may understate
 typical speeds. If technically sophisticated users dominate the test
 pool, the data may overstate typical speeds. For the purposes of a
 comparative analysis across civic associations within a single county,
-what matters is whether the bias is spatially systematic --- that is,
-whether the test-taker population differs in structure across
-associations in ways that would distort the between-association
-comparisons. That cannot be fully evaluated without ground-truth data.
+what matters is whether the bias is spatially systematic: whether the
+test-taker population differs in structure across associations in ways
+that would distort the between-association comparisons. That cannot be
+fully evaluated without ground-truth data.
 
 Users of this analysis should treat the download speeds as indicative of
 infrastructure capacity at the high end of the user experience
@@ -1449,9 +1445,8 @@ but do not eliminate this concern {[}23{]}.
 The redistribution does not propagate formal uncertainty bounds. An
 analyst who needs confidence intervals on the civic-association
 estimates would need to request the block-group-level margins of error
-from the Census API and carry them through the redistribution algebra
---- a non-trivial extension that is beyond the scope of the current
-pipeline.
+from the Census API and carry them through the redistribution algebra, a
+non-trivial extension that is beyond the scope of the current pipeline.
 
 \section{\texorpdfstring{\texttt{redistribute\_direct} rescales measures
 independently}{redistribute\_direct rescales measures independently}}\label{redistribute_direct-rescales-measures-independently}
@@ -1459,17 +1454,16 @@ independently}{redistribute\_direct rescales measures independently}}\label{redi
 The \texttt{redistribute\_direct} function rescales each source column
 independently to ensure its total is preserved in the target geography.
 When two columns are redistributed independently and then combined into
-a ratio --- as happens with both income (aggregate income / households)
-and broadband (speed-product / tests) --- the rescaling applied to each
-column need not be identical. Near the county boundary, where tile
-clipping and block-group edge effects are most pronounced, the two
-columns may be rescaled by slightly different factors, producing a ratio
-that is not perfectly equivalent to what a joint redistribution would
-yield.
+a ratio, as happens with both income (aggregate income / households) and
+broadband (speed-product / tests), the rescaling applied to each column
+need not be identical. Near the county boundary, where tile clipping and
+block-group edge effects are most pronounced, the two columns may be
+rescaled by slightly different factors, producing a ratio that is not
+perfectly equivalent to what a joint redistribution would yield.
 
 In the Arlington validation, the household total is preserved within
-approximately 2\% of the source total --- well within the ACS sampling
-error, and acceptable for a comparative county-level analysis. For
+approximately 2\% of the source total, well within the ACS sampling
+error and acceptable for a comparative county-level analysis. For
 applications where ratio precision at the county boundary is critical,
 analysts should consider masking associations that have more than a
 threshold fraction of their area outside the source coverage, or running
@@ -1483,17 +1477,17 @@ redistribution paths.
 The Arlington analysis is a worked illustration of a general workflow.
 Any jurisdiction with civic associations, planning districts, school
 attendance zones, or other custom geographies can follow the same steps
-to estimate income and broadband speed --- or any other combination of
-an ACS count variable and an Ookla speed-test variable --- at the
-sub-county level. This chapter distils the pipeline into a numbered
-recipe and points to the tools needed to run it.
+to estimate income and broadband speed (or any other combination of an
+ACS count variable and an Ookla speed-test variable) at the sub-county
+level. This chapter distils the pipeline into a numbered recipe and
+points to the tools needed to run it.
 
 \section{The six-step recipe}\label{the-six-step-recipe}
 
 \textbf{1. Define your target geography as a GeoJSON with a stable
-identifier.} Your target polygons --- the units you want estimates for
---- must be stored as a GeoJSON (or any format readable by GeoPandas)
-and must include a column that uniquely identifies each polygon. The
+identifier.} Your target polygons, the units you want estimates for,
+must be stored as a GeoJSON (or any format readable by GeoPandas) and
+must include a column that uniquely identifies each polygon. The
 companion repository uses \texttt{geoid} by convention, but any string
 or integer key works as long as it is stable and unique. The polygons
 must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is
@@ -1544,8 +1538,8 @@ module.
 \textbf{6. Map, analyse, and interpret.} Join the income and speed
 estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or
 whatever format your visualisation or analysis tool requires. The
-companion repository builds all five result figures --- choropleth maps,
-scatter plot, and bivariate map --- through a single command.
+companion repository builds all five result figures (choropleth maps,
+scatter plot, and bivariate map) through a single command.
 
 \section{Running the companion
 pipeline}\label{running-the-companion-pipeline}
@@ -1578,13 +1572,13 @@ All code is open-source and MIT-licensed.
 
 The areal interpolation logic in the Python pipeline mirrors the
 \texttt{sdc-redistribute} family of functions available in R. An R
-implementation of the full Arlington pipeline --- using \texttt{tigris}
-for Census geometries, \texttt{censusapi} or \texttt{tidycensus} for ACS
-data, \texttt{ooklaOpenDataR} for speed-test tiles, and \texttt{areal}
-or a direct port of \texttt{redistribute\_direct} for the interpolation
-step --- is forthcoming. Analysts already working in R can follow the
-same six-step recipe using those packages; the redistribution algebra is
-language-agnostic.
+implementation of the full Arlington pipeline is forthcoming, using
+\texttt{tigris} for Census geometries, \texttt{censusapi} or
+\texttt{tidycensus} for ACS data, \texttt{ooklaOpenDataR} for speed-test
+tiles, and \texttt{areal} or a direct port of
+\texttt{redistribute\_direct} for the interpolation step. Analysts
+already working in R can follow the same six-step recipe using those
+packages; the redistribution algebra is language-agnostic.
 
 \section{Adapting to other variables}\label{adapting-to-other-variables}
 
@@ -1595,16 +1589,16 @@ variables. Any Ookla variable that can be expressed as a count-weighted
 product (upload speed follows the same \texttt{avg\_u\_kbps\ *\ tests}
 construction as download speed) can be substituted in the same step.
 Analysts working with other speed-test or coverage datasets will need to
-identify the analogous extensive quantity --- typically a count that,
-when summed and divided into a product column, recovers the intensive
-rate of interest --- and follow the same pattern.
+identify the analogous extensive quantity (typically a count that, when
+summed and divided into a product column, recovers the intensive rate of
+interest) and follow the same pattern.
 
 \bookmarksetup{startatroot}
 
 \chapter{The Complete Pipeline Code}\label{sec-code}
 
 This appendix reproduces the full, runnable Python pipeline behind the
-worked example --- the actual source, not a simplified sketch. It is
+worked example: the actual source, not a simplified sketch. It is
 generated directly from the \texttt{pipeline/} package in the companion
 repository, so it always matches the code that produced every figure and
 number in this guide.
@@ -1626,7 +1620,7 @@ omitted here to keep the focus on the data method.
 
 \section{Configuration}\label{configuration}
 
-Central settings --- the Arlington FIPS codes, the ACS count variables
+Central settings: the Arlington FIPS codes, the ACS count variables
 (aggregate income and households), and the dataset paths every other
 module reads.
 
@@ -1690,8 +1684,8 @@ module reads.
 
 \section{Acquire census geographies}\label{acquire-census-geographies}
 
-Download Arlington's census block groups --- the source geography for
-the income redistribution.
+Download Arlington's census block groups, the source geography for the
+income redistribution.
 
 \textbf{\texttt{pipeline/acquire\_geographies.py}}
 
@@ -2273,7 +2267,7 @@ difference per civic association.
 \NormalTok{    src\_hh }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(acs[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{())}
 \NormalTok{    parcel\_hh }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(pd.read\_csv(config.CIVIC\_INCOME\_PARCELS)[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{())}
 \NormalTok{    pct }\OperatorTok{=} \DecValTok{100} \OperatorTok{*}\NormalTok{ (parcel\_hh }\OperatorTok{{-}}\NormalTok{ src\_hh) }\OperatorTok{/}\NormalTok{ src\_hh }\ControlFlowTok{if}\NormalTok{ src\_hh }\ControlFlowTok{else} \FloatTok{0.0}
-    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Household totals — ACS source: }\SpecialCharTok{\{}\NormalTok{src\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{; parcel method: }\SpecialCharTok{\{}\NormalTok{parcel\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{ (}\SpecialCharTok{\{}\NormalTok{pct}\SpecialCharTok{:+.1f\}}\SpecialStringTok{\%)"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Household totals, ACS source: }\SpecialCharTok{\{}\NormalTok{src\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{; parcel method: }\SpecialCharTok{\{}\NormalTok{parcel\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{ (}\SpecialCharTok{\{}\NormalTok{pct}\SpecialCharTok{:+.1f\}}\SpecialStringTok{\%)"}\NormalTok{)}
 
 \NormalTok{    gdf.to\_file(config.CIVIC\_INCOME\_COMPARISON, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
     \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(gdf)}\SpecialCharTok{\}}\SpecialStringTok{ comparison rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_INCOME\_COMPARISON}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
@@ -2349,9 +2343,12 @@ Wire every stage into one command:
 \NormalTok{    acquire\_acs,}
 \NormalTok{    acquire\_geographies,}
 \NormalTok{    acquire\_ookla,}
+\NormalTok{    acquire\_parcels,}
 \NormalTok{    combine,}
+\NormalTok{    compare\_methods,}
 \NormalTok{    redistribute\_broadband,}
 \NormalTok{    redistribute\_income,}
+\NormalTok{    redistribute\_income\_parcels,}
 \NormalTok{    validate,}
 \NormalTok{)}
 
@@ -2360,9 +2357,12 @@ Wire every stage into one command:
 \NormalTok{    acquire\_geographies.main()}
 \NormalTok{    acquire\_acs.main()}
 \NormalTok{    acquire\_ookla.main()}
+\NormalTok{    acquire\_parcels.main()}
 \NormalTok{    redistribute\_income.main()}
 \NormalTok{    redistribute\_broadband.main()}
 \NormalTok{    combine.main()}
+\NormalTok{    redistribute\_income\_parcels.main()}
+\NormalTok{    compare\_methods.main()}
 \NormalTok{    validate.main()}
     \BuiltInTok{print}\NormalTok{(}\StringTok{"Pipeline complete."}\NormalTok{)}
 

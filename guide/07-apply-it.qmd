@@ -1,11 +1,11 @@
 # Apply It to Your Own Jurisdiction {#sec-apply}
 
-The Arlington analysis is a worked illustration of a general workflow. Any jurisdiction with civic associations, planning districts, school attendance zones, or other custom geographies can follow the same steps to estimate income and broadband speed — or any other combination of an ACS count variable and an Ookla speed-test variable — at the sub-county level. This chapter distils the pipeline into a numbered recipe and points to the tools needed to run it.
+The Arlington analysis is a worked illustration of a general workflow. Any jurisdiction with civic associations, planning districts, school attendance zones, or other custom geographies can follow the same steps to estimate income and broadband speed (or any other combination of an ACS count variable and an Ookla speed-test variable) at the sub-county level. This chapter distils the pipeline into a numbered recipe and points to the tools needed to run it.
 
 ## The six-step recipe
 
 **1. Define your target geography as a GeoJSON with a stable identifier.**
-Your target polygons — the units you want estimates for — must be stored as a GeoJSON (or any format readable by GeoPandas) and must include a column that uniquely identifies each polygon. The companion repository uses `geoid` by convention, but any string or integer key works as long as it is stable and unique. The polygons must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is the safe default) and should tile the jurisdiction without meaningful gaps or overlaps. Gaps will cause households and tests near the edges to be unallocated; overlaps will cause double-counting.
+Your target polygons, the units you want estimates for, must be stored as a GeoJSON (or any format readable by GeoPandas) and must include a column that uniquely identifies each polygon. The companion repository uses `geoid` by convention, but any string or integer key works as long as it is stable and unique. The polygons must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is the safe default) and should tile the jurisdiction without meaningful gaps or overlaps. Gaps will cause households and tests near the edges to be unallocated; overlaps will cause double-counting.
 
 **2. Obtain source counts on their native geography.**
 For income, retrieve ACS block-group estimates for the county of interest via the Census API. The two variables needed are B19025_001E (aggregate household income) and B11001_001E (number of households). Both must be five-year estimates aligned with the same ACS vintage. For broadband, download the relevant Ookla quarterly fixed-broadband tile from Ookla's public S3 bucket. Clip the tile to your jurisdiction's bounding box to reduce memory usage. Retain `tests` and `avg_d_kbps`. Both datasets must be in the same CRS as your target geography before redistribution.
@@ -20,7 +20,7 @@ Mean income is `agg_income_target / households_target`. Download speed in Mbps i
 Before proceeding to analysis, compare the sum of redistributed households across all target polygons to the sum of ACS households across all source block groups. They should agree within a few percent. A larger discrepancy indicates a geometry problem (gaps, overlaps, CRS mismatch) that will bias every downstream estimate. Similarly check that redistributed test counts sum to within a few percent of source tile test counts. Both checks are implemented in the companion repository's `pipeline.validate` module.
 
 **6. Map, analyse, and interpret.**
-Join the income and speed estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or whatever format your visualisation or analysis tool requires. The companion repository builds all five result figures — choropleth maps, scatter plot, and bivariate map — through a single command.
+Join the income and speed estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or whatever format your visualisation or analysis tool requires. The companion repository builds all five result figures (choropleth maps, scatter plot, and bivariate map) through a single command.
 
 ## Running the companion pipeline
 
@@ -40,8 +40,8 @@ Both commands require `uv` (the Python package manager), a Census API key in the
 
 ## R implementation
 
-The areal interpolation logic in the Python pipeline mirrors the `sdc-redistribute` family of functions available in R. An R implementation of the full Arlington pipeline — using `tigris` for Census geometries, `censusapi` or `tidycensus` for ACS data, `ooklaOpenDataR` for speed-test tiles, and `areal` or a direct port of `redistribute_direct` for the interpolation step — is forthcoming. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.
+The areal interpolation logic in the Python pipeline mirrors the `sdc-redistribute` family of functions available in R. An R implementation of the full Arlington pipeline is forthcoming, using `tigris` for Census geometries, `censusapi` or `tidycensus` for ACS data, `ooklaOpenDataR` for speed-test tiles, and `areal` or a direct port of `redistribute_direct` for the interpolation step. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.
 
 ## Adapting to other variables
 
-The recipe generalises beyond income and broadband. Any ACS extensive variable (counts of people, households, housing units, workers) can be redistributed in step 3 by substituting the appropriate B-table variables. Any Ookla variable that can be expressed as a count-weighted product (upload speed follows the same `avg_u_kbps * tests` construction as download speed) can be substituted in the same step. Analysts working with other speed-test or coverage datasets will need to identify the analogous extensive quantity — typically a count that, when summed and divided into a product column, recovers the intensive rate of interest — and follow the same pattern.
+The recipe generalises beyond income and broadband. Any ACS extensive variable (counts of people, households, housing units, workers) can be redistributed in step 3 by substituting the appropriate B-table variables. Any Ookla variable that can be expressed as a count-weighted product (upload speed follows the same `avg_u_kbps * tests` construction as download speed) can be substituted in the same step. Analysts working with other speed-test or coverage datasets will need to identify the analogous extensive quantity (typically a count that, when summed and divided into a product column, recovers the intensive rate of interest) and follow the same pattern.

@@ -32,7 +32,7 @@ def main() -> None:
     src_hh = float(acs["households"].sum())
     parcel_hh = float(pd.read_csv(config.CIVIC_INCOME_PARCELS)["households"].sum())
     pct = 100 * (parcel_hh - src_hh) / src_hh if src_hh else 0.0
-    print(f"Household totals — ACS source: {src_hh:,.0f}; parcel method: {parcel_hh:,.0f} ({pct:+.1f}%)")
+    print(f"Household totals, ACS source: {src_hh:,.0f}; parcel method: {parcel_hh:,.0f} ({pct:+.1f}%)")
 
     gdf.to_file(config.CIVIC_INCOME_COMPARISON, driver="GeoJSON")
     print(f"Wrote {len(gdf)} comparison rows → {config.CIVIC_INCOME_COMPARISON}")

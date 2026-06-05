@@ -1,6 +1,6 @@
 """Best-effort download of the guide's OFL fonts into ./fonts.
 
-Variable TTFs from the google/fonts repo. Failure is non-fatal — style.py falls
+Variable TTFs from the google/fonts repo. Failure is non-fatal; style.py falls
 back to a generic sans-serif when a font is absent.
 """
 from __future__ import annotations
@@ -27,7 +27,7 @@ def main() -> None:
             urllib.request.urlretrieve(url, dest)
             size = dest.stat().st_size
             if size < 5_000:
-                print(f"WARN {name} too small ({size} bytes) — likely an error page, deleting")
+                print(f"WARN {name} too small ({size} bytes), likely an error page, deleting")
                 dest.unlink()
                 continue
             print(f"fetched {name} ({size} bytes)")

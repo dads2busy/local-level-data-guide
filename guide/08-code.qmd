@@ -1,7 +1,7 @@
 # The Complete Pipeline Code {#sec-code}
 
 This appendix reproduces the full, runnable Python pipeline behind the worked
-example — the actual source, not a simplified sketch. It is generated directly
+example: the actual source, not a simplified sketch. It is generated directly
 from the `pipeline/` package in the companion repository, so it always matches
 the code that produced every figure and number in this guide.
 
@@ -19,7 +19,7 @@ same repository and is omitted here to keep the focus on the data method.
 
 ## Configuration
 
-Central settings — the Arlington FIPS codes, the ACS count variables (aggregate income and households), and the dataset paths every other module reads.
+Central settings: the Arlington FIPS codes, the ACS count variables (aggregate income and households), and the dataset paths every other module reads.
 
 **`pipeline/config.py`**
 
@@ -80,7 +80,7 @@ CIVIC_INCOME_COMPARISON = DATA / "civic_income_comparison.geojson"  # produced b
 
 ## Acquire census geographies
 
-Download Arlington's census block groups — the source geography for the income redistribution.
+Download Arlington's census block groups, the source geography for the income redistribution.
 
 **`pipeline/acquire_geographies.py`**
 
@@ -641,7 +641,7 @@ def main() -> None:
     src_hh = float(acs["households"].sum())
     parcel_hh = float(pd.read_csv(config.CIVIC_INCOME_PARCELS)["households"].sum())
     pct = 100 * (parcel_hh - src_hh) / src_hh if src_hh else 0.0
-    print(f"Household totals — ACS source: {src_hh:,.0f}; parcel method: {parcel_hh:,.0f} ({pct:+.1f}%)")
+    print(f"Household totals, ACS source: {src_hh:,.0f}; parcel method: {parcel_hh:,.0f} ({pct:+.1f}%)")
 
     gdf.to_file(config.CIVIC_INCOME_COMPARISON, driver="GeoJSON")
     print(f"Wrote {len(gdf)} comparison rows → {config.CIVIC_INCOME_COMPARISON}")
@@ -713,9 +713,12 @@ from pipeline import (
     acquire_acs,
     acquire_geographies,
     acquire_ookla,
+    acquire_parcels,
     combine,
+    compare_methods,
     redistribute_broadband,
     redistribute_income,
+    redistribute_income_parcels,
     validate,
 )
 
@@ -724,9 +727,12 @@ def main() -> None:
     acquire_geographies.main()
     acquire_acs.main()
     acquire_ookla.main()
+    acquire_parcels.main()
     redistribute_income.main()
     redistribute_broadband.main()
     combine.main()
+    redistribute_income_parcels.main()
+    compare_methods.main()
     validate.main()
     print("Pipeline complete.")
 
