@@ -346,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, rightrule=.15mm, colback=white, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, left=2mm, bottomtitle=1mm, breakable, titlerule=0mm, coltitle=black, toprule=.15mm, arc=.35mm, opacitybacktitle=0.6, leftrule=.75mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -397,6 +397,33 @@ civic-association level, not because the underlying relationship
 changed, but because the boundary choice changed. Analysts who do not
 account for this can draw conclusions that are artifacts of the data's
 packaging rather than reflections of reality.
+
+To see why, consider a single variable measured across one small area
+and summarised under two district schemes (Figure~\ref{fig-maup}). The
+underlying values are identical in both cases; only the boundaries
+differ. One scheme cuts across the gradient and reports a nearly uniform
+figure of about 220 Mbps in every district, erasing the variation
+entirely. The other aligns with the gradient and reports districts
+ranging from 138 to 302 Mbps. Same data, opposite conclusions, with
+nothing changed but where the lines were drawn.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=1\linewidth,height=\textheight,keepaspectratio]{figures/fig_maup.png}
+
+}
+
+\caption{\label{fig-maup}The Modifiable Areal Unit Problem in miniature.
+A single east-to-west speed gradient (left) is summarised under two
+district schemes covering the identical area. Boundaries A (centre) cut
+across the gradient, so every district averages about 220 Mbps and the
+variation disappears. Boundaries B (right) align with the gradient, so
+district averages range from 138 to 302 Mbps. The choice of geography is
+an analytical decision, not a clerical one.}
+
+\end{figure}%
 
 \section{Three misaligned
 geographies}\label{three-misaligned-geographies}
@@ -694,7 +721,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, rightrule=.15mm, colback=white, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, left=2mm, bottomtitle=1mm, breakable, titlerule=0mm, coltitle=black, toprule=.15mm, arc=.35mm, opacitybacktitle=0.6, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -855,7 +882,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, rightrule=.15mm, colback=white, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, left=2mm, bottomtitle=1mm, breakable, titlerule=0mm, coltitle=black, toprule=.15mm, arc=.35mm, opacitybacktitle=0.6, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1218,7 +1245,7 @@ to civic associations in proportion to the number of unit points that
 fall within each association, weighted by their source block-group
 membership.
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, breakable, bottomtitle=1mm, colback=white, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, coltitle=black, left=2mm, leftrule=.75mm, arc=.35mm, toptitle=1mm, rightrule=.15mm, toprule=.15mm, opacityback=0]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, rightrule=.15mm, colback=white, bottomrule=.15mm, colframe=quarto-callout-note-color-frame, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, left=2mm, bottomtitle=1mm, breakable, titlerule=0mm, coltitle=black, toprule=.15mm, arc=.35mm, opacitybacktitle=0.6, leftrule=.75mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]

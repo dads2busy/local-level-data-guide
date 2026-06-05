@@ -6,6 +6,7 @@ from pathlib import Path
 import geopandas as gpd
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 matplotlib.use("Agg")
 
@@ -172,7 +173,80 @@ def fig_scatter_area_vs_parcel() -> Path:
     return _save(fig, "scatter_area_vs_parcel.png")
 
 
+def fig_maup() -> Path:
+    """Synthetic illustration of the Modifiable Areal Unit Problem.
+
+    One east-west speed gradient, summarised under two district schemes. Bands
+    cut across the gradient (panel 2) each span its full range and average out
+    to a near-uniform value, hiding the variation; bands aligned with the
+    gradient (panel 3) diverge sharply, revealing it. The field depends only on
+    the east-west axis, so the contrast is exact rather than staged.
+    """
+    nx, ny = 48, 36
+    cols = np.arange(nx)
+    surface = 100.0 + (cols / (nx - 1)) * 240.0   # 100..340 Mbps, east-west only
+    grid = np.tile(surface, (ny, 1))
+    vmin, vmax = 100.0, 340.0
+    cmap = style.SEQUENTIAL
+
+    def bands(axis: int):
+        out = np.empty_like(grid)
+        n = grid.shape[axis]
+        edges = [0, n // 3, 2 * n // 3, n]
+        means = []
+        for i in range(3):
+            sl = slice(edges[i], edges[i + 1])
+            block = grid[sl, :] if axis == 0 else grid[:, sl]
+            m = float(block.mean())
+            if axis == 0:
+                out[sl, :] = m
+            else:
+                out[:, sl] = m
+            means.append(m)
+        return out, edges, means
+
+    fig, axes = plt.subplots(1, 3, figsize=(13.5, 5.4))
+    box = dict(boxstyle="round,pad=0.3", fc="white", ec="none", alpha=0.85)
+
+    axes[0].imshow(grid, cmap=cmap, vmin=vmin, vmax=vmax, origin="lower", aspect="equal")
+    axes[0].set_title("The underlying data")
+
+    g2, e2, m2 = bands(0)  # stacked horizontal districts → hide the gradient
+    axes[1].imshow(g2, cmap=cmap, vmin=vmin, vmax=vmax, origin="lower", aspect="equal")
+    for y in e2[1:-1]:
+        axes[1].axhline(y - 0.5, color="white", lw=2.5)
+    for i in range(3):
+        axes[1].text(nx / 2, (e2[i] + e2[i + 1]) / 2 - 0.5, f"{m2[i]:.0f}",
+                     ha="center", va="center", color=style.PALETTE["ink"],
+                     fontweight="bold", fontsize=12, bbox=box)
+    axes[1].set_title("Boundaries A: variation hidden")
+
+    g3, e3, m3 = bands(1)  # side-by-side vertical districts → reveal the gradient
+    axes[2].imshow(g3, cmap=cmap, vmin=vmin, vmax=vmax, origin="lower", aspect="equal")
+    for x in e3[1:-1]:
+        axes[2].axvline(x - 0.5, color="white", lw=2.5)
+    for i in range(3):
+        axes[2].text((e3[i] + e3[i + 1]) / 2 - 0.5, ny / 2, f"{m3[i]:.0f}",
+                     ha="center", va="center", color=style.PALETTE["ink"],
+                     fontweight="bold", fontsize=12, bbox=box)
+    axes[2].set_title("Boundaries B: variation revealed")
+
+    for ax in axes:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    sm = plt.cm.ScalarMappable(norm=plt.Normalize(vmin, vmax), cmap=cmap)
+    cbar = fig.colorbar(sm, ax=axes, orientation="horizontal",
+                        fraction=0.046, pad=0.08, shrink=0.5)
+    cbar.set_label("Download speed (Mbps)")
+
+    fig.suptitle("The same data, summarised two ways", fontsize=14,
+                 fontweight="bold", color=style.PALETTE["ink"])
+    return _save(fig, "fig_maup.png")
+
+
 ALL_FIGURES = [
+    fig_maup,
     fig_transformation_3panel,
     fig_locator,
     fig_ookla_tiles,

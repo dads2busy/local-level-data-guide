@@ -8,6 +8,7 @@ from pipeline import diagrams, figures
 ROOT = Path(__file__).resolve().parent.parent
 
 EXPECTED = [
+    "figures/fig_maup.png",
     "figures/fig_transformation_3panel.png",
     "figures/fig_locator_civic.png",
     "figures/fig_ookla_tiles.png",

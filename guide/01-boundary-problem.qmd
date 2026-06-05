@@ -8,6 +8,10 @@ This mismatch has a formal name in spatial statistics: the **Modifiable Areal Un
 
 The practical consequence for local policy work is significant: the relationship you observe between two variables can change substantially depending solely on the geographic units you use to measure it [@ref79]. A correlation between income and broadband access that appears strong at the block-group level may weaken, strengthen, or reverse at the civic-association level, not because the underlying relationship changed, but because the boundary choice changed. Analysts who do not account for this can draw conclusions that are artifacts of the data's packaging rather than reflections of reality.
 
+To see why, consider a single variable measured across one small area and summarised under two district schemes (@fig-maup). The underlying values are identical in both cases; only the boundaries differ. One scheme cuts across the gradient and reports a nearly uniform figure of about 220 Mbps in every district, erasing the variation entirely. The other aligns with the gradient and reports districts ranging from 138 to 302 Mbps. Same data, opposite conclusions, with nothing changed but where the lines were drawn.
+
+![The Modifiable Areal Unit Problem in miniature. A single east-to-west speed gradient (left) is summarised under two district schemes covering the identical area. Boundaries A (centre) cut across the gradient, so every district averages about 220 Mbps and the variation disappears. Boundaries B (right) align with the gradient, so district averages range from 138 to 302 Mbps. The choice of geography is an analytical decision, not a clerical one.](figures/fig_maup.png){#fig-maup width=100%}
+
 ## Three misaligned geographies
 
 This guide works with three source geographies, none of which aligns with the others.
