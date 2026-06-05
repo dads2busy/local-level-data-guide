@@ -96,7 +96,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-a37c72dd2dbac68997fcdc15a3622e78.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-1349031029214dd1f8635b1c6717b2ae.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-18b8ae8c28a3d7fd18e5156801f118cc.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -375,6 +375,20 @@ Figure&nbsp;7.5: Area-weighted vs.&nbsp;parcel-weighted mean income across the 6
 </section>
 
 </main> <!-- /main -->
+<script>
+// Place the project sponsorship logo at the bottom of the left sidebar,
+// below the table of contents. Injected into every book page.
+window.addEventListener("DOMContentLoaded", function () {
+  var sidebar = document.querySelector("#quarto-sidebar");
+  if (!sidebar || document.querySelector(".sidebar-sponsor")) return;
+  var wrap = document.createElement("div");
+  wrap.className = "sidebar-sponsor";
+  wrap.innerHTML =
+    '<span class="sidebar-sponsor-label">Project sponsor</span>' +
+    '<img src="figures/partners-mclogo.png" alt="Project sponsor logo" />';
+  sidebar.appendChild(wrap);
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
