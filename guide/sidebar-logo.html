@@ -9,5 +9,16 @@ window.addEventListener("DOMContentLoaded", function () {
     author.textContent = "Aaron Schroeder";
     title.insertAdjacentElement("afterend", author);
   }
+
+  // Navy continuity bar across the top of every page except the cover, which
+  // already opens with the full navy banner. Sits in normal flow so it
+  // scrolls away with the page.
+  var path = window.location.pathname;
+  var isCover = path === "/" || /\/index\.html$/.test(path);
+  if (!isCover && !document.querySelector(".top-bar")) {
+    var bar = document.createElement("div");
+    bar.className = "top-bar";
+    document.body.insertAdjacentElement("afterbegin", bar);
+  }
 });
 </script>

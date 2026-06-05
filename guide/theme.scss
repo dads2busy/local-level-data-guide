@@ -15,6 +15,10 @@ $light: #E5E7EB;
 $muted: #3D4A66;
 
 body { font-family: $font-family-serif; line-height: 1.7; color: $ink; }
+
+// Navy continuity bar across the very top of interior pages, echoing the
+// cover banner. Injected as the first body element by sidebar-logo.html.
+.top-bar { width: 100%; height: 0.5in; background: $ink; }
 .sidebar, .quarto-title-block { font-family: $font-family-sans-serif; color: $ink; }
 
 #quarto-document-content {
