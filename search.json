@@ -1,0 +1,332 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Creating Local-Level Geographic Datasets",
+    "section": "",
+    "text": "1 The Sub-County Data Gap\nLocal officials make decisions at the neighborhood level, but the data they rely on is usually reported at the county level. A county-wide broadband adoption rate, a county-wide income figure, a county-wide health outcome — these statistics obscure the variation that actually matters for policy. A neighborhood with near-universal high-speed service and an adjacent neighborhood with almost none look identical in a county aggregate. The officials who need to target investment, design interventions, or justify budget requests are working blind.\nThe units that drive real decisions are not counties. They are neighborhood associations, service districts, planning corridors, school catchment zones, and utility territories. These are the geographies where residents organize, where services are delivered, and where disparities become visible. County-level data cannot answer the questions local officials are actually asking.",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>The Sub-County Data Gap</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#why-sub-county-data-is-scarce",
+    "href": "index.html#why-sub-county-data-is-scarce",
+    "title": "Creating Local-Level Geographic Datasets",
+    "section": "1.1 Why sub-county data is scarce",
+    "text": "1.1 Why sub-county data is scarce\nThe scarcity of reliable sub-county data has three overlapping causes. First, small-area estimates carry large statistical uncertainty: when a sample is divided into dozens of small geographic units, the counts per unit shrink, and margins of error grow until estimates become unreliable [1]. Second, statistical agencies and data providers apply geographic suppression or aggregation to protect individual confidentiality; the smaller the area, the more likely a cell will be suppressed [2]. Third, there is no standardized collection infrastructure at the sub-county level. Unlike counties or census tracts, neighborhood and civic-association boundaries are locally defined, vary across jurisdictions, and change over time, so no national data program routinely publishes estimates for them [3].\nThe result is a persistent data gap between the geographic scale at which data is collected and reported and the geographic scale at which local government operates. Analysts working inside local government — and researchers trying to support them — must construct the sub-county datasets they need rather than retrieve them from a shelf [4].",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>The Sub-County Data Gap</span>"
+    ]
+  },
+  {
+    "objectID": "index.html#what-this-guide-demonstrates",
+    "href": "index.html#what-this-guide-demonstrates",
+    "title": "Creating Local-Level Geographic Datasets",
+    "section": "1.2 What this guide demonstrates",
+    "text": "1.2 What this guide demonstrates\nThis guide works through a concrete example: estimating mean household income and fixed-broadband download speeds for each of Arlington County, Virginia’s 62 civic associations, which together cover approximately 109,528 households. The two source datasets — Ookla fixed-broadband speed-test tiles and American Community Survey block-group income and household counts — arrive on entirely different geographic footprints that match neither each other nor the civic-association boundaries. The guide shows, step by step, how to align those footprints through areal-weighted interpolation and produce estimates at the policy-relevant geography.\nThe worked example is implemented in Python. An R implementation is forthcoming.\n\n\n\n\n\n\nWho this guide is for\n\n\n\nLocal government analysts will find a reproducible workflow they can adapt to their own jurisdiction, data sources, and policy geographies. The method generalizes beyond broadband and income to any pair of spatially misaligned datasets.\nDecision-makers and program managers can read the prose and figures without engaging the code. The key takeaways are in the chapter narratives and maps. The technical sections are clearly marked.\nSome background in geographic data is helpful but not required. The guide explains each concept as it arises.\n\n\n\n\n\n\n[1] “Stacks.cdc.gov.” Accessed: Jun. 04, 2026. [Online]. Available: https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf\n\n\n[2] “Github.com.” Accessed: Jun. 04, 2026. [Online]. Available: https://github.com/CDCgov/EPHTracking-Subcounty\n\n\n[3] “results4america.org.” Accessed: Jun. 04, 2026. [Online]. Available: https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf\n\n\n[4] “Iecam.illinois.edu.” Accessed: Jun. 04, 2026. [Online]. Available: https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>The Sub-County Data Gap</span>"
+    ]
+  },
+  {
+    "objectID": "01-boundary-problem.html",
+    "href": "01-boundary-problem.html",
+    "title": "2  The Problem of Misaligned Boundaries",
+    "section": "",
+    "text": "2.1 The Modifiable Areal Unit Problem\nEvery geographic dataset comes packaged in a particular set of spatial units — the shapes that define where each observation applies. Census estimates arrive at the block-group or tract level. Speed-test tiles come in a fixed web-mercator grid. Administrative records attach to parcels, precincts, or service zones. The problem is that the boundaries used to collect and publish one dataset almost never match those used for another, and neither typically matches the policy geography where decisions get made.\nThis mismatch has a formal name in spatial statistics: the Modifiable Areal Unit Problem, or MAUP [1]. The MAUP has two related components. The scale effect describes how statistical summaries — means, correlations, rates — change when the same underlying data is aggregated to larger or smaller units. The zonation effect describes how the same summary statistics change when you redraw boundaries at the same scale but in a different configuration. Neither effect is a modeling error; both are inherent properties of spatially aggregated data.\nThe practical consequence for local policy work is significant: the relationship you observe between two variables can change substantially depending solely on the geographic units you use to measure it [2]. A correlation between income and broadband access that appears strong at the block-group level may weaken, strengthen, or reverse at the civic-association level — not because the underlying relationship changed, but because the boundary choice changed. Analysts who do not account for this can draw conclusions that are artifacts of the data’s packaging rather than reflections of reality.",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Problem of Misaligned Boundaries</span>"
+    ]
+  },
+  {
+    "objectID": "01-boundary-problem.html#three-misaligned-geographies",
+    "href": "01-boundary-problem.html#three-misaligned-geographies",
+    "title": "2  The Problem of Misaligned Boundaries",
+    "section": "2.2 Three misaligned geographies",
+    "text": "2.2 Three misaligned geographies\nThis guide works with three source geographies, none of which aligns with the others.\nOokla speed-test tiles are delivered on a zoom-level-16 web-mercator grid. Each tile is approximately 610 meters on a side — a fixed, global grid with no relationship to any political or administrative boundary. Tiles do not respect county lines, block-group edges, or neighborhood borders.\nACS block groups are the Census Bureau’s smallest standard geography for which the five-year American Community Survey publishes reliable estimates. Block groups within Arlington County range widely in area and population density; their boundaries follow streets, water features, and other physical markers that predate any local policy unit.\nArlington civic associations are community-defined neighborhoods that serve as the county’s formal channels for resident input and local governance. Their 62 boundaries were drawn through local political and historical processes, not by any statistical agency, and they bear no systematic relationship to the Census hierarchy.\nThe figure below illustrates the transformation this guide performs: taking source data packaged in two incompatible grids and producing estimates on the policy-relevant civic-association geography.\n\n\n\n\n\n\nFigure 2.1: Transforming misaligned source data (Ookla tiles, ACS block groups) onto the policy-relevant civic-association geography.\n\n\n\nAs Figure 2.1 shows, a single civic association may overlap dozens of Ookla tiles and several block groups simultaneously. No one-to-one correspondence exists between any pair of these three geographies. The method described in subsequent chapters — areal-weighted interpolation — handles this overlap systematically by distributing each source observation across target units in proportion to the share of its area that falls within each target unit.\nThe key assumption underlying this approach is that the quantity of interest is distributed uniformly within each source unit. That assumption is never perfectly true, but it is a principled and auditable starting point — and far preferable to ignoring the boundary problem altogether.\n\n\n\n\n[1] “Atlas.co.” Accessed: Jun. 04, 2026. [Online]. Available: https://atlas.co/blog/modifiable-areal-unit-problem-maup/\n\n\n[2] “Gisgeography.com.” Accessed: Jun. 04, 2026. [Online]. Available: https://gisgeography.com/maup-modifiable-areal-unit-problem/",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>The Problem of Misaligned Boundaries</span>"
+    ]
+  },
+  {
+    "objectID": "02-the-data.html",
+    "href": "02-the-data.html",
+    "title": "3  The Data",
+    "section": "",
+    "text": "3.1 Ookla Speed-Test Tiles\nThis chapter describes the three datasets used in the worked example: Ookla fixed-broadband speed-test tiles, American Community Survey block-group income and household counts, and Arlington County civic-association boundaries. Each is publicly available.\nOokla publishes quarterly snapshots of aggregated speed-test performance through its open-data program [1], [2]. The fixed-broadband dataset contains one record per zoom-level-16 web-mercator tile — a global grid in which each cell is approximately 610 meters on a side at mid-latitudes. For each tile that received at least one test in a quarter, the dataset reports the median download speed (Mbps), median upload speed (Mbps), and number of tests that contributed to those medians.\nFor this guide, the relevant quarter is Q1 2021, chosen to align with the ACS 2021 five-year estimates. Download speed and test count are the primary variables of interest. Test count matters because tiles with very few tests carry more uncertainty; the method chapter discusses how this is handled.\nOokla speed-test data reflects the experience of users who actively ran a test at Speedtest.net or through an embedded Speedtest SDK during the quarter. This is not a random sample of all internet users, and coverage varies with population density and smartphone penetration. These limitations are discussed further in the limitations chapter.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>The Data</span>"
+    ]
+  },
+  {
+    "objectID": "02-the-data.html#ookla-speed-test-tiles",
+    "href": "02-the-data.html#ookla-speed-test-tiles",
+    "title": "3  The Data",
+    "section": "",
+    "text": "Figure 3.1: Ookla fixed-broadband speed-test tiles over Arlington (download Mbps).",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>The Data</span>"
+    ]
+  },
+  {
+    "objectID": "02-the-data.html#american-community-survey",
+    "href": "02-the-data.html#american-community-survey",
+    "title": "3  The Data",
+    "section": "3.2 American Community Survey",
+    "text": "3.2 American Community Survey\nThe American Community Survey is the Census Bureau’s ongoing household survey, published annually as one-year and five-year estimates. The five-year estimates average data collected over a rolling 60-month window and are the appropriate choice for small geographies where single-year samples are too thin to support reliable estimates [3], [4].\nThis guide uses two block-group-level variables from the ACS 2021 five-year release:\n\nTable B19025 — Aggregate household income. This is the sum of all household incomes within the block group, expressed in dollars. Unlike the median, aggregate income is an additive quantity: totals from sub-areas can be summed to produce a total for any containing area.\nTable B11001 — Household count. The number of occupied housing units in the block group.\n\nWe use these two counts together rather than median income because mean income for any custom geography can be derived directly from them: divide aggregate income by household count. This arithmetic is only valid for additive counts, not medians. Using aggregate income and household counts preserves the ability to produce correct estimates at any aggregated geographic unit.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>The Data</span>"
+    ]
+  },
+  {
+    "objectID": "02-the-data.html#arlington-civic-associations",
+    "href": "02-the-data.html#arlington-civic-associations",
+    "title": "3  The Data",
+    "section": "3.3 Arlington Civic Associations",
+    "text": "3.3 Arlington Civic Associations\nArlington County, Virginia is divided into 62 civic associations — community-defined neighborhoods that serve as the county’s primary formal mechanism for organized resident input [5], [6]. Each association elects officers and engages with county government on land use, transportation, infrastructure, and community services. Membership in the Arlington County Civic Federation, which coordinates the associations, is the standard means by which neighborhoods participate in county decision-making.\nThe civic-association boundaries used here come from Arlington County’s GIS open data portal [7]. The 62 associations cover the entire county and tile it without overlap, making them a complete and non-overlapping partition of Arlington’s approximately 109,528 households. This makes them an ideal policy geography: they are locally meaningful, formally recognized, and together exhaustive.\n\n\n\n\n\n\nFigure 3.2: Arlington’s 62 civic associations — the policy-relevant target geography.\n\n\n\nBecause civic associations are not part of the Census geographic hierarchy, no federal statistical agency publishes estimates at this level. Producing those estimates is precisely what the remainder of this guide demonstrates.\n\n\n\n\n[1] “Speedtest by ookla global fixed and mobile network performance ...” Accessed: Jun. 04, 2026. [Online]. Available: https://github.com/teamookla/ookla-open-data\n\n\n[2] “Announcing ookla open datasets.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.ookla.com/articles/announcing-ookla-open-datasets\n\n\n[3] “American community survey 5-year data (2009-2023).” Accessed: Jun. 04, 2026. [Online]. Available: https://www.census.gov/data/developers/data-sets/acs-5year.html\n\n\n[4] “American community survey data - u.s. Census bureau.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.census.gov/programs-surveys/acs/data.html\n\n\n[5] “Arlington county civic federation: home.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.civfed.org\n\n\n[6] “Civic & citizen associations - arlington county.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.arlingtonva.us/Government/Topics/Community/Civic-and-Citizen-Association\n\n\n[7] “Civic association polygons | arlington county, virginia. GIS open data.” Accessed: Jun. 04, 2026. [Online]. Available: https://gisdata-arlgis.opendata.arcgis.com/datasets/ArlGIS::civic-association-polygons/explore?location=38.880938%2C-77.109550%2C13.55",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>The Data</span>"
+    ]
+  },
+  {
+    "objectID": "03-method.html",
+    "href": "03-method.html",
+    "title": "4  The Core Method: Areal Interpolation",
+    "section": "",
+    "text": "4.1 How area-weighted redistribution works\nThe fundamental challenge of local-level data work is geometric: you have numbers attached to one set of polygons and questions about a different set of polygons. Areal interpolation is the family of methods that bridges that gap. The specific technique used throughout this guide — area-weighted redistribution — is the most transparent and widely applicable member of that family [1], [2].\nThe governing idea is simple: if a source area’s polygon overlaps 40% of a target area’s polygon, then 40% of that source area’s count is assigned to that target area. More precisely, for each pair of source and target polygons that intersect, the method computes the fractional overlap — the ratio of intersection area to source area — and multiplies the source value by that fraction. When a target polygon overlaps multiple source polygons, the contributions from each source are summed to produce the target estimate.\nFormally, the weight \\(w_{ij}\\) applied when transferring a value from source polygon \\(i\\) to target polygon \\(j\\) is:\n\\[w_{ij} = \\frac{\\text{area}(i \\cap j)}{\\text{area}(i)}\\]\nThe weights across all target polygons that share area with source polygon \\(i\\) sum to 1.0, so the total value in the source layer is conserved. This is the key constraint that distinguishes redistribution from other forms of spatial estimation: values are allocated, not created.\nThe method rests on one explicit assumption: the variable of interest is distributed uniformly within each source polygon. Population is not perfectly uniform within a Census block group, and download speed is not perfectly uniform across a 610-meter Ookla tile. But the assumption is transparent, auditable, and consistent — and it systematically outperforms simply ignoring the boundary problem altogether [3].",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>The Core Method: Areal Interpolation</span>"
+    ]
+  },
+  {
+    "objectID": "03-method.html#sec-extensive-intensive",
+    "href": "03-method.html#sec-extensive-intensive",
+    "title": "4  The Core Method: Areal Interpolation",
+    "section": "4.2 Extensive vs. intensive measures",
+    "text": "4.2 Extensive vs. intensive measures\nThis is the most important concept in the entire chapter. Understanding it determines whether your redistributed estimates are correct or subtly wrong.\nGeographic measures divide into two fundamentally different types based on how they relate to the size of the area they describe.\nExtensive measures (also called additive or count-like measures) scale with area. If you split a block group in two, each half has roughly half the total households, roughly half the aggregate income, roughly half the test count. Extensive measures can be legitimately redistributed using area weights because the splitting and summing is arithmetically valid. Examples: total households, aggregate household income, total speed-test count.\nIntensive measures (also called rate-like or derived measures) do not scale with area. Mean income is the same whether you measure it for the whole block group or for a one-block sliver of it. If you split a block group and assign each half 40% of its mean income, you have made a category error — you are treating a rate as if it were a count. Examples: mean income, mean download speed, population density, any ratio.\nThe practical rule is therefore:\n\nRedistribute counts. Derive rates afterward.\n\nTo produce a valid mean income for a civic association, you redistribute aggregate income (extensive) and household count (extensive) separately to each civic association, then divide: \\(\\text{mean income} = \\text{agg. income} \\div \\text{households}\\). You never redistribute mean income directly.\nThe same logic applies to a statistic that analysts sometimes want but cannot obtain this way: the median. Median household income is fundamentally a positional statistic — it describes the midpoint of a distribution — and it has no additive decomposition. There is no arithmetic operation on two partial medians that recovers the median of their union. If you areally redistribute a median, the result is numerically meaningless. This guide uses aggregate income precisely because medians cannot be handled this way.\nGetting this distinction wrong is the single most common error in areal interpolation. It produces estimates that look plausible but are quietly incorrect — typically biased toward area-weighted means of the rate rather than the population-weighted mean that the underlying counts would produce. In areas with uneven population density (as Arlington has — denser urban corridors alongside lower-density suburban neighborhoods), this error can be substantial.\nFigure 4.1 summarizes the full redistribution workflow: extensive counts enter the redistribution, area weights are applied, and intensive rates are computed only at the end from the redistributed count totals.\n\n\n\n\n\n\nFigure 4.1: The redistribution method: extensive counts move area-weighted; intensive rates are derived from them.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>The Core Method: Areal Interpolation</span>"
+    ]
+  },
+  {
+    "objectID": "03-method.html#the-sdc-redistribute-implementation",
+    "href": "03-method.html#the-sdc-redistribute-implementation",
+    "title": "4  The Core Method: Areal Interpolation",
+    "section": "4.3 The sdc-redistribute implementation",
+    "text": "4.3 The sdc-redistribute implementation\nIn practice, the redistribution is performed by the sdc_redistribute Python package, which handles the geometric intersection, weight calculation, and column-wise multiplication in a single call. The source geometry and one or more target geometries are supplied as GeoJSON or GeoDataFrame objects; the caller specifies which columns are extensive counts. The function returns a target-geometry GeoDataFrame with redistributed count columns that can be combined or divided to produce any desired derived measure.\n\n\n\n\n\n\nPython: the redistribution call\n\n\n\n\n\nfrom sdc_redistribute import redistribute_direct\n\nresult = redistribute_direct(\n    source_df=counts_long,            # geoid, year, measure, value\n    source_geo=\"block_groups.geojson\",\n    target_geos={\"civic_association\": \"civic_assoc.geojson\"},\n    count_cols=[\"agg_income\", \"households\"],   # EXTENSIVE counts\n    source_id=\"geoid\",\n)\n# mean income (INTENSIVE) is derived afterwards:\n#   mean_income = agg_income / households\n\n\n\nThe collapsible snippet above shows the essential pattern: only extensive counts are passed to count_cols. The intensive quantity — mean income — is not a parameter to the function; it is computed by the analyst on the output. This design makes the extensive-vs-intensive distinction architecturally explicit: the function cannot produce a rate; it can only redistribute counts.\nThe worked example in Chapter 5 applies this pattern twice in sequence, once for income and once for broadband speed, and then validates that the redistributed totals are internally consistent before proceeding to analysis.\n\n\n\n\n[1] “What is areal interpolation?—ArcGIS pro | documentation.” Accessed: Jun. 04, 2026. [Online]. Available: https://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/what-is-areal-interpolation.htm\n\n\n[2] “Areal interpolation | vincent thorne.” Accessed: Jun. 04, 2026. [Online]. Available: https://vinceth.net/2021/06/18/areal-interpolation.html\n\n\n[3] “Spatial interpolation using areal features: A review of methods and ...” Accessed: Jun. 04, 2026. [Online]. Available: https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>The Core Method: Areal Interpolation</span>"
+    ]
+  },
+  {
+    "objectID": "04-worked-example.html",
+    "href": "04-worked-example.html",
+    "title": "5  Worked Example: Arlington, Step by Step",
+    "section": "",
+    "text": "5.1 Stage 1: Acquire the source data\nThis chapter walks the full pipeline from raw source files to validated civic-association estimates. The five stages — acquire, redistribute income, redistribute broadband, combine, and validate — correspond directly to the pipeline modules in the companion repository. By the end, each of Arlington’s 62 civic associations has an estimated mean household income and an estimated mean download speed derived from the same underlying geography and the same redistribution logic.\nThe complete runnable pipeline is a single command: uv run python -m pipeline.run.\nThree datasets must be in hand before any redistribution can take place.\nCensus block-group boundaries are fetched programmatically using pygris, a Python wrapper around the Census Bureau’s TIGER/Line shapefiles API. The call retrieves the block-group polygons for Arlington County (FIPS 51013) at the 2021 vintage, which aligns with the ACS five-year estimates used for income. The resulting GeoDataFrame provides the source geometry for the ACS redistribution step.\nACS income variables are retrieved through the Census API using a Census API key. The two variables used are B19025_001E (aggregate household income in the past 12 months) and B11001_001E (number of occupied housing units — households). Both are block-group-level estimates from the ACS 2021 five-year release. Neither is a median; both are extensive counts that can be legitimately redistributed. A Census API key is required; the pipeline reads it from the environment variable CENSUS_API_KEY.\nOokla fixed-broadband speed-test tiles are downloaded from Ookla’s public Amazon S3 bucket, which hosts quarterly snapshots of the aggregated tile data as geoparquet files. The pipeline fetches the Q1 2021 tile for the relevant S3 path, clips it to the Arlington bounding box, and retains two columns: tests (the count of speed tests in each tile during the quarter) and avg_d_kbps (the average download speed across those tests, in kilobits per second). Both are used in the broadband redistribution below.\nWith these three inputs in hand — block-group polygons, ACS counts, and Ookla tiles — the pipeline is ready to redistribute.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Worked Example: Arlington, Step by Step</span>"
+    ]
+  },
+  {
+    "objectID": "04-worked-example.html#stage-2-redistribute-income",
+    "href": "04-worked-example.html#stage-2-redistribute-income",
+    "title": "5  Worked Example: Arlington, Step by Step",
+    "section": "5.2 Stage 2: Redistribute income",
+    "text": "5.2 Stage 2: Redistribute income\nIncome follows the pattern described in Section 4.2. The two ACS variables — aggregate household income and household count — are extensive measures. Both are redistributed independently to civic associations using area-weighted interpolation. The redistribution preserves their totals: whatever aggregate income exists across all block groups flows, in its entirety, to the set of civic associations (since civic associations tile the county without gaps or overlaps).\nFigure 5.1 illustrates the transformation. The source (block groups) carries two count columns, and the target (civic associations) receives redistributed versions of both.\n\n\n\n\n\n\nFigure 5.1: Income transform: redistribute aggregate income + households, then derive mean income.\n\n\n\nOnce redistribution is complete, mean household income for each civic association is a simple arithmetic step:\n\\[\\text{mean income}_j = \\frac{\\text{agg. income}_j}{\\text{households}_j}\\]\nThe result is a population-weighted mean — accurate in the sense that larger block groups (more households) contribute more to the civic association’s estimate than smaller ones, scaled continuously by the fraction of their area that falls within the association’s boundary.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Worked Example: Arlington, Step by Step</span>"
+    ]
+  },
+  {
+    "objectID": "04-worked-example.html#stage-3-redistribute-broadband",
+    "href": "04-worked-example.html#stage-3-redistribute-broadband",
+    "title": "5  Worked Example: Arlington, Step by Step",
+    "section": "5.3 Stage 3: Redistribute broadband",
+    "text": "5.3 Stage 3: Redistribute broadband\nBroadband speed requires one additional preparatory step because download speed, like income, is an intensive measure. The variable reported in the Ookla tiles — avg_d_kbps — cannot be directly redistributed. The count that makes it meaningful — tests — can.\nThe solution is to reconstruct the extensive quantity that, when divided by test count, recovers average speed. For each tile:\n\\[\\text{speed} \\times \\text{tests} = \\text{total download kilobits (proxy)}\\]\nThis product is an extensive count: if a tile’s area is split in two, each half contributed roughly half the total download kilobits. It can be redistributed. The test count is also extensive and can be redistributed. After both are moved to civic associations, the intensive rate is derived:\n\\[\\text{download speed}_j = \\frac{(\\text{speed} \\times \\text{tests})_j}{\\text{tests}_j} \\div 1000\\]\nThe division by 1,000 converts kilobits per second to megabits per second for presentation.\nFigure 5.2 shows the broadband transform. Notice the structural parallel with the income transform in Figure 5.1: in both cases, the intensive output (mean income, mean speed) appears only after redistribution, never before.\n\n\n\n\n\n\nFigure 5.2: Broadband transform: redistribute tests and speed×tests, then derive count-weighted speed.\n\n\n\n\n\n\n\n\n\nPython: count-weighting broadband speed\n\n\n\n\n\n# Speed is INTENSIVE — redistribute counts, then derive the rate.\ntiles[\"d_product\"] = tiles[\"avg_d_kbps\"] * tiles[\"tests\"]   # extensive\n# ... redistribute tests + d_product to civic associations ...\ncivic[\"download_mbps\"] = (civic[\"d_product\"] / civic[\"tests\"]) / 1000\n\n\n\nThe collapsible snippet above captures the key lines. Creating d_product before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed avg_d_kbps directly would produce a speed estimate weighted by area, not by test count — a different and less meaningful quantity, and one that systematically overstates speed in low-density tiles with few tests.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Worked Example: Arlington, Step by Step</span>"
+    ]
+  },
+  {
+    "objectID": "04-worked-example.html#stage-4-combine",
+    "href": "04-worked-example.html#stage-4-combine",
+    "title": "5  Worked Example: Arlington, Step by Step",
+    "section": "5.4 Stage 4: Combine",
+    "text": "5.4 Stage 4: Combine\nWith both redistributions complete, the income and broadband results are joined to the civic-association GeoDataFrame on the association identifier. The four intermediate columns — redistributed aggregate income, redistributed households, redistributed test count, and redistributed speed-product — are used to compute the two final output columns: mean_income and download_mbps. All 62 civic associations receive a value for both measures.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Worked Example: Arlington, Step by Step</span>"
+    ]
+  },
+  {
+    "objectID": "04-worked-example.html#stage-5-validate",
+    "href": "04-worked-example.html#stage-5-validate",
+    "title": "5  Worked Example: Arlington, Step by Step",
+    "section": "5.5 Stage 5: Validate",
+    "text": "5.5 Stage 5: Validate\nBefore proceeding to analysis or visualization, the pipeline verifies one internal consistency check: household totals should be preserved by the redistribution. The sum of redistributed households across all 62 civic associations is compared to the sum of ACS household counts across all block groups. In a well-functioning redistribution over a complete, non-overlapping partition of the county (which Arlington’s civic associations are), these totals should be identical up to floating-point rounding.\nIn practice, the redistributed household total is preserved within 2% of the source total — a result of minor edge effects at the county boundary where tile clipping introduces small geometric imprecision. This tolerance is well within the margin of the ACS sampling error itself, and it confirms that the redistribution has not created or destroyed households at any meaningful scale.\nAnalysts applying this method to their own geographies should perform this same check. A discrepancy larger than a few percent typically indicates either a non-exhaustive target partition (gaps between target polygons), a coordinate-reference-system mismatch between source and target layers, or a geometric validity problem in one of the input files.\nWith validation passed, the pipeline writes its output and the data is ready for mapping and analysis — the subject of the next chapter.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Worked Example: Arlington, Step by Step</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html",
+    "href": "05-results.html",
+    "title": "6  Results & Interpretation",
+    "section": "",
+    "text": "6.1 Income distribution\nThe pipeline described in the preceding chapters produces two estimates for each of Arlington’s 62 civic associations: a mean household income derived from ACS block-group counts, and a mean download speed derived from Ookla speed-test tiles. This chapter presents both distributions, compares them, and draws out the central finding — a finding that runs counter to the most common assumption analysts bring to digital-divide work.\nMean household income across the 62 associations spans from roughly $73,000 (Arlington Mill) to $468,000 (Gulf Branch), with a mean of association means near $215,600 and a median near $191,500. The roughly 109,500 households represented in the data are not evenly spread: Arlington’s geography concentrates its highest incomes in low-density, single-family neighbourhoods in the northern and western portions of the county — Gulf Branch, Rivercrest, Bellevue Forest, and Old Glebe all exceed $447,000. Denser, more mixed-use corridors in the south and east — Columbia Heights, Arlington Mill, Forest Glen — cluster toward the lower end.\nThe spatial pattern in Figure 6.1 reflects Arlington’s well-documented socio-spatial structure: income rises sharply as one moves away from the Rosslyn–Ballston and Route 1 corridors into the low-density residential tracts that border Fairfax and Falls Church [1]. The spread is wide for a jurisdiction that ranks among the wealthiest counties in the United States, which makes the county an instructive case: if income structured broadband access anywhere, it should be detectable here.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#income-distribution",
+    "href": "05-results.html#income-distribution",
+    "title": "6  Results & Interpretation",
+    "section": "",
+    "text": "Figure 6.1: Mean household income by civic association.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#broadband-speed-distribution",
+    "href": "05-results.html#broadband-speed-distribution",
+    "title": "6  Results & Interpretation",
+    "section": "6.2 Broadband speed distribution",
+    "text": "6.2 Broadband speed distribution\nMean download speed across the same 62 associations ranges from 100.8 Mbps (Foxcroft Heights) to 320.8 Mbps (Columbia Forest), with a county-wide mean of approximately 246.8 Mbps and a median of 251.9 Mbps. Mean upload speed averages roughly 105 Mbps. Even at the low end, every association exceeds the FCC’s legacy 25/3 Mbps benchmark; the real differentiation occurs at the higher tiers that support heavy simultaneous use.\n\n\n\n\n\n\nFigure 6.2: Broadband download speed by civic association.\n\n\n\nThe spatial pattern in Figure 6.2 is striking and largely inverts the income map. The fastest associations are concentrated in the denser southern and central corridors. Columbia Forest reaches 320.8 Mbps; Long Branch Creek 307.9 Mbps; Arlington Mill — the lowest-income association in the dataset at approximately $73,000 — records the third-fastest speed at 307.0 Mbps. Fairlington follows at 293.4 Mbps. Conversely, the slowest associations — Foxcroft Heights (100.8 Mbps), Arlingwood (117.3 Mbps), Dominion Hills (176.2 Mbps) — are not low-income enclaves; they are mid-to-high-income, low-density, single-family neighbourhoods in the county’s outer northern tier.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#the-central-finding-income-and-speed-are-decoupled",
+    "href": "05-results.html#the-central-finding-income-and-speed-are-decoupled",
+    "title": "6  Results & Interpretation",
+    "section": "6.3 The central finding: income and speed are decoupled",
+    "text": "6.3 The central finding: income and speed are decoupled\nThe Pearson correlation between mean household income and mean download speed across the 62 civic associations is r = −0.11. This value is substantively indistinguishable from zero. Income and broadband speed are essentially decoupled in Arlington.\n\n\n\n\n\n\nFigure 6.3: Income vs. broadband download speed across the 62 civic associations (r = −0.11).\n\n\n\nThe scatter plot in Figure 6.3 makes the absence of a relationship visually plain. There is no line — positive or negative — that summarises the cloud in any useful way. Analysts who arrive at this data expecting the standard “rich neighbourhoods get faster internet” finding will not find it here. The naive expectation, plausible on its face and documented in national-scale studies of access gaps [2], does not hold inside a uniformly affluent jurisdiction where income variation is high but where the key driver of infrastructure investment operates on a different dimension entirely.\nThat dimension is housing density. Dense multifamily corridors generate the subscriber concentration that makes competitive fibre and cable deployment commercially attractive to internet service providers. Arlington’s Rosslyn–Ballston spine and the Route 1 corridor have both density and the infrastructure investment that follows from it. Low-density single-family enclaves in northern Arlington have neither the building stock to attract the same level of competitive investment nor the resulting speeds — regardless of how wealthy their residents are.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#income-to-speed-ratio",
+    "href": "05-results.html#income-to-speed-ratio",
+    "title": "6  Results & Interpretation",
+    "section": "6.4 Income-to-speed ratio",
+    "text": "6.4 Income-to-speed ratio\nTo quantify the mismatch between income and infrastructure, consider the income-to-speed ratio: dollars of mean household income per Mbps of mean download speed. Across the 62 associations this ratio ranges from $238 per Mbps (Arlington Mill, high speed, lower income) to $2,490 per Mbps (Arlingwood, low speed, higher income) — more than a ten-fold span.\n\n\n\n\n\n\nFigure 6.4: Income-to-speed ratio (dollars of household income per Mbps of download speed).\n\n\n\nThe map in Figure 6.4 is effectively a map of which associations are getting the least broadband for their economic standing. The highest-ratio associations — Arlingwood ($2,490), Bellevue Forest ($2,107), Gulf Branch ($1,752), Old Glebe ($1,713) — are all wealthy, low-density, northern-tier communities. They are not suffering a crisis of unaffordability; they are simply not served by the same density of competitive infrastructure as their southern counterparts. The lowest-ratio association, Arlington Mill, has the strongest infrastructure relative to its income level precisely because dense multifamily housing attracted competitive carriers.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#bivariate-synthesis",
+    "href": "05-results.html#bivariate-synthesis",
+    "title": "6  Results & Interpretation",
+    "section": "6.5 Bivariate synthesis",
+    "text": "6.5 Bivariate synthesis\nClassifying each association by income tercile (low/mid/high) and speed tercile (low/mid/high) produces a three-by-three contingency table that summarises the joint distribution. The cell counts are:\n\n\n\n\nLow speed\nMid speed\nHigh speed\n\n\n\n\nLow income\n4\n8\n9\n\n\nMid income\n6\n7\n7\n\n\nHigh income\n11\n5\n5\n\n\n\n\n\n\n\n\n\nFigure 6.5: Bivariate map: income tercile × speed tercile across the 62 civic associations.\n\n\n\nThe largest single cell is high-income / low-speed, with 11 associations — Williamsburg, Maywood, Dominion Hills, Arlingwood, Bellevue Forest, Donaldson Run, and their neighbours. This cell alone falsifies the “rich areas get fast internet” hypothesis. At the opposite corner, 9 associations fall in the low-income / high-speed cell — Columbia Heights, Forest Glen, Columbia Forest, Westover Village, Long Branch Creek, and Arlington Mill — the dense multifamily corridors already identified as speed leaders.\nThe bivariate map in Figure 6.5 makes the geography legible. The high-income/low-speed cluster occupies the low-density northern and western portions of the county. The low-income/high-speed cluster wraps around the denser central and southern corridors. The pattern is structurally coherent and consistent across all three ways of visualising it — the scatter, the ratio map, and the bivariate class map.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "05-results.html#policy-implications",
+    "href": "05-results.html#policy-implications",
+    "title": "6  Results & Interpretation",
+    "section": "6.6 Policy implications",
+    "text": "6.6 Policy implications\nThe finding that the digital-divide axis in Arlington is housing density and infrastructure build-out, not household income, has direct implications for how jurisdictions should design broadband equity interventions [3], [4].\nIncome-based subsidy targeting — the most common policy tool — would direct resources toward low-income households while leaving the actual speed gaps unaddressed. The households that experience the weakest broadband performance in Arlington are, on average, high-income households in low-density neighbourhoods. An income-tested programme would systematically miss them.\nMore effective interventions would target the mechanism driving the gap: the commercial calculus that makes dense corridors attractive to competitive carriers but leaves single-family enclaves with fewer options. This suggests policy levers such as right-of-way facilitation for fibre providers in low-density zones, municipal broadband franchising conditioned on area coverage, and infrastructure requirements built into residential subdivision permitting. None of these is calibrated to household income; all are calibrated to the density-and-competition gap that the data actually reveal.\nThe Arlington case cannot be assumed to generalise directly to jurisdictions with lower overall incomes or with genuine gaps in physical access infrastructure. But the methodological lesson — that one should verify the relationship between income and speed empirically before designing income-based interventions — applies everywhere.\n\n\n\n\n[1] “Arlington county, virginia - u.s. Census bureau QuickFacts.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.census.gov/quickfacts/fact/table/arlingtoncountyvirginia/PST045224\n\n\n[2] “Mapping the digital divide: What predicts internet access across ...” Accessed: Jun. 04, 2026. [Online]. Available: https://pmc.ncbi.nlm.nih.gov/articles/PMC10961931/\n\n\n[3] “Bridging the digital divide: A path to universal broadband access.” Accessed: Jun. 04, 2026. [Online]. Available: https://broadbandbreakfast.com/bridging-the-digital-divide-a-path-to-universal-broadband-access/\n\n\n[4] “How policymakers can help bridge the digital divide in 2021 - AAF.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.americanactionforum.org/insight/how-policymakers-can-help-bridge-the-digital-divide-in-2021/",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>Results & Interpretation</span>"
+    ]
+  },
+  {
+    "objectID": "06-limitations.html",
+    "href": "06-limitations.html",
+    "title": "7  Limitations & Uncertainty",
+    "section": "",
+    "text": "7.1 Area-weighting assumes uniform internal distribution\nThe results in Chapter 6 are derived estimates, not direct measurements. Every step of the pipeline — from the source data to the redistribution to the final ratio calculations — introduces uncertainty. This chapter itemises the four most important sources and explains what each implies for interpreting and extending the analysis.\nThe core assumption of area-weighted interpolation is that the quantity being redistributed is distributed uniformly within each source unit. For ACS income, the source units are census block groups; for Ookla broadband, the source units are 610-metre speed-test tiles. Wherever that uniformity assumption is wrong — wherever households or speed-test activity are spatially clustered within a unit — the redistribution will misallocate a fraction of the value.\nIn practice, both income and population density vary within block groups, particularly at the edges where block groups straddle the civic-association boundary. The effect is largest for target associations that are small relative to the source units they overlap, and smallest for large associations that wholly contain many source units. Analysts should treat estimates for the smallest associations with additional caution and, where possible, validate against parcel-level or point-level data.\nThis limitation is not unique to this workflow; it is inherent to any area-weighted interpolation approach [1], [2]. The redistribute_direct function used here, like all area-weighting methods, cannot recover sub-unit spatial variation that is not encoded in the source data.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Limitations & Uncertainty</span>"
+    ]
+  },
+  {
+    "objectID": "06-limitations.html#ookla-data-reflects-active-test-takers-not-all-households",
+    "href": "06-limitations.html#ookla-data-reflects-active-test-takers-not-all-households",
+    "title": "7  Limitations & Uncertainty",
+    "section": "7.2 Ookla data reflects active test-takers, not all households",
+    "text": "7.2 Ookla data reflects active test-takers, not all households\nThe Ookla speed-test tiles record the average performance of users who actively ran a speed test during the measurement quarter. This introduces a form of self-selection bias: test-takers are not a random sample of all internet subscribers. People who run speed tests are more likely to be technically engaged, more likely to be troubleshooting a slow connection, and possibly more concentrated in particular building types or demographic groups [3].\nThe direction of this bias is not straightforwardly predictable. If frustrated users test more frequently, the Ookla data may understate typical speeds. If technically sophisticated users dominate the test pool, the data may overstate typical speeds. For the purposes of a comparative analysis across civic associations within a single county, what matters is whether the bias is spatially systematic — that is, whether the test-taker population differs in structure across associations in ways that would distort the between-association comparisons. That cannot be fully evaluated without ground-truth data.\nUsers of this analysis should treat the download speeds as indicative of infrastructure capacity at the high end of the user experience distribution, not as estimates of median or typical household experience.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Limitations & Uncertainty</span>"
+    ]
+  },
+  {
+    "objectID": "06-limitations.html#acs-income-carries-sampling-error",
+    "href": "06-limitations.html#acs-income-carries-sampling-error",
+    "title": "7  Limitations & Uncertainty",
+    "section": "7.3 ACS income carries sampling error",
+    "text": "7.3 ACS income carries sampling error\nThe ACS five-year block-group estimates are not administrative records; they are survey estimates with associated margins of error. At the block-group level, particularly for smaller block groups, the coefficient of variation on income variables can be substantial. The guide uses aggregate household income (B19025_001E) and household count (B11001_001E) rather than median income precisely because both are extensive, summable measures that survive redistribution with interpretable units.\nHowever, the mean income ultimately derived for each civic association is still the ratio of two redistributed survey estimates. Both the numerator (aggregate income) and denominator (household count) carry ACS sampling uncertainty. In well-populated block groups this uncertainty is modest; in smaller block groups it can be large enough to materially affect the redistributed estimate. Arlington’s relatively high response rates and the use of five-year pooled estimates (2017–2021) mitigate but do not eliminate this concern [4].\nThe redistribution does not propagate formal uncertainty bounds. An analyst who needs confidence intervals on the civic-association estimates would need to request the block-group-level margins of error from the Census API and carry them through the redistribution algebra — a non-trivial extension that is beyond the scope of the current pipeline.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Limitations & Uncertainty</span>"
+    ]
+  },
+  {
+    "objectID": "06-limitations.html#redistribute_direct-rescales-measures-independently",
+    "href": "06-limitations.html#redistribute_direct-rescales-measures-independently",
+    "title": "7  Limitations & Uncertainty",
+    "section": "7.4 redistribute_direct rescales measures independently",
+    "text": "7.4 redistribute_direct rescales measures independently\nThe redistribute_direct function rescales each source column independently to ensure its total is preserved in the target geography. When two columns are redistributed independently and then combined into a ratio — as happens with both income (aggregate income / households) and broadband (speed-product / tests) — the rescaling applied to each column need not be identical. Near the county boundary, where tile clipping and block-group edge effects are most pronounced, the two columns may be rescaled by slightly different factors, producing a ratio that is not perfectly equivalent to what a joint redistribution would yield.\nIn the Arlington validation, the household total is preserved within approximately 2% of the source total — well within the ACS sampling error, and acceptable for a comparative county-level analysis. For applications where ratio precision at the county boundary is critical, analysts should consider masking associations that have more than a threshold fraction of their area outside the source coverage, or running a sensitivity check that compares estimates from independent and joint redistribution paths.\n\n\n\n\n[1] “What is areal interpolation?—ArcGIS pro | documentation.” Accessed: Jun. 04, 2026. [Online]. Available: https://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/what-is-areal-interpolation.htm\n\n\n[2] “Areal interpolation | by ITC, university of twente.” Accessed: Jun. 04, 2026. [Online]. Available: https://gistbok-ltb.ucgis.org/27/concept/7992\n\n\n[3] “Speedtest® methodology | ookla®.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.ookla.com/resources/guides/speedtest-methodology\n\n\n[4] “American community survey (ACS) - arlington county.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.arlingtonva.us/Government/Projects/Data-Research/Demographics/American-Community-Survey",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>Limitations & Uncertainty</span>"
+    ]
+  },
+  {
+    "objectID": "07-apply-it.html",
+    "href": "07-apply-it.html",
+    "title": "8  Apply It to Your Own Jurisdiction",
+    "section": "",
+    "text": "8.1 The six-step recipe\nThe Arlington analysis is a worked illustration of a general workflow. Any jurisdiction with civic associations, planning districts, school attendance zones, or other custom geographies can follow the same steps to estimate income and broadband speed — or any other combination of an ACS count variable and an Ookla speed-test variable — at the sub-county level. This chapter distils the pipeline into a numbered recipe and points to the tools needed to run it.\n1. Define your target geography as a GeoJSON with a stable identifier. Your target polygons — the units you want estimates for — must be stored as a GeoJSON (or any format readable by GeoPandas) and must include a column that uniquely identifies each polygon. The companion repository uses geoid by convention, but any string or integer key works as long as it is stable and unique. The polygons must be in a standard coordinate reference system (WGS 84 / EPSG:4326 is the safe default) and should tile the jurisdiction without meaningful gaps or overlaps. Gaps will cause households and tests near the edges to be unallocated; overlaps will cause double-counting.\n2. Obtain source counts on their native geography. For income, retrieve ACS block-group estimates for the county of interest via the Census API. The two variables needed are B19025_001E (aggregate household income) and B11001_001E (number of households). Both must be five-year estimates aligned with the same ACS vintage. For broadband, download the relevant Ookla quarterly fixed-broadband tile from Ookla’s public S3 bucket. Clip the tile to your jurisdiction’s bounding box to reduce memory usage. Retain tests and avg_d_kbps. Both datasets must be in the same CRS as your target geography before redistribution.\n3. Redistribute the source counts to your target geography. Call redistribute_direct (from the sda_areal Python package, or its R equivalent once available) with your source GeoDataFrame and target GeoDataFrame. For ACS, redistribute agg_income and households. For Ookla, first construct d_product = avg_d_kbps * tests, then redistribute tests and d_product. Each call preserves the source total within floating-point tolerance.\n4. Derive the intensive rates from the redistributed counts. Mean income is agg_income_target / households_target. Download speed in Mbps is (d_product_target / tests_target) / 1000. Neither derived variable should be redistributed directly; the correct workflow always redistributes the underlying counts and derives the rate afterward. Attempting to redistribute mean income or average speed directly will produce area-weighted results that are correct in only the degenerate case where all source units are identical in density.\n5. Validate that totals are preserved. Before proceeding to analysis, compare the sum of redistributed households across all target polygons to the sum of ACS households across all source block groups. They should agree within a few percent. A larger discrepancy indicates a geometry problem (gaps, overlaps, CRS mismatch) that will bias every downstream estimate. Similarly check that redistributed test counts sum to within a few percent of source tile test counts. Both checks are implemented in the companion repository’s pipeline.validate module.\n6. Map, analyse, and interpret. Join the income and speed estimates to your target GeoDataFrame and export as GeoJSON, Parquet, or whatever format your visualisation or analysis tool requires. The companion repository builds all five result figures — choropleth maps, scatter plot, and bivariate map — through a single command.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Apply It to Your Own Jurisdiction</span>"
+    ]
+  },
+  {
+    "objectID": "07-apply-it.html#running-the-companion-pipeline",
+    "href": "07-apply-it.html#running-the-companion-pipeline",
+    "title": "8  Apply It to Your Own Jurisdiction",
+    "section": "8.2 Running the companion pipeline",
+    "text": "8.2 Running the companion pipeline\nThe full pipeline is executed with a single command from the repository root:\nuv run python -m pipeline.run\nThis command fetches the Census and Ookla data, performs both redistributions, validates totals, and writes the output GeoJSON. To regenerate the result figures from the pipeline output:\nuv run python -m pipeline.build_figures\nBoth commands require uv (the Python package manager), a Census API key in the environment variable CENSUS_API_KEY, and an internet connection. The repository README provides setup instructions. All code is open-source and MIT-licensed.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Apply It to Your Own Jurisdiction</span>"
+    ]
+  },
+  {
+    "objectID": "07-apply-it.html#r-implementation",
+    "href": "07-apply-it.html#r-implementation",
+    "title": "8  Apply It to Your Own Jurisdiction",
+    "section": "8.3 R implementation",
+    "text": "8.3 R implementation\nThe areal interpolation logic in the Python pipeline mirrors the sdc-redistribute family of functions available in R. An R implementation of the full Arlington pipeline — using tigris for Census geometries, censusapi or tidycensus for ACS data, ooklaOpenDataR for speed-test tiles, and areal or a direct port of redistribute_direct for the interpolation step — is forthcoming. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Apply It to Your Own Jurisdiction</span>"
+    ]
+  },
+  {
+    "objectID": "07-apply-it.html#adapting-to-other-variables",
+    "href": "07-apply-it.html#adapting-to-other-variables",
+    "title": "8  Apply It to Your Own Jurisdiction",
+    "section": "8.4 Adapting to other variables",
+    "text": "8.4 Adapting to other variables\nThe recipe generalises beyond income and broadband. Any ACS extensive variable (counts of people, households, housing units, workers) can be redistributed in step 3 by substituting the appropriate B-table variables. Any Ookla variable that can be expressed as a count-weighted product (upload speed follows the same avg_u_kbps * tests construction as download speed) can be substituted in the same step. Analysts working with other speed-test or coverage datasets will need to identify the analogous extensive quantity — typically a count that, when summed and divided into a product column, recovers the intensive rate of interest — and follow the same pattern.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Apply It to Your Own Jurisdiction</span>"
+    ]
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "References",
+    "section": "",
+    "text": "[1] “Stacks.cdc.gov.” Accessed: Jun.\n04, 2026. [Online]. Available: https://stacks.cdc.gov/view/cdc/59750/cdc_59750_DS1.pdf\n\n\n[2] “Github.com.” Accessed: Jun. 04,\n2026. [Online]. Available: https://github.com/CDCgov/EPHTracking-Subcounty\n\n\n[3] “results4america.org.” Accessed:\nJun. 04, 2026. [Online]. Available: https://results4america.org/wp-content/uploads/2021/06/Deloitte-WWC-Data-Gap-Report_vFinal-063021.pdf\n\n\n[4] “Iecam.illinois.edu.” Accessed:\nJun. 04, 2026. [Online]. Available: https://iecam.illinois.edu/browse/subcounty-data-cautions-and-recommendations\n\n\n[5] “Atlas.co.” Accessed: Jun. 04,\n2026. [Online]. Available: https://atlas.co/blog/modifiable-areal-unit-problem-maup/\n\n\n[6] “Gisgeography.com.” Accessed: Jun.\n04, 2026. [Online]. Available: https://gisgeography.com/maup-modifiable-areal-unit-problem/\n\n\n[7] “Speedtest by ookla global fixed and\nmobile network performance ...” Accessed: Jun. 04, 2026.\n[Online]. Available: https://github.com/teamookla/ookla-open-data\n\n\n[8] “Announcing ookla open datasets.”\nAccessed: Jun. 04, 2026. [Online]. Available: https://www.ookla.com/articles/announcing-ookla-open-datasets\n\n\n[9] “American community survey 5-year data\n(2009-2023).” Accessed: Jun. 04, 2026. [Online]. Available: https://www.census.gov/data/developers/data-sets/acs-5year.html\n\n\n[10] “Arlington county civic federation:\nhome.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.civfed.org\n\n\n[11] “Mapping the digital divide: What\npredicts internet access across ...” Accessed: Jun. 04, 2026.\n[Online]. Available: https://pmc.ncbi.nlm.nih.gov/articles/PMC10961931/\n\n\n[12] “Bridging the digital divide: A path to\nuniversal broadband access.” Accessed: Jun. 04, 2026. [Online].\nAvailable: https://broadbandbreakfast.com/bridging-the-digital-divide-a-path-to-universal-broadband-access/\n\n\n[13] “What is areal interpolation?—ArcGIS pro\n| documentation.” Accessed: Jun. 04, 2026. [Online]. Available:\nhttps://pro.arcgis.com/en/pro-app/latest/help/analysis/geostatistical-analyst/what-is-areal-interpolation.htm\n\n\n[14] “Areal interpolation | by ITC, university\nof twente.” Accessed: Jun. 04, 2026. [Online]. Available: https://gistbok-ltb.ucgis.org/27/concept/7992\n\n\n[15] “How policymakers can help bridge the\ndigital divide in 2021 - AAF.” Accessed: Jun. 04, 2026. [Online].\nAvailable: https://www.americanactionforum.org/insight/how-policymakers-can-help-bridge-the-digital-divide-in-2021/\n\n\n[16] “Areal interpolation | vincent\nthorne.” Accessed: Jun. 04, 2026. [Online]. Available: https://vinceth.net/2021/06/18/areal-interpolation.html\n\n\n[17] “Speedtest® methodology | ookla®.”\nAccessed: Jun. 04, 2026. [Online]. Available: https://www.ookla.com/resources/guides/speedtest-methodology\n\n\n[18] “Spatial interpolation using areal\nfeatures: A review of methods and ...” Accessed: Jun. 04, 2026.\n[Online]. Available: https://compass.onlinelibrary.wiley.com/doi/10.1111/gec3.12465\n\n\n[19] “American community survey data - u.s.\nCensus bureau.” Accessed: Jun. 04, 2026. [Online]. Available: https://www.census.gov/programs-surveys/acs/data.html\n\n\n[20] “Civic & citizen associations -\narlington county.” Accessed: Jun. 04, 2026. [Online]. Available:\nhttps://www.arlingtonva.us/Government/Topics/Community/Civic-and-Citizen-Association\n\n\n[21] “Civic association polygons | arlington\ncounty, virginia. GIS open data.” Accessed: Jun. 04, 2026.\n[Online]. Available: https://gisdata-arlgis.opendata.arcgis.com/datasets/ArlGIS::civic-association-polygons/explore?location=38.880938%2C-77.109550%2C13.55\n\n\n[22] “American community survey (ACS) -\narlington county.” Accessed: Jun. 04, 2026. [Online]. Available:\nhttps://www.arlingtonva.us/Government/Projects/Data-Research/Demographics/American-Community-Survey\n\n\n[23] “Arlington county, virginia - u.s. Census\nbureau QuickFacts.” Accessed: Jun. 04, 2026. [Online]. Available:\nhttps://www.census.gov/quickfacts/fact/table/arlingtoncountyvirginia/PST045224",
+    "crumbs": [
+      "References"
+    ]
+  }
+]
