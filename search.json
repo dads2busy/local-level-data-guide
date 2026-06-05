@@ -320,6 +320,106 @@
     ]
   },
   {
+    "objectID": "08-code.html",
+    "href": "08-code.html",
+    "title": "9  The Complete Pipeline Code",
+    "section": "",
+    "text": "9.1 Configuration\nThis appendix reproduces the full, runnable Python pipeline behind the worked example — the actual source, not a simplified sketch. It is generated directly from the pipeline/ package in the companion repository, so it always matches the code that produced every figure and number in this guide.\nThe pipeline is built on the sdc-redistribute package and runs end to end with a single command:\nThe modules below appear in execution order. Figure generation (pipeline/style.py, pipeline/maps.py, pipeline/figures.py) lives in the same repository and is omitted here to keep the focus on the data method.\nCentral settings — the Arlington FIPS codes, the ACS count variables (aggregate income and households), and the dataset paths every other module reads.\npipeline/config.py",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#configuration",
+    "href": "08-code.html#configuration",
+    "title": "9  The Complete Pipeline Code",
+    "section": "",
+    "text": "\"\"\"Central configuration: geographies, CRS, source identifiers, paths.\"\"\"\nfrom pathlib import Path\n\nfrom dotenv import load_dotenv\n\n# Load secrets (e.g. CENSUS_API_KEY) from a local .env if present. The file is\n# gitignored; loading it here makes the key available to any pipeline module.\nload_dotenv()\n\n# Arlington County, Virginia\nSTATE_FIPS = \"51\"\nCOUNTY_FIPS = \"013\"\nACS_YEAR = 2021          # 5-year ACS vintage used throughout\nOOKLA_YEAR = 2023\nOOKLA_QUARTER = 2\n\n# Area weighting is handled inside sdc-redistribute, which reprojects geographic\n# inputs to EPSG:3857 before computing intersection areas. At county scale the\n# choice of projected CRS is immaterial (&lt;0.3% area-ratio spread vs State Plane),\n# so the pipeline does not impose its own projected CRS.\n\n# ACS variables are EXTENSIVE COUNTS (never redistribute the median directly).\n# Mean household income is derived later as agg_income / households.\nACS_VARS = {\n    \"agg_income\": \"B19025_001\",   # Aggregate household income (dollars)\n    \"households\": \"B11001_001\",   # Total households (count)\n}\n\n# Ookla open data S3 parquet path template\nOOKLA_S3 = (\n    \"s3://ookla-open-data/parquet/performance/type=fixed/\"\n    \"year={year}/quarter={quarter}/\"\n    \"{year}-{month:02d}-01_performance_fixed_tiles.parquet\"\n)\n\n# Paths\nROOT = Path(__file__).resolve().parent.parent\nDATA = ROOT / \"data\"\n\n# Source / output dataset paths\nCIVIC_ASSOC = DATA / \"va013_geo_arl_2021_civic_associations.geojson\"\nBLOCK_GROUPS = DATA / \"va013_block_groups.geojson\"          # produced by acquire_geographies\nBLOCKS = DATA / \"va013_geo_blocks.geojson\"                  # existing\nACS_COUNTS = DATA / \"va013_acs_income_counts.geojson\"       # produced by acquire_acs\nOOKLA_TILES = DATA / \"ookla_tiles_arlington.geojson\"        # existing/refreshable\nCIVIC_INCOME = DATA / \"civic_income.csv\"                    # produced by redistribute_income\nCIVIC_BROADBAND = DATA / \"civic_broadband.csv\"             # produced by redistribute_broadband\nCIVIC_COMBINED = DATA / \"civic_combined.geojson\"           # produced by combine",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#acquire-census-geographies",
+    "href": "08-code.html#acquire-census-geographies",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.2 Acquire census geographies",
+    "text": "9.2 Acquire census geographies\nDownload Arlington’s census block groups — the source geography for the income redistribution.\npipeline/acquire_geographies.py\n\"\"\"Acquire Arlington census block-group geometries via pygris.\"\"\"\nfrom __future__ import annotations\n\nimport geopandas as gpd\nfrom pygris import block_groups\n\nfrom pipeline import config\n\n\ndef fetch_block_groups() -&gt; gpd.GeoDataFrame:\n    \"\"\"Download Arlington County (VA/013) block groups for the ACS vintage.\"\"\"\n    bg = block_groups(\n        state=config.STATE_FIPS,\n        county=config.COUNTY_FIPS,\n        year=config.ACS_YEAR,\n        cb=True,\n    )\n    return bg\n\n\ndef main() -&gt; None:\n    bg = fetch_block_groups()\n    bg.to_file(config.BLOCK_GROUPS, driver=\"GeoJSON\")\n    print(f\"Wrote {len(bg)} block groups → {config.BLOCK_GROUPS}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#acquire-acs-income-counts",
+    "href": "08-code.html#acquire-acs-income-counts",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.3 Acquire ACS income counts",
+    "text": "9.3 Acquire ACS income counts\nPull aggregate household income and household counts from the Census API. These are counts (extensive measures); mean income is derived later.\npipeline/acquire_acs.py\n\"\"\"Acquire Arlington ACS aggregate income + household counts (block group).\"\"\"\nfrom __future__ import annotations\n\nimport os\n\nimport geopandas as gpd\nimport pandas as pd\nfrom census import Census\n\nfrom pipeline import config\nfrom pipeline.acquire_geographies import fetch_block_groups\n\n\ndef _sanitize_counts(df: pd.DataFrame) -&gt; pd.DataFrame:\n    \"\"\"Replace Census negative sentinels (e.g. -666666666) with 0.\n\n    Aggregate income and household counts are non-negative by definition; the\n    Census API returns large negative sentinel codes for suppressed or\n    not-applicable cells (typically zero-household block groups). Left in place,\n    these sentinels would propagate through area-weighted redistribution and\n    produce negative incomes. Treating them as 0 is correct for the\n    zero-household areas they mark.\n    \"\"\"\n    out = df.copy()\n    for col in (\"agg_income\", \"households\"):\n        out[col] = out[col].mask(out[col] &lt; 0, 0)\n    return out\n\n\ndef fetch_acs_counts(api_key: str | None = None) -&gt; pd.DataFrame:\n    \"\"\"Return a DataFrame: GEOID, agg_income, households for Arlington block groups.\"\"\"\n    key = api_key or os.environ.get(\"CENSUS_API_KEY\")\n    c = Census(key, year=config.ACS_YEAR)\n    # The census library needs the API estimate suffix \"E\" on each variable\n    # (e.g. B19025_001E), unlike tidycensus which strips it.\n    agg_var = config.ACS_VARS[\"agg_income\"] + \"E\"\n    hh_var = config.ACS_VARS[\"households\"] + \"E\"\n    rows = c.acs5.state_county_blockgroup(\n        fields=(\"NAME\", agg_var, hh_var),\n        state_fips=config.STATE_FIPS,\n        county_fips=config.COUNTY_FIPS,\n        blockgroup=Census.ALL,\n        tract=Census.ALL,\n    )\n    df = pd.DataFrame(rows)\n    df[\"GEOID\"] = df[\"state\"] + df[\"county\"] + df[\"tract\"] + df[\"block group\"]\n    df = df.rename(columns={agg_var: \"agg_income\", hh_var: \"households\"})\n    df = _sanitize_counts(df)\n    return df[[\"GEOID\", \"agg_income\", \"households\"]]\n\n\ndef main() -&gt; None:\n    counts = fetch_acs_counts()\n    bg = fetch_block_groups()[[\"GEOID\", \"geometry\"]]\n    merged = bg.merge(counts, on=\"GEOID\", how=\"left\")\n    gdf = gpd.GeoDataFrame(merged, geometry=\"geometry\", crs=bg.crs)\n    gdf.to_file(config.ACS_COUNTS, driver=\"GeoJSON\")\n    print(f\"Wrote {len(gdf)} block groups with income counts → {config.ACS_COUNTS}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#acquire-ookla-broadband-tiles",
+    "href": "08-code.html#acquire-ookla-broadband-tiles",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.4 Acquire Ookla broadband tiles",
+    "text": "9.4 Acquire Ookla broadband tiles\nRead the Ookla open-data broadband tiles from S3 and clip them to Arlington.\npipeline/acquire_ookla.py\n\"\"\"Acquire Ookla fixed-broadband tiles for Arlington from S3 open data.\"\"\"\nfrom __future__ import annotations\n\nimport geopandas as gpd\nimport pandas as pd\nfrom shapely import wkt\n\nfrom pipeline import config\nfrom pipeline.acquire_geographies import fetch_block_groups\n\n\ndef _s3_path() -&gt; str:\n    month = config.OOKLA_QUARTER * 3 - 2  # Q1-&gt;01, Q2-&gt;04, Q3-&gt;07, Q4-&gt;10\n    return config.OOKLA_S3.format(\n        year=config.OOKLA_YEAR, quarter=config.OOKLA_QUARTER, month=month\n    )\n\n\ndef fetch_ookla_tiles() -&gt; gpd.GeoDataFrame:\n    \"\"\"Download and bbox-filter Ookla tiles to Arlington County.\"\"\"\n    df = pd.read_parquet(_s3_path(), storage_options={\"anon\": True})\n    df[\"geometry\"] = df[\"tile\"].apply(wkt.loads)\n    tiles = gpd.GeoDataFrame(df, geometry=\"geometry\", crs=\"EPSG:4326\")\n\n    bbox = fetch_block_groups().to_crs(\"EPSG:4326\").total_bounds  # minx,miny,maxx,maxy\n    minx, miny, maxx, maxy = bbox\n    return tiles.cx[minx:maxx, miny:maxy].copy()\n\n\ndef main() -&gt; None:\n    tiles = fetch_ookla_tiles()\n    cols = [\"quadkey\", \"avg_d_kbps\", \"avg_u_kbps\", \"avg_lat_ms\", \"tests\", \"devices\", \"geometry\"]\n    tiles[cols].to_file(config.OOKLA_TILES, driver=\"GeoJSON\")\n    print(f\"Wrote {len(tiles)} Ookla tiles → {config.OOKLA_TILES}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#redistribute-income",
+    "href": "08-code.html#redistribute-income",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.5 Redistribute income",
+    "text": "9.5 Redistribute income\nArea-weight the income and household counts onto civic associations with sdc-redistribute, then derive mean household income.\npipeline/redistribute_income.py\n\"\"\"Redistribute ACS income counts to civic associations and derive mean income.\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\n\nimport geopandas as gpd\nimport pandas as pd\nfrom sdc_redistribute import redistribute_direct\n\nfrom pipeline import config\n\n\ndef redistribute_income(\n    counts_long: pd.DataFrame, source_geo: Path, target_geo: Path\n) -&gt; pd.DataFrame:\n    \"\"\"Return per-civic-association agg_income, households, and derived mean_income.\n\n    ``counts_long`` is long format (geoid, year, measure, value) with measures\n    ``agg_income`` and ``households``.\n    \"\"\"\n    result = redistribute_direct(\n        source_df=counts_long,\n        source_geo=source_geo,\n        target_geos={\"civic_association\": target_geo},\n        count_cols=[\"agg_income\", \"households\"],\n        source_id=\"geoid\",\n    )\n    # result is long with measures agg_income_direct / households_direct\n    wide = result.pivot_table(\n        index=\"geoid\", columns=\"measure\", values=\"value\", aggfunc=\"first\"\n    ).reset_index()\n    wide.columns.name = None\n    wide = wide.rename(\n        columns={\"agg_income_direct\": \"agg_income\", \"households_direct\": \"households\"}\n    )\n    # Mean household income is an INTENSIVE quantity derived from two counts.\n    wide[\"mean_income\"] = wide[\"agg_income\"] / wide[\"households\"].where(\n        wide[\"households\"] &gt; 0\n    )\n    return wide[[\"geoid\", \"agg_income\", \"households\", \"mean_income\"]]\n\n\ndef main() -&gt; None:\n    # ACS counts GeoJSON uses uppercase GEOID; rename to the lowercase `geoid`\n    # that redistribute_direct expects, for both the long-format counts and the\n    # source geometry. Write a geoid-keyed source file for redistribute_direct.\n    bg = gpd.read_file(config.ACS_COUNTS).rename(columns={\"GEOID\": \"geoid\"})\n    long = bg[[\"geoid\", \"agg_income\", \"households\"]].melt(\n        id_vars=\"geoid\", var_name=\"measure\", value_name=\"value\"\n    )\n    long[\"year\"] = config.ACS_YEAR\n\n    src_path = config.DATA / \"_acs_src.geojson\"\n    bg[[\"geoid\", \"geometry\"]].to_file(src_path, driver=\"GeoJSON\")\n    out = redistribute_income(long, src_path, config.CIVIC_ASSOC)\n    src_path.unlink(missing_ok=True)\n\n    out.to_csv(config.CIVIC_INCOME, index=False)\n    print(f\"Wrote {len(out)} civic-association income rows → {config.CIVIC_INCOME}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#redistribute-broadband",
+    "href": "08-code.html#redistribute-broadband",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.6 Redistribute broadband",
+    "text": "9.6 Redistribute broadband\nRedistribute test counts and the speed×tests product, then derive the count-weighted mean download and upload speeds.\npipeline/redistribute_broadband.py\n\"\"\"Redistribute Ookla broadband to civic associations; derive mean speeds.\"\"\"\nfrom __future__ import annotations\n\nfrom pathlib import Path\n\nimport geopandas as gpd\nimport pandas as pd\nfrom sdc_redistribute import redistribute_direct\n\nfrom pipeline import config\n\nMIN_TESTS = 5  # statistical-reliability filter on source tiles\n\n\ndef redistribute_broadband(\n    counts_long: pd.DataFrame, source_geo: Path, target_geo: Path\n) -&gt; pd.DataFrame:\n    \"\"\"Return per-civic-association tests and derived download/upload Mbps.\"\"\"\n    result = redistribute_direct(\n        source_df=counts_long,\n        source_geo=source_geo,\n        target_geos={\"civic_association\": target_geo},\n        count_cols=[\"tests\", \"d_product\", \"u_product\"],\n        source_id=\"geoid\",\n    )\n    wide = result.pivot_table(\n        index=\"geoid\", columns=\"measure\", values=\"value\", aggfunc=\"first\"\n    ).reset_index()\n    wide.columns.name = None\n    wide = wide.rename(\n        columns={\n            \"tests_direct\": \"tests\",\n            \"d_product_direct\": \"d_product\",\n            \"u_product_direct\": \"u_product\",\n        }\n    )\n    valid = wide[\"tests\"] &gt; 0\n    wide[\"download_mbps\"] = (wide[\"d_product\"] / wide[\"tests\"].where(valid)) / 1000\n    wide[\"upload_mbps\"] = (wide[\"u_product\"] / wide[\"tests\"].where(valid)) / 1000\n    return wide[[\"geoid\", \"tests\", \"download_mbps\", \"upload_mbps\"]]\n\n\ndef build_counts_long(tiles: gpd.GeoDataFrame) -&gt; pd.DataFrame:\n    \"\"\"Build the long-format count frame from raw Ookla tiles.\"\"\"\n    t = tiles[tiles[\"tests\"] &gt;= MIN_TESTS].copy()\n    t[\"d_product\"] = t[\"avg_d_kbps\"] * t[\"tests\"]\n    t[\"u_product\"] = t[\"avg_u_kbps\"] * t[\"tests\"]\n    long = t[[\"quadkey\", \"tests\", \"d_product\", \"u_product\"]].melt(\n        id_vars=\"quadkey\", var_name=\"measure\", value_name=\"value\"\n    )\n    long = long.rename(columns={\"quadkey\": \"geoid\"})\n    long[\"year\"] = config.OOKLA_YEAR\n    return long\n\n\ndef main() -&gt; None:\n    tiles = gpd.read_file(config.OOKLA_TILES)\n    tiles[\"geoid\"] = tiles[\"quadkey\"].astype(str)\n    long = build_counts_long(tiles)\n    # Write a geoid-keyed source file for redistribute_direct\n    src = tiles[[\"geoid\", \"geometry\"]].copy()\n    src_path = config.DATA / \"_ookla_src.geojson\"\n    src.to_file(src_path, driver=\"GeoJSON\")\n    out = redistribute_broadband(long, src_path, config.CIVIC_ASSOC)\n    out.to_csv(config.CIVIC_BROADBAND, index=False)\n    src_path.unlink(missing_ok=True)\n    print(f\"Wrote {len(out)} civic-association broadband rows → {config.CIVIC_BROADBAND}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#combine-and-derive-metrics",
+    "href": "08-code.html#combine-and-derive-metrics",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.7 Combine and derive metrics",
+    "text": "9.7 Combine and derive metrics\nJoin the redistributed income and broadband measures onto the civic association polygons and compute the income-to-speed ratio and the bivariate income×speed classes.\npipeline/combine.py\n\"\"\"Combine income + broadband and compute derived policy metrics.\"\"\"\nfrom __future__ import annotations\n\nimport geopandas as gpd\nimport pandas as pd\n\nfrom pipeline import config\n\n\ndef _tercile(series: pd.Series) -&gt; pd.Series:\n    \"\"\"Return 1/2/3 tercile labels by rank (robust to ties and NaN).\"\"\"\n    ranks = series.rank(method=\"first\")\n    return pd.qcut(ranks, 3, labels=[1, 2, 3]).astype(\"Int64\")\n\n\ndef add_derived_metrics(df: pd.DataFrame) -&gt; pd.DataFrame:\n    \"\"\"Add income_speed_ratio and bivariate_class (income-speed terciles).\"\"\"\n    out = df.copy()\n    out[\"income_speed_ratio\"] = out[\"mean_income\"] / out[\"download_mbps\"].where(\n        out[\"download_mbps\"] &gt; 0\n    )\n    inc = _tercile(out[\"mean_income\"])\n    spd = _tercile(out[\"download_mbps\"])\n    out[\"bivariate_class\"] = inc.astype(str) + \"-\" + spd.astype(str)\n    return out\n\n\ndef main() -&gt; None:\n    civ = gpd.read_file(config.CIVIC_ASSOC)[[\"geoid\", \"region_name\", \"geometry\"]]\n    income = pd.read_csv(config.CIVIC_INCOME, dtype={\"geoid\": str})\n    broadband = pd.read_csv(config.CIVIC_BROADBAND, dtype={\"geoid\": str})\n    merged = civ.merge(income, on=\"geoid\", how=\"left\").merge(\n        broadband, on=\"geoid\", how=\"left\"\n    )\n    merged = add_derived_metrics(merged)\n    gdf = gpd.GeoDataFrame(merged, geometry=\"geometry\", crs=civ.crs)\n    gdf.to_file(config.CIVIC_COMBINED, driver=\"GeoJSON\")\n    print(f\"Wrote {len(gdf)} combined civic-association rows → {config.CIVIC_COMBINED}\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#validate",
+    "href": "08-code.html#validate",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.8 Validate",
+    "text": "9.8 Validate\nConfirm household totals are preserved by the redistribution and that no speeds or incomes are negative.\npipeline/validate.py\n\"\"\"Integrity checks on redistributed outputs.\"\"\"\nfrom __future__ import annotations\n\nimport pandas as pd\n\n\ndef check_total_preserved(source_total: float, target_total: float, tol: float = 0.01) -&gt; None:\n    \"\"\"Assert target total matches source total within relative tolerance ``tol``.\"\"\"\n    if source_total == 0:\n        return\n    rel = abs(target_total - source_total) / abs(source_total)\n    assert rel &lt;= tol, f\"total drift {rel:.3%} exceeds {tol:.3%}\"\n\n\ndef check_ranges(df: pd.DataFrame) -&gt; None:\n    \"\"\"Assert speed/income columns are non-negative where present.\"\"\"\n    for col in (\"download_mbps\", \"upload_mbps\", \"mean_income\", \"households\"):\n        if col in df.columns:\n            vals = df[col].dropna()\n            assert (vals &gt;= 0).all(), f\"{col} has negative values\"\n\n\ndef main() -&gt; None:\n    import geopandas as gpd\n    from pipeline import config\n\n    combined = gpd.read_file(config.CIVIC_COMBINED)\n    acs = gpd.read_file(config.ACS_COUNTS)\n    check_total_preserved(\n        acs[\"households\"].sum(), combined[\"households\"].sum(), tol=0.02\n    )\n    check_ranges(combined)\n    print(\"Validation passed.\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
+    "objectID": "08-code.html#run-the-full-pipeline",
+    "href": "08-code.html#run-the-full-pipeline",
+    "title": "9  The Complete Pipeline Code",
+    "section": "9.9 Run the full pipeline",
+    "text": "9.9 Run the full pipeline\nWire every stage into one command: uv run python -m pipeline.run.\npipeline/run.py\n\"\"\"Run the full pipeline end to end (acquisition → outputs → validation).\"\"\"\nfrom __future__ import annotations\n\nfrom pipeline import (\n    acquire_acs,\n    acquire_geographies,\n    acquire_ookla,\n    combine,\n    redistribute_broadband,\n    redistribute_income,\n    validate,\n)\n\n\ndef main() -&gt; None:\n    acquire_geographies.main()\n    acquire_acs.main()\n    acquire_ookla.main()\n    redistribute_income.main()\n    redistribute_broadband.main()\n    combine.main()\n    validate.main()\n    print(\"Pipeline complete.\")\n\n\nif __name__ == \"__main__\":\n    main()",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>The Complete Pipeline Code</span>"
+    ]
+  },
+  {
     "objectID": "references.html",
     "href": "references.html",
     "title": "References",
