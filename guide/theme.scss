@@ -145,8 +145,8 @@ nav[role="doc-toc"] a.active {
 #title-block-header .quarto-title-meta { display: none !important; }
 
 .quarto-title-banner {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
   .quarto-title .title {
     font-family: $font-family-sans-serif;
     font-weight: 800;
@@ -171,14 +171,14 @@ nav[role="doc-toc"] a.active {
 }
 
 .cover-hero {
-  max-width: 680px;
+  max-width: 476px;
   margin: 2.6rem auto 0.4rem;
   text-align: center;
   img { max-width: 100%; height: auto; }
 }
 .cover-hero-caption {
   display: block;
-  max-width: 620px;
+  max-width: 476px;
   margin: 0.4rem auto 0;
   font-family: $font-family-sans-serif;
   font-size: 0.86rem;
