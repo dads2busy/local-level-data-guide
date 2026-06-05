@@ -21,12 +21,17 @@ uv run python -m pipeline.run
 Outputs land in `data/`:
 - `civic_income.csv`, `civic_broadband.csv` — redistributed measures
 - `civic_combined.geojson` — joined + derived metrics (ratio, bivariate class)
+- `civic_income_parcels.csv` — parcel-centroid income redistribution via `pipeline.acquire_parcels` + `redistribute_income_parcels`
+- `civic_income_comparison.geojson` — side-by-side comparison of area-weighted vs parcel-based estimates (`compare_methods`)
 
 ## Method
 
 Counts (aggregate income, households, broadband tests) are redistributed
 area-weighted with `sdc-redistribute`; intensive rates (mean income, mean
-speed) are derived from count ratios. See `docs/superpowers/specs/`.
+speed) are derived from count ratios. The guide now includes a second,
+parcel-based approach that assigns block-group income to civic associations
+using parcel centroids as a spatial proxy, with a comparison chapter showing
+where the two methods agree and diverge. See `docs/superpowers/specs/`.
 
 ## Figures
 

@@ -346,7 +346,7 @@ estimates at the policy-relevant geography.
 The worked example is implemented in \textbf{Python}. An \textbf{R}
 implementation is forthcoming.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
+\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -694,7 +694,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
+\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -856,7 +856,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, colbacktitle=quarto-callout-note-color!10!white, breakable, left=2mm, opacitybacktitle=0.6, rightrule=.15mm, coltitle=black, leftrule=.75mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, bottomtitle=1mm, toprule=.15mm, toptitle=1mm, colframe=quarto-callout-note-color-frame, arc=.35mm, opacityback=0, bottomrule=.15mm, titlerule=0mm]
+\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1148,6 +1148,220 @@ jurisdictions with lower overall incomes or with genuine gaps in
 physical access infrastructure. But the methodological lesson --- that
 one should verify the relationship between income and speed empirically
 before designing income-based interventions --- applies everywhere.
+
+\bookmarksetup{startatroot}
+
+\chapter{A Second Approach: Parcel-Based
+Redistribution}\label{sec-parcels}
+
+The area-weighted method introduced in Chapter~\ref{sec-method} works
+well, but it rests on a simplifying assumption worth examining: that
+each variable of interest is distributed uniformly across a block
+group's entire polygon. In practice, a block group's polygon includes
+roads, parks, parking lots, commercial strips, and other land that
+contains no housing at all. For measures tied to where people actually
+live, this matters. Dasymetric methods replace the uniform-distribution
+assumption by using an ancillary layer --- in this case, parcel
+locations --- to concentrate redistributed values where housing actually
+sits {[}16{]}.
+
+This chapter implements that alternative and then asks directly: how
+much does the choice of method change the result?
+
+\section{The parcel data}\label{the-parcel-data}
+
+Arlington County's Master Housing Unit Database (MHUD) provides a
+parcel-level inventory of every residential unit in the county. The
+layer used here contains \textbf{34,340 parcels} carrying roughly
+\textbf{127,000 housing units} in total. The vast majority of those
+parcels --- \textbf{33,665} --- are single-family detached or attached
+(SFD/SFA) structures, typically carrying one or two units apiece. The
+remaining \textbf{675} parcels are classified as multifamily (MULTI),
+and they account for a disproportionate share of the county's housing
+stock: the multifamily parcels are concentrated along the
+Rosslyn--Ballston corridor and the Route 1 spine, where high-rise and
+mid-rise buildings each contribute hundreds of units to the total.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.9\linewidth,height=\textheight,keepaspectratio]{figures/map_parcels.png}
+
+}
+
+\caption{\label{fig-parcels}Arlington housing units by parcel --- point
+size is unit count; the few multifamily parcels carry most of the
+county's housing units, concentrated in the Rosslyn--Ballston and Route
+1 corridors.}
+
+\end{figure}%
+
+Figure~\ref{fig-parcels} makes the spatial concentration vivid. A small
+number of large dots --- each representing a multifamily building ---
+account for a large fraction of the county's residential footprint. The
+single-family parcels are numerous but individually small, spread across
+the county's lower-density northern and western neighbourhoods. This
+heterogeneity is precisely what dasymetric redistribution is designed to
+exploit: instead of spreading a block group's household counts uniformly
+across its entire polygon, we concentrate them where the housing units
+are.
+
+\section{The method: unit-weighted
+redistribution}\label{the-method-unit-weighted-redistribution}
+
+The implementation follows a straightforward unit-weighting scheme. Each
+parcel is ``exploded'' into a number of identical point records equal to
+its \texttt{Total\_Units} count --- so a 300-unit multifamily building
+contributes 300 identical centroid points, while a single-family parcel
+contributes one. That pool of unit points is then passed to
+\texttt{redistribute\_parcels} from the \texttt{sdc-redistribute}
+package, which uses the point locations as the dasymetric control layer.
+The block-group aggregate income and household counts are redistributed
+to civic associations in proportion to the number of unit points that
+fall within each association, weighted by their source block-group
+membership.
+
+\begin{tcolorbox}[enhanced jigsaw, toprule=.15mm, colback=white, colframe=quarto-callout-note-color-frame, rightrule=.15mm, left=2mm, colbacktitle=quarto-callout-note-color!10!white, breakable, opacityback=0, coltitle=black, bottomtitle=1mm, toptitle=1mm, leftrule=.75mm, bottomrule=.15mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, titlerule=0mm, arc=.35mm, opacitybacktitle=0.6]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sdc\_redistribute }\ImportTok{import}\NormalTok{ redistribute\_parcels}
+\CommentTok{\# explode each parcel into Total\_Units identical points first, then:}
+\NormalTok{result }\OperatorTok{=}\NormalTok{ redistribute\_parcels(}
+\NormalTok{    source\_df}\OperatorTok{=}\NormalTok{counts\_long, parcel\_centroids}\OperatorTok{=}\NormalTok{unit\_points,}
+\NormalTok{    source\_geo}\OperatorTok{=}\StringTok{"block\_groups.geojson"}\NormalTok{,}
+\NormalTok{    target\_geos}\OperatorTok{=}\NormalTok{\{}\StringTok{"civic\_association"}\NormalTok{: }\StringTok{"civic\_assoc.geojson"}\NormalTok{\},}
+\NormalTok{    count\_cols}\OperatorTok{=}\NormalTok{[}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{], source\_id}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{,}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\end{tcolorbox}
+
+The logic is the same as the area-weighted approach --- redistribute
+extensive counts, derive intensive rates afterward --- with one
+structural difference: the implicit population surface has changed from
+a uniform density within each block group to a density proportional to
+the spatial distribution of housing units within that block group.
+
+\section{Results: a close agreement with the area-weighted
+estimates}\label{results-a-close-agreement-with-the-area-weighted-estimates}
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{figures/map_income_parcels.png}
+
+}
+
+\caption{\label{fig-income-parcels}Mean household income by civic
+association --- parcel-based redistribution.}
+
+\end{figure}%
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{figures/map_income_diff.png}
+
+}
+
+\caption{\label{fig-income-diff}Difference in mean household income:
+parcel minus area-weighted (dollars).}
+
+\end{figure}%
+
+Figure~\ref{fig-income-parcels} and Figure~\ref{fig-income-diff} tell a
+consistent story. The parcel map looks nearly identical to its
+area-weighted counterpart, and the difference map is dominated by values
+close to zero.
+
+\begin{figure}[H]
+
+\centering{
+
+\includegraphics[width=0.85\linewidth,height=\textheight,keepaspectratio]{figures/scatter_area_vs_parcel.png}
+
+}
+
+\caption{\label{fig-area-parcel}Area-weighted vs.~parcel-weighted mean
+income across the 62 civic associations.}
+
+\end{figure}%
+
+The scatter plot in Figure~\ref{fig-area-parcel} makes the relationship
+explicit: the two methods produce a Pearson r = 1.00 across the 62
+associations. The largest per-association shift in either direction is
+approximately ±\$22,000 --- a few percent on six-figure incomes. The
+three biggest gainers under parcel weighting are \textbf{Arlington
+Forest (+\$22,306)}, \textbf{Cherrydale (+\$15,347)}, and
+\textbf{Foxcroft Heights (+\$13,047)}. The three biggest losers are
+\textbf{Lyon Park (−\$6,118)}, \textbf{John M Langston (−\$4,960)}, and
+\textbf{Douglas Park (−\$3,781)}.
+
+Why do the methods agree so closely? Mean household income is a smooth,
+intensive measure: it describes a characteristic of households, not a
+count of things that accumulate over area. When a block group's income
+is fairly evenly distributed among its housing stock --- which holds in
+Arlington at the block-group scale --- then \emph{where} within the
+block group the housing sits barely changes the weighted average that
+reaches each civic association. Parcel placement shifts modest fractions
+of the income count from one association to an adjacent one, but because
+the income levels on both sides of any given boundary are similar, the
+effect on the mean nearly cancels. The ±\$22,000 maximum shift
+represents the cases where a multifamily building with an unusually
+different household composition sits near a boundary --- a real effect,
+but a small one relative to the income range in the data.
+
+\section{Leakage and the case for parcel weighting on count
+measures}\label{leakage-and-the-case-for-parcel-weighting-on-count-measures}
+
+One honest limitation deserves direct statement. Approximately
+\textbf{3,032 households} --- about \textbf{2.8\%} of the county total
+--- sit in parcels whose centroids fall outside any civic association
+boundary. These households contribute to the block-group totals but are
+not allocated to any association under the parcel method. The parcel
+approach therefore slightly underestimates total households compared
+with the area-weighted method, which allocates every square metre of a
+block group to some association. Analysts using this method for official
+estimates should be aware of this leakage and decide whether to
+redistribute orphaned parcels to the nearest association or treat them
+as a separate ``unassigned'' category.
+
+For mean income, which is what this guide measures, the 2.8\% household
+leakage has a negligible effect on the ratio. For \textbf{count
+measures} --- total population, total housing units --- the answer is
+different. Dasymetric and parcel-based redistribution earn their keep
+precisely when the placement of housing within a block group drives the
+allocation of counts across target boundaries. If you want to know how
+many housing units fall within a specific civic association's polygon,
+point-in-polygon counting on the parcel layer is more accurate than area
+weighting; the difference can be substantial in associations with
+compact boundaries or with multifamily buildings near their edges.
+
+The natural next step in this direction is \textbf{household-size
+weighting}: single-family and multifamily units have systematically
+different average household sizes, and a redistribution that treats all
+units as interchangeable conflates these. The \texttt{sdc-redistribute}
+package's \texttt{redistribute\_parcel\_pums\_adj} function implements
+this extension by drawing on Public Use Microdata Sample (PUMS)
+household-size distributions, stratified by unit type, to weight
+single-family parcels differently from multifamily ones. Applying that
+method to Arlington's MHUD data --- and assessing whether the
+household-size correction changes the civic-association estimates
+meaningfully --- is a planned extension of this work.
+
+For the income analysis in this guide, the two methods are
+interchangeable in practice. The parcel approach is presented here to
+establish the infrastructure and to make a broader point: method choice
+matters most when the variable in question is a count and when housing
+is unevenly distributed within source units. When the variable is a
+smooth intensive measure like mean income, and when the redistribution
+is operating at the block-group-to-neighbourhood scale, area weighting
+and parcel weighting converge.
 
 \bookmarksetup{startatroot}
 
@@ -1468,6 +1682,9 @@ module reads.
 \NormalTok{CIVIC\_INCOME }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_income.csv"}                    \CommentTok{\# produced by redistribute\_income}
 \NormalTok{CIVIC\_BROADBAND }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_broadband.csv"}             \CommentTok{\# produced by redistribute\_broadband}
 \NormalTok{CIVIC\_COMBINED }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_combined.geojson"}           \CommentTok{\# produced by combine}
+\NormalTok{PARCELS }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"va013\_parcels.geojson"}                   \CommentTok{\# produced by acquire\_parcels}
+\NormalTok{CIVIC\_INCOME\_PARCELS }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_income\_parcels.csv"}   \CommentTok{\# produced by redistribute\_income\_parcels}
+\NormalTok{CIVIC\_INCOME\_COMPARISON }\OperatorTok{=}\NormalTok{ DATA }\OperatorTok{/} \StringTok{"civic\_income\_comparison.geojson"}  \CommentTok{\# produced by compare\_methods}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1843,6 +2060,223 @@ bivariate income×speed classes.
 \NormalTok{    gdf }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(merged, geometry}\OperatorTok{=}\StringTok{"geometry"}\NormalTok{, crs}\OperatorTok{=}\NormalTok{civ.crs)}
 \NormalTok{    gdf.to\_file(config.CIVIC\_COMBINED, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
     \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(gdf)}\SpecialCharTok{\}}\SpecialStringTok{ combined civic{-}association rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_COMBINED}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Acquire parcels}\label{acquire-parcels}
+
+Page through the Arlington MHUD FeatureServer and reduce parcel polygons
+to unit-bearing centroids.
+
+\textbf{\texttt{pipeline/acquire\_parcels.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Acquire Arlington MHUD parcel polygons and reduce them to unit{-}bearing centroids."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ json}
+\ImportTok{import}\NormalTok{ urllib.parse}
+\ImportTok{import}\NormalTok{ urllib.request}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+\NormalTok{LAYER }\OperatorTok{=}\NormalTok{ (}
+    \StringTok{"https://arlgis.arlingtonva.us/arcgis/rest/services/Open\_Data/"}
+    \StringTok{"od\_MHUD\_Polygons/FeatureServer/0/query"}
+\NormalTok{)}
+\NormalTok{PAGE }\OperatorTok{=} \DecValTok{2000}
+
+
+\KeywordTok{def}\NormalTok{ \_fetch\_page(offset: }\BuiltInTok{int}\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame }\OperatorTok{|} \VariableTok{None}\NormalTok{:}
+\NormalTok{    params }\OperatorTok{=}\NormalTok{ \{}
+        \StringTok{"where"}\NormalTok{: }\StringTok{"1=1"}\NormalTok{,}
+        \StringTok{"outFields"}\NormalTok{: }\StringTok{"Total\_Units,Unit\_Type"}\NormalTok{,}
+        \StringTok{"outSR"}\NormalTok{: }\StringTok{"4326"}\NormalTok{,}
+        \StringTok{"resultOffset"}\NormalTok{: }\BuiltInTok{str}\NormalTok{(offset),}
+        \StringTok{"resultRecordCount"}\NormalTok{: }\BuiltInTok{str}\NormalTok{(PAGE),}
+        \StringTok{"f"}\NormalTok{: }\StringTok{"geojson"}\NormalTok{,}
+\NormalTok{    \}}
+\NormalTok{    url }\OperatorTok{=}\NormalTok{ LAYER }\OperatorTok{+} \StringTok{"?"} \OperatorTok{+}\NormalTok{ urllib.parse.urlencode(params)}
+    \ControlFlowTok{with}\NormalTok{ urllib.request.urlopen(url, timeout}\OperatorTok{=}\DecValTok{60}\NormalTok{) }\ImportTok{as}\NormalTok{ resp:  }\CommentTok{\# noqa: S310}
+\NormalTok{        data }\OperatorTok{=}\NormalTok{ json.load(resp)}
+\NormalTok{    feats }\OperatorTok{=}\NormalTok{ data.get(}\StringTok{"features"}\NormalTok{, [])}
+    \ControlFlowTok{if} \KeywordTok{not}\NormalTok{ feats:}
+        \ControlFlowTok{return} \VariableTok{None}
+    \ControlFlowTok{return}\NormalTok{ gpd.GeoDataFrame.from\_features(feats, crs}\OperatorTok{=}\StringTok{"EPSG:4326"}\NormalTok{)}
+
+
+\KeywordTok{def}\NormalTok{ fetch\_parcels() }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame:}
+    \CommentTok{"""Page through the MHUD FeatureServer and return all parcel polygons."""}
+\NormalTok{    parts: }\BuiltInTok{list}\NormalTok{[gpd.GeoDataFrame] }\OperatorTok{=}\NormalTok{ []}
+\NormalTok{    offset }\OperatorTok{=} \DecValTok{0}
+    \ControlFlowTok{while} \VariableTok{True}\NormalTok{:}
+\NormalTok{        page }\OperatorTok{=}\NormalTok{ \_fetch\_page(offset)}
+        \ControlFlowTok{if}\NormalTok{ page }\KeywordTok{is} \VariableTok{None} \KeywordTok{or} \BuiltInTok{len}\NormalTok{(page) }\OperatorTok{==} \DecValTok{0}\NormalTok{:}
+            \ControlFlowTok{break}
+\NormalTok{        parts.append(page)}
+        \ControlFlowTok{if} \BuiltInTok{len}\NormalTok{(page) }\OperatorTok{\textless{}}\NormalTok{ PAGE:}
+            \ControlFlowTok{break}
+\NormalTok{        offset }\OperatorTok{+=}\NormalTok{ PAGE}
+\NormalTok{    gdf }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(pd.concat(parts, ignore\_index}\OperatorTok{=}\VariableTok{True}\NormalTok{), crs}\OperatorTok{=}\StringTok{"EPSG:4326"}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ gdf}
+
+
+\KeywordTok{def}\NormalTok{ to\_centroids(polys: gpd.GeoDataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame:}
+    \CommentTok{"""Reduce parcel polygons to centroids, keeping Total\_Units and Unit\_Type."""}
+\NormalTok{    cent }\OperatorTok{=}\NormalTok{ polys.copy()}
+    \CommentTok{\# representative\_point() is guaranteed inside the polygon (unlike centroid)}
+\NormalTok{    cent[}\StringTok{"geometry"}\NormalTok{] }\OperatorTok{=}\NormalTok{ cent.geometry.representative\_point()}
+    \ControlFlowTok{return}\NormalTok{ cent[[}\StringTok{"Total\_Units"}\NormalTok{, }\StringTok{"Unit\_Type"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]]}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    polys }\OperatorTok{=}\NormalTok{ fetch\_parcels()}
+\NormalTok{    pts }\OperatorTok{=}\NormalTok{ to\_centroids(polys)}
+\NormalTok{    pts.to\_file(config.PARCELS, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(pts)}\SpecialCharTok{\}}\SpecialStringTok{ parcel centroids → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{PARCELS}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute income through
+parcels}\label{redistribute-income-through-parcels}
+
+Explode parcels into per-unit points and redistribute block-group income
+through them (the dasymetric second approach).
+
+\textbf{\texttt{pipeline/redistribute\_income\_parcels.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Redistribute income through unit{-}weighted parcels (dasymetric), derive mean income."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{from}\NormalTok{ pathlib }\ImportTok{import}\NormalTok{ Path}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+\ImportTok{from}\NormalTok{ sdc\_redistribute }\ImportTok{import}\NormalTok{ redistribute\_parcels}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+
+\KeywordTok{def}\NormalTok{ explode\_by\_units(parcels: gpd.GeoDataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ gpd.GeoDataFrame:}
+    \CommentTok{"""Replicate each parcel into Total\_Units identical points; drop units \textless{}= 0."""}
+\NormalTok{    p }\OperatorTok{=}\NormalTok{ parcels[parcels[}\StringTok{"Total\_Units"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}\NormalTok{].copy()}
+\NormalTok{    reps }\OperatorTok{=}\NormalTok{ p[}\StringTok{"Total\_Units"}\NormalTok{].astype(}\BuiltInTok{int}\NormalTok{).to\_numpy()}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ p.loc[p.index.repeat(reps)].reset\_index(drop}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+    \ControlFlowTok{return}\NormalTok{ out}
+
+
+\KeywordTok{def}\NormalTok{ redistribute\_income\_parcels(}
+\NormalTok{    counts\_long: pd.DataFrame,}
+\NormalTok{    parcels: gpd.GeoDataFrame,}
+\NormalTok{    source\_geo: Path,}
+\NormalTok{    target\_geo: Path,}
+\NormalTok{) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Return per{-}civic{-}association agg\_income, households, derived mean\_income."""}
+\NormalTok{    points }\OperatorTok{=}\NormalTok{ explode\_by\_units(parcels)}
+\NormalTok{    result }\OperatorTok{=}\NormalTok{ redistribute\_parcels(}
+\NormalTok{        source\_df}\OperatorTok{=}\NormalTok{counts\_long,}
+\NormalTok{        parcel\_centroids}\OperatorTok{=}\NormalTok{points,}
+\NormalTok{        source\_geo}\OperatorTok{=}\NormalTok{source\_geo,}
+\NormalTok{        target\_geos}\OperatorTok{=}\NormalTok{\{}\StringTok{"civic\_association"}\NormalTok{: target\_geo\},}
+\NormalTok{        count\_cols}\OperatorTok{=}\NormalTok{[}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{],}
+\NormalTok{        source\_id}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{,}
+\NormalTok{    )}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ result.pivot\_table(}
+\NormalTok{        index}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, columns}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, values}\OperatorTok{=}\StringTok{"value"}\NormalTok{, aggfunc}\OperatorTok{=}\StringTok{"first"}
+\NormalTok{    ).reset\_index()}
+\NormalTok{    wide.columns.name }\OperatorTok{=} \VariableTok{None}
+\NormalTok{    wide }\OperatorTok{=}\NormalTok{ wide.rename(}
+\NormalTok{        columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"agg\_income\_parcels"}\NormalTok{: }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households\_parcels"}\NormalTok{: }\StringTok{"households"}\NormalTok{\}}
+\NormalTok{    )}
+\NormalTok{    wide[}\StringTok{"mean\_income"}\NormalTok{] }\OperatorTok{=}\NormalTok{ wide[}\StringTok{"agg\_income"}\NormalTok{] }\OperatorTok{/}\NormalTok{ wide[}\StringTok{"households"}\NormalTok{].where(}
+\NormalTok{        wide[}\StringTok{"households"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ wide[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{]]}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    parcels }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.PARCELS)}
+\NormalTok{    bg }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.ACS\_COUNTS).rename(columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"GEOID"}\NormalTok{: }\StringTok{"geoid"}\NormalTok{\})}
+    \BuiltInTok{long} \OperatorTok{=}\NormalTok{ bg[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{]].melt(}
+\NormalTok{        id\_vars}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, var\_name}\OperatorTok{=}\StringTok{"measure"}\NormalTok{, value\_name}\OperatorTok{=}\StringTok{"value"}
+\NormalTok{    )}
+    \BuiltInTok{long}\NormalTok{[}\StringTok{"year"}\NormalTok{] }\OperatorTok{=}\NormalTok{ config.ACS\_YEAR}
+
+\NormalTok{    src\_path }\OperatorTok{=}\NormalTok{ config.DATA }\OperatorTok{/} \StringTok{"\_acs\_src\_parcels.geojson"}
+\NormalTok{    bg[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]].to\_file(src\_path, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ redistribute\_income\_parcels(}\BuiltInTok{long}\NormalTok{, parcels, src\_path, config.CIVIC\_ASSOC)}
+\NormalTok{    src\_path.unlink(missing\_ok}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+
+\NormalTok{    out.to\_csv(config.CIVIC\_INCOME\_PARCELS, index}\OperatorTok{=}\VariableTok{False}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(out)}\SpecialCharTok{\}}\SpecialStringTok{ parcel{-}weighted income rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_INCOME\_PARCELS}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
+
+
+\ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
+\NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Compare methods}\label{compare-methods}
+
+Join the area-weighted and parcel-weighted income and quantify the
+difference per civic association.
+
+\textbf{\texttt{pipeline/compare\_methods.py}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{"""Compare area{-}weighted vs parcel{-}weighted income per civic association."""}
+\ImportTok{from}\NormalTok{ \_\_future\_\_ }\ImportTok{import}\NormalTok{ annotations}
+
+\ImportTok{import}\NormalTok{ geopandas }\ImportTok{as}\NormalTok{ gpd}
+\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
+
+\ImportTok{from}\NormalTok{ pipeline }\ImportTok{import}\NormalTok{ config}
+
+
+\KeywordTok{def}\NormalTok{ compare\_income(area: pd.DataFrame, parcel: pd.DataFrame) }\OperatorTok{{-}\textgreater{}}\NormalTok{ pd.DataFrame:}
+    \CommentTok{"""Join the two methods\textquotesingle{} mean income; add diff (parcel {-} area) and pct\_diff."""}
+\NormalTok{    a }\OperatorTok{=}\NormalTok{ area[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{]].rename(columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"mean\_income"}\NormalTok{: }\StringTok{"mean\_income\_area"}\NormalTok{\})}
+\NormalTok{    p }\OperatorTok{=}\NormalTok{ parcel[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{]].rename(columns}\OperatorTok{=}\NormalTok{\{}\StringTok{"mean\_income"}\NormalTok{: }\StringTok{"mean\_income\_parcel"}\NormalTok{\})}
+\NormalTok{    out }\OperatorTok{=}\NormalTok{ a.merge(p, on}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, how}\OperatorTok{=}\StringTok{"outer"}\NormalTok{)}
+\NormalTok{    out[}\StringTok{"diff"}\NormalTok{] }\OperatorTok{=}\NormalTok{ out[}\StringTok{"mean\_income\_parcel"}\NormalTok{] }\OperatorTok{{-}}\NormalTok{ out[}\StringTok{"mean\_income\_area"}\NormalTok{]}
+\NormalTok{    out[}\StringTok{"pct\_diff"}\NormalTok{] }\OperatorTok{=} \DecValTok{100} \OperatorTok{*}\NormalTok{ out[}\StringTok{"diff"}\NormalTok{] }\OperatorTok{/}\NormalTok{ out[}\StringTok{"mean\_income\_area"}\NormalTok{].where(}
+\NormalTok{        out[}\StringTok{"mean\_income\_area"}\NormalTok{] }\OperatorTok{\textgreater{}} \DecValTok{0}
+\NormalTok{    )}
+    \ControlFlowTok{return}\NormalTok{ out}
+
+
+\KeywordTok{def}\NormalTok{ main() }\OperatorTok{{-}\textgreater{}} \VariableTok{None}\NormalTok{:}
+\NormalTok{    civ }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.CIVIC\_ASSOC)[[}\StringTok{"geoid"}\NormalTok{, }\StringTok{"region\_name"}\NormalTok{, }\StringTok{"geometry"}\NormalTok{]]}
+\NormalTok{    area }\OperatorTok{=}\NormalTok{ pd.read\_csv(config.CIVIC\_INCOME, dtype}\OperatorTok{=}\NormalTok{\{}\StringTok{"geoid"}\NormalTok{: }\BuiltInTok{str}\NormalTok{\})}
+\NormalTok{    parcel }\OperatorTok{=}\NormalTok{ pd.read\_csv(config.CIVIC\_INCOME\_PARCELS, dtype}\OperatorTok{=}\NormalTok{\{}\StringTok{"geoid"}\NormalTok{: }\BuiltInTok{str}\NormalTok{\})}
+    \BuiltInTok{cmp} \OperatorTok{=}\NormalTok{ compare\_income(area, parcel)}
+\NormalTok{    gdf }\OperatorTok{=}\NormalTok{ civ.merge(}\BuiltInTok{cmp}\NormalTok{, on}\OperatorTok{=}\StringTok{"geoid"}\NormalTok{, how}\OperatorTok{=}\StringTok{"left"}\NormalTok{)}
+\NormalTok{    gdf }\OperatorTok{=}\NormalTok{ gpd.GeoDataFrame(gdf, geometry}\OperatorTok{=}\StringTok{"geometry"}\NormalTok{, crs}\OperatorTok{=}\NormalTok{civ.crs)}
+
+    \CommentTok{\# Honest accounting: report parcel{-}method household total vs ACS source.}
+\NormalTok{    acs }\OperatorTok{=}\NormalTok{ gpd.read\_file(config.ACS\_COUNTS)}
+\NormalTok{    src\_hh }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(acs[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{())}
+\NormalTok{    parcel\_hh }\OperatorTok{=} \BuiltInTok{float}\NormalTok{(pd.read\_csv(config.CIVIC\_INCOME\_PARCELS)[}\StringTok{"households"}\NormalTok{].}\BuiltInTok{sum}\NormalTok{())}
+\NormalTok{    pct }\OperatorTok{=} \DecValTok{100} \OperatorTok{*}\NormalTok{ (parcel\_hh }\OperatorTok{{-}}\NormalTok{ src\_hh) }\OperatorTok{/}\NormalTok{ src\_hh }\ControlFlowTok{if}\NormalTok{ src\_hh }\ControlFlowTok{else} \FloatTok{0.0}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Household totals — ACS source: }\SpecialCharTok{\{}\NormalTok{src\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{; parcel method: }\SpecialCharTok{\{}\NormalTok{parcel\_hh}\SpecialCharTok{:,.0f\}}\SpecialStringTok{ (}\SpecialCharTok{\{}\NormalTok{pct}\SpecialCharTok{:+.1f\}}\SpecialStringTok{\%)"}\NormalTok{)}
+
+\NormalTok{    gdf.to\_file(config.CIVIC\_INCOME\_COMPARISON, driver}\OperatorTok{=}\StringTok{"GeoJSON"}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"Wrote }\SpecialCharTok{\{}\BuiltInTok{len}\NormalTok{(gdf)}\SpecialCharTok{\}}\SpecialStringTok{ comparison rows → }\SpecialCharTok{\{}\NormalTok{config}\SpecialCharTok{.}\NormalTok{CIVIC\_INCOME\_COMPARISON}\SpecialCharTok{\}}\SpecialStringTok{"}\NormalTok{)}
 
 
 \ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}

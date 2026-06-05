@@ -29,3 +29,13 @@ def test_fetch_ookla_tiles_has_speed_columns():
     tiles = fetch_ookla_tiles()
     assert len(tiles) > 0
     assert {"quadkey", "avg_d_kbps", "tests"} <= set(tiles.columns)
+
+
+@pytest.mark.network
+def test_fetch_parcels_has_units_and_type():
+    from pipeline.acquire_parcels import fetch_parcels
+
+    gdf = fetch_parcels()
+    assert len(gdf) > 30000
+    assert {"Total_Units", "Unit_Type"} <= set(gdf.columns)
+    assert gdf["Total_Units"].sum() > 100000  # exploded units ≈ household count

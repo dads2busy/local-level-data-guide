@@ -46,3 +46,6 @@ OOKLA_TILES = DATA / "ookla_tiles_arlington.geojson"        # existing/refreshab
 CIVIC_INCOME = DATA / "civic_income.csv"                    # produced by redistribute_income
 CIVIC_BROADBAND = DATA / "civic_broadband.csv"             # produced by redistribute_broadband
 CIVIC_COMBINED = DATA / "civic_combined.geojson"           # produced by combine
+PARCELS = DATA / "va013_parcels.geojson"                   # produced by acquire_parcels
+CIVIC_INCOME_PARCELS = DATA / "civic_income_parcels.csv"   # produced by redistribute_income_parcels
+CIVIC_INCOME_COMPARISON = DATA / "civic_income_comparison.geojson"  # produced by compare_methods

@@ -40,6 +40,15 @@ MODULES: list[tuple[str, str, str]] = [
      "Join the redistributed income and broadband measures onto the civic "
      "association polygons and compute the income-to-speed ratio and the "
      "bivariate income×speed classes."),
+    ("acquire_parcels.py", "Acquire parcels",
+     "Page through the Arlington MHUD FeatureServer and reduce parcel polygons "
+     "to unit-bearing centroids."),
+    ("redistribute_income_parcels.py", "Redistribute income through parcels",
+     "Explode parcels into per-unit points and redistribute block-group income "
+     "through them (the dasymetric second approach)."),
+    ("compare_methods.py", "Compare methods",
+     "Join the area-weighted and parcel-weighted income and quantify the "
+     "difference per civic association."),
     ("validate.py", "Validate",
      "Confirm household totals are preserved by the redistribution and that no "
      "speeds or incomes are negative."),
