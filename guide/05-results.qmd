@@ -6,7 +6,7 @@ The pipeline described in the preceding chapters produces two estimates for each
 
 Mean household income across the 62 associations spans from roughly **$73,000** (Arlington Mill) to **$468,000** (Gulf Branch), with a mean of association means near **$215,600** and a median near **$191,500**. The roughly **109,500** households represented in the data are not evenly spread: Arlington's geography concentrates its highest incomes in low-density, single-family neighbourhoods in the northern and western portions of the county — Gulf Branch, Rivercrest, Bellevue Forest, and Old Glebe all exceed $447,000. Denser, more mixed-use corridors in the south and east — Columbia Heights, Arlington Mill, Forest Glen — cluster toward the lower end.
 
-![Mean household income by civic association.](../figures/map_income.png){#fig-income width=85%}
+![Mean household income by civic association.](figures/map_income.png){#fig-income width=85%}
 
 The spatial pattern in @fig-income reflects Arlington's well-documented socio-spatial structure: income rises sharply as one moves away from the Rosslyn–Ballston and Route 1 corridors into the low-density residential tracts that border Fairfax and Falls Church [@ref159]. The spread is wide for a jurisdiction that ranks among the wealthiest counties in the United States, which makes the county an instructive case: if income structured broadband access anywhere, it should be detectable here.
 
@@ -14,7 +14,7 @@ The spatial pattern in @fig-income reflects Arlington's well-documented socio-sp
 
 Mean download speed across the same 62 associations ranges from **100.8 Mbps** (Foxcroft Heights) to **320.8 Mbps** (Columbia Forest), with a county-wide mean of approximately **246.8 Mbps** and a median of **251.9 Mbps**. Mean upload speed averages roughly **105 Mbps**. Even at the low end, every association exceeds the FCC's legacy 25/3 Mbps benchmark; the real differentiation occurs at the higher tiers that support heavy simultaneous use.
 
-![Broadband download speed by civic association.](../figures/map_speed.png){#fig-speed width=85%}
+![Broadband download speed by civic association.](figures/map_speed.png){#fig-speed width=85%}
 
 The spatial pattern in @fig-speed is striking and largely inverts the income map. The fastest associations are concentrated in the denser southern and central corridors. Columbia Forest reaches 320.8 Mbps; Long Branch Creek 307.9 Mbps; **Arlington Mill — the lowest-income association in the dataset at approximately $73,000 — records the third-fastest speed at 307.0 Mbps**. Fairlington follows at 293.4 Mbps. Conversely, the slowest associations — Foxcroft Heights (100.8 Mbps), Arlingwood (117.3 Mbps), Dominion Hills (176.2 Mbps) — are not low-income enclaves; they are mid-to-high-income, low-density, single-family neighbourhoods in the county's outer northern tier.
 
@@ -22,7 +22,7 @@ The spatial pattern in @fig-speed is striking and largely inverts the income map
 
 The Pearson correlation between mean household income and mean download speed across the 62 civic associations is **r = −0.11**. This value is substantively indistinguishable from zero. Income and broadband speed are essentially **decoupled** in Arlington.
 
-![Income vs. broadband download speed across the 62 civic associations (r = −0.11).](../figures/scatter_income_speed.png){#fig-scatter width=85%}
+![Income vs. broadband download speed across the 62 civic associations (r = −0.11).](figures/scatter_income_speed.png){#fig-scatter width=85%}
 
 The scatter plot in @fig-scatter makes the absence of a relationship visually plain. There is no line — positive or negative — that summarises the cloud in any useful way. Analysts who arrive at this data expecting the standard "rich neighbourhoods get faster internet" finding will not find it here. The naive expectation, plausible on its face and documented in national-scale studies of access gaps [@ref95], does not hold inside a uniformly affluent jurisdiction where income variation is high but where the key driver of infrastructure investment operates on a different dimension entirely.
 
@@ -32,7 +32,7 @@ That dimension is **housing density**. Dense multifamily corridors generate the 
 
 To quantify the mismatch between income and infrastructure, consider the income-to-speed ratio: dollars of mean household income per Mbps of mean download speed. Across the 62 associations this ratio ranges from **$238 per Mbps** (Arlington Mill, high speed, lower income) to **$2,490 per Mbps** (Arlingwood, low speed, higher income) — more than a ten-fold span.
 
-![Income-to-speed ratio (dollars of household income per Mbps of download speed).](../figures/map_ratio.png){#fig-ratio width=85%}
+![Income-to-speed ratio (dollars of household income per Mbps of download speed).](figures/map_ratio.png){#fig-ratio width=85%}
 
 The map in @fig-ratio is effectively a map of which associations are getting the least broadband for their economic standing. The highest-ratio associations — Arlingwood ($2,490), Bellevue Forest ($2,107), Gulf Branch ($1,752), Old Glebe ($1,713) — are all wealthy, low-density, northern-tier communities. They are not suffering a crisis of unaffordability; they are simply not served by the same density of competitive infrastructure as their southern counterparts. The lowest-ratio association, Arlington Mill, has the strongest infrastructure relative to its income level precisely because dense multifamily housing attracted competitive carriers.
 
@@ -46,7 +46,7 @@ Classifying each association by income tercile (low/mid/high) and speed tercile 
 | **Mid income** | 6 | 7 | 7 |
 | **High income** | 11 | 5 | 5 |
 
-![Bivariate map: income tercile × speed tercile across the 62 civic associations.](../figures/map_bivariate.png){#fig-bivariate width=85%}
+![Bivariate map: income tercile × speed tercile across the 62 civic associations.](figures/map_bivariate.png){#fig-bivariate width=85%}
 
 The **largest single cell is high-income / low-speed, with 11 associations** — Williamsburg, Maywood, Dominion Hills, Arlingwood, Bellevue Forest, Donaldson Run, and their neighbours. This cell alone falsifies the "rich areas get fast internet" hypothesis. At the opposite corner, **9 associations fall in the low-income / high-speed cell** — Columbia Heights, Forest Glen, Columbia Forest, Westover Village, Long Branch Creek, and Arlington Mill — the dense multifamily corridors already identified as speed leaders.
 

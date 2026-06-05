@@ -10,7 +10,7 @@ For this guide, the relevant quarter is Q1 2021, chosen to align with the ACS 20
 
 Ookla speed-test data reflects the experience of users who actively ran a test at Speedtest.net or through an embedded Speedtest SDK during the quarter. This is not a random sample of all internet users, and coverage varies with population density and smartphone penetration. These limitations are discussed further in the limitations chapter.
 
-![Ookla fixed-broadband speed-test tiles over Arlington (download Mbps).](../figures/fig_ookla_tiles.png){#fig-tiles width=90%}
+![Ookla fixed-broadband speed-test tiles over Arlington (download Mbps).](figures/fig_ookla_tiles.png){#fig-tiles width=90%}
 
 ## American Community Survey
 
@@ -29,6 +29,6 @@ Arlington County, Virginia is divided into 62 civic associations — community-d
 
 The civic-association boundaries used here come from Arlington County's GIS open data portal [@ref146]. The 62 associations cover the entire county and tile it without overlap, making them a complete and non-overlapping partition of Arlington's approximately 109,528 households. This makes them an ideal policy geography: they are locally meaningful, formally recognized, and together exhaustive.
 
-![Arlington's 62 civic associations — the policy-relevant target geography.](../figures/fig_locator_civic.png){#fig-locator width=90%}
+![Arlington's 62 civic associations — the policy-relevant target geography.](figures/fig_locator_civic.png){#fig-locator width=90%}
 
 Because civic associations are not part of the Census geographic hierarchy, no federal statistical agency publishes estimates at this level. Producing those estimates is precisely what the remainder of this guide demonstrates.

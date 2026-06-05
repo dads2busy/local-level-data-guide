@@ -1,6 +1,7 @@
 project:
   type: book
   output-dir: _output
+  pre-render: copy_figures.py
 
 book:
   title: "Creating Local-Level Geographic Datasets"

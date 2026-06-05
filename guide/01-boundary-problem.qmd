@@ -20,7 +20,7 @@ This guide works with three source geographies, none of which aligns with the ot
 
 The figure below illustrates the transformation this guide performs: taking source data packaged in two incompatible grids and producing estimates on the policy-relevant civic-association geography.
 
-![Transforming misaligned source data (Ookla tiles, ACS block groups) onto the policy-relevant civic-association geography.](../figures/fig_transformation_3panel.png){#fig-transform width=100%}
+![Transforming misaligned source data (Ookla tiles, ACS block groups) onto the policy-relevant civic-association geography.](figures/fig_transformation_3panel.png){#fig-transform width=100%}
 
 As @fig-transform shows, a single civic association may overlap dozens of Ookla tiles and several block groups simultaneously. No one-to-one correspondence exists between any pair of these three geographies. The method described in subsequent chapters — areal-weighted interpolation — handles this overlap systematically by distributing each source observation across target units in proportion to the share of its area that falls within each target unit.
 
