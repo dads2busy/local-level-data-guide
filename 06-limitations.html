@@ -61,7 +61,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-69201317a74ee3f5d518f2f8cad4f100.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-eb6178cd9cdcda02b593b6bbf0a9cf85.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-73fcd8b1684cb1f782485aab5eaac3d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -284,21 +284,16 @@ div.csl-indent {
 
 </main> <!-- /main -->
 <script>
-// Place the project sponsorship logo at the bottom of the left sidebar,
-// below the table of contents. Injected into every book page.
 window.addEventListener("DOMContentLoaded", function () {
-  // The cover page features the sponsor in its own footer; skip the sidebar
-  // copy there to avoid showing the logo twice.
-  var path = window.location.pathname;
-  if (path === "/" || /\/index\.html$/.test(path)) return;
-  var sidebar = document.querySelector("#quarto-sidebar");
-  if (!sidebar || document.querySelector(".sidebar-sponsor")) return;
-  var wrap = document.createElement("div");
-  wrap.className = "sidebar-sponsor";
-  wrap.innerHTML =
-    '<span class="sidebar-sponsor-label">Project sponsor</span>' +
-    '<img src="figures/partners-mclogo.png" alt="Project sponsor logo" />';
-  sidebar.appendChild(wrap);
+  // Author line directly under the book title in the left sidebar (all pages).
+  // The sponsor logo lives on the landing page only, not in the sidebar.
+  var title = document.querySelector(".sidebar-title");
+  if (title && !document.querySelector(".sidebar-author")) {
+    var author = document.createElement("div");
+    author.className = "sidebar-author";
+    author.textContent = "Aaron Schroeder";
+    title.insertAdjacentElement("afterend", author);
+  }
 });
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
