@@ -277,19 +277,19 @@ window.Quarto = {
 </header>
 
 
-<p>This chapter walks the full pipeline from raw source files to validated civic-association estimates. The five stages — acquire, redistribute income, redistribute broadband, combine, and validate — correspond directly to the pipeline modules in the companion repository. By the end, each of Arlington’s 62 civic associations has an estimated mean household income and an estimated mean download speed derived from the same underlying geography and the same redistribution logic.</p>
+<p>This chapter walks the full pipeline from raw source files to validated civic-association estimates. The five stages (acquire, redistribute income, redistribute broadband, combine, and validate) correspond directly to the pipeline modules in the companion repository. By the end, each of Arlington’s 62 civic associations has an estimated mean household income and an estimated mean download speed derived from the same underlying geography and the same redistribution logic.</p>
 <p>The complete runnable pipeline is a single command: <code>uv run python -m pipeline.run</code>.</p>
 <section id="stage-1-acquire-the-source-data" class="level2" data-number="5.1">
 <h2 data-number="5.1" class="anchored" data-anchor-id="stage-1-acquire-the-source-data"><span class="header-section-number">5.1</span> Stage 1: Acquire the source data</h2>
 <p>Three datasets must be in hand before any redistribution can take place.</p>
 <p><strong>Census block-group boundaries</strong> are fetched programmatically using <code>pygris</code>, a Python wrapper around the Census Bureau’s TIGER/Line shapefiles API. The call retrieves the block-group polygons for Arlington County (FIPS 51013) at the 2021 vintage, which aligns with the ACS five-year estimates used for income. The resulting GeoDataFrame provides the source geometry for the ACS redistribution step.</p>
-<p><strong>ACS income variables</strong> are retrieved through the Census API using a Census API key. The two variables used are B19025_001E (aggregate household income in the past 12 months) and B11001_001E (number of occupied housing units — households). Both are block-group-level estimates from the ACS 2021 five-year release. Neither is a median; both are extensive counts that can be legitimately redistributed. A Census API key is required; the pipeline reads it from the environment variable <code>CENSUS_API_KEY</code>.</p>
+<p><strong>ACS income variables</strong> are retrieved through the Census API using a Census API key. The two variables used are B19025_001E (aggregate household income in the past 12 months) and B11001_001E (number of occupied housing units, i.e., households). Both are block-group-level estimates from the ACS 2021 five-year release. Neither is a median; both are extensive counts that can be legitimately redistributed. A Census API key is required; the pipeline reads it from the environment variable <code>CENSUS_API_KEY</code>.</p>
 <p><strong>Ookla fixed-broadband speed-test tiles</strong> are downloaded from Ookla’s public Amazon S3 bucket, which hosts quarterly snapshots of the aggregated tile data as geoparquet files. The pipeline fetches the Q1 2021 tile for the relevant S3 path, clips it to the Arlington bounding box, and retains two columns: <code>tests</code> (the count of speed tests in each tile during the quarter) and <code>avg_d_kbps</code> (the average download speed across those tests, in kilobits per second). Both are used in the broadband redistribution below.</p>
-<p>With these three inputs in hand — block-group polygons, ACS counts, and Ookla tiles — the pipeline is ready to redistribute.</p>
+<p>With these three inputs in hand (block-group polygons, ACS counts, and Ookla tiles), the pipeline is ready to redistribute.</p>
 </section>
 <section id="stage-2-redistribute-income" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="stage-2-redistribute-income"><span class="header-section-number">5.2</span> Stage 2: Redistribute income</h2>
-<p>Income follows the pattern described in <a href="03-method.html#sec-extensive-intensive" class="quarto-xref"><span>Section 4.2</span></a>. The two ACS variables — aggregate household income and household count — are extensive measures. Both are redistributed independently to civic associations using area-weighted interpolation. The redistribution preserves their totals: whatever aggregate income exists across all block groups flows, in its entirety, to the set of civic associations (since civic associations tile the county without gaps or overlaps).</p>
+<p>Income follows the pattern described in <a href="03-method.html#sec-extensive-intensive" class="quarto-xref"><span>Section 4.2</span></a>. The two ACS variables, aggregate household income and household count, are extensive measures. Both are redistributed independently to civic associations using area-weighted interpolation. The redistribution preserves their totals: whatever aggregate income exists across all block groups flows, in its entirety, to the set of civic associations (since civic associations tile the county without gaps or overlaps).</p>
 <p><a href="#fig-acs" class="quarto-xref">Figure&nbsp;<span>5.1</span></a> illustrates the transformation. The source (block groups) carries two count columns, and the target (civic associations) receives redistributed versions of both.</p>
 <div id="fig-acs" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -303,11 +303,11 @@ Figure&nbsp;5.1: Income transform: redistribute aggregate income + households, t
 </div>
 <p>Once redistribution is complete, mean household income for each civic association is a simple arithmetic step:</p>
 <p><span class="math display">\[\text{mean income}_j = \frac{\text{agg. income}_j}{\text{households}_j}\]</span></p>
-<p>The result is a population-weighted mean — accurate in the sense that larger block groups (more households) contribute more to the civic association’s estimate than smaller ones, scaled continuously by the fraction of their area that falls within the association’s boundary.</p>
+<p>The result is a population-weighted mean: larger block groups (more households) contribute more to the civic association’s estimate than smaller ones, scaled continuously by the fraction of their area that falls within the association’s boundary.</p>
 </section>
 <section id="stage-3-redistribute-broadband" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="stage-3-redistribute-broadband"><span class="header-section-number">5.3</span> Stage 3: Redistribute broadband</h2>
-<p>Broadband speed requires one additional preparatory step because download speed, like income, is an intensive measure. The variable reported in the Ookla tiles — <code>avg_d_kbps</code> — cannot be directly redistributed. The count that makes it meaningful — <code>tests</code> — can.</p>
+<p>Broadband speed requires one additional preparatory step because download speed, like income, is an intensive measure. The variable reported in the Ookla tiles, <code>avg_d_kbps</code>, cannot be directly redistributed. The count that makes it meaningful, <code>tests</code>, can.</p>
 <p>The solution is to reconstruct the extensive quantity that, when divided by test count, recovers average speed. For each tile:</p>
 <p><span class="math display">\[\text{speed} \times \text{tests} = \text{total download kilobits (proxy)}\]</span></p>
 <p>This product is an extensive count: if a tile’s area is split in two, each half contributed roughly half the total download kilobits. It can be redistributed. The test count is also extensive and can be redistributed. After both are moved to civic associations, the intensive rate is derived:</p>
@@ -336,25 +336,25 @@ Python: count-weighting broadband speed
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Speed is INTENSIVE — redistribute counts, then derive the rate.</span></span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Speed is INTENSIVE: redistribute counts, then derive the rate.</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>tiles[<span class="st">"d_product"</span>] <span class="op">=</span> tiles[<span class="st">"avg_d_kbps"</span>] <span class="op">*</span> tiles[<span class="st">"tests"</span>]   <span class="co"># extensive</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ... redistribute tests + d_product to civic associations ...</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>civic[<span class="st">"download_mbps"</span>] <span class="op">=</span> (civic[<span class="st">"d_product"</span>] <span class="op">/</span> civic[<span class="st">"tests"</span>]) <span class="op">/</span> <span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
-<p>The collapsible snippet above captures the key lines. Creating <code>d_product</code> before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed <code>avg_d_kbps</code> directly would produce a speed estimate weighted by <em>area</em>, not by <em>test count</em> — a different and less meaningful quantity, and one that systematically overstates speed in low-density tiles with few tests.</p>
+<p>The collapsible snippet above captures the key lines. Creating <code>d_product</code> before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed <code>avg_d_kbps</code> directly would produce a speed estimate weighted by <em>area</em>, not by <em>test count</em>: a different and less meaningful quantity that systematically overstates speed in low-density tiles with few tests.</p>
 </section>
 <section id="stage-4-combine" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="stage-4-combine"><span class="header-section-number">5.4</span> Stage 4: Combine</h2>
-<p>With both redistributions complete, the income and broadband results are joined to the civic-association GeoDataFrame on the association identifier. The four intermediate columns — redistributed aggregate income, redistributed households, redistributed test count, and redistributed speed-product — are used to compute the two final output columns: <code>mean_income</code> and <code>download_mbps</code>. All 62 civic associations receive a value for both measures.</p>
+<p>With both redistributions complete, the income and broadband results are joined to the civic-association GeoDataFrame on the association identifier. The four intermediate columns (redistributed aggregate income, redistributed households, redistributed test count, and redistributed speed-product) are used to compute the two final output columns: <code>mean_income</code> and <code>download_mbps</code>. All 62 civic associations receive a value for both measures.</p>
 </section>
 <section id="stage-5-validate" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="stage-5-validate"><span class="header-section-number">5.5</span> Stage 5: Validate</h2>
 <p>Before proceeding to analysis or visualization, the pipeline verifies one internal consistency check: household totals should be preserved by the redistribution. The sum of redistributed households across all 62 civic associations is compared to the sum of ACS household counts across all block groups. In a well-functioning redistribution over a complete, non-overlapping partition of the county (which Arlington’s civic associations are), these totals should be identical up to floating-point rounding.</p>
-<p>In practice, the redistributed household total is preserved within <strong>2%</strong> of the source total — a result of minor edge effects at the county boundary where tile clipping introduces small geometric imprecision. This tolerance is well within the margin of the ACS sampling error itself, and it confirms that the redistribution has not created or destroyed households at any meaningful scale.</p>
+<p>In practice, the redistributed household total is preserved within <strong>2%</strong> of the source total, a result of minor edge effects at the county boundary where tile clipping introduces small geometric imprecision. This tolerance is well within the margin of the ACS sampling error itself, and it confirms that the redistribution has not created or destroyed households at any meaningful scale.</p>
 <p>Analysts applying this method to their own geographies should perform this same check. A discrepancy larger than a few percent typically indicates either a non-exhaustive target partition (gaps between target polygons), a coordinate-reference-system mismatch between source and target layers, or a geometric validity problem in one of the input files.</p>
-<p>With validation passed, the pipeline writes its output and the data is ready for mapping and analysis — the subject of the next chapter.</p>
+<p>With validation passed, the pipeline writes its output and the data is ready for mapping and analysis, the subject of the next chapter.</p>
 
 
 </section>
