@@ -86,7 +86,7 @@ civic$download_mbps <- (civic$d_product / civic$tests) / 1000
 ```
 :::
 
-The collapsible snippet above captures the key lines. Creating `d_product` before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed `avg_d_kbps` directly would produce a speed estimate weighted by *area*, not by *test count*: a different and less meaningful quantity that systematically overstates speed in low-density tiles with few tests.
+The snippet above captures the key lines. Creating `d_product` before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed `avg_d_kbps` directly would produce a speed estimate weighted by *area*, not by *test count*: a different and less meaningful quantity that systematically overstates speed in low-density tiles with few tests.
 
 ## Stage 4: Combine
 
