@@ -20,7 +20,8 @@ The implementation follows a straightforward unit-weighting scheme. Each parcel 
 
 ![Parcel-based redistribution in three steps. A source area and its parcels (1); the source total disaggregated across those parcels (2); and the parcels reaggregated under a different target boundary, where only the parcels inside the target (highlighted) contribute to its estimate (3).](figures/fig_disaggregation.png){#fig-disaggregation width=100%}
 
-::: {.callout-note collapse="true" title="Python: parcel redistribution"}
+::: {.panel-tabset}
+## Python
 ```python
 from sdc_redistribute import redistribute_parcels
 # explode each parcel into Total_Units identical points first, then:
@@ -30,6 +31,16 @@ result = redistribute_parcels(
     target_geos={"civic_association": "civic_assoc.geojson"},
     count_cols=["agg_income", "households"], source_id="geoid",
 )
+```
+
+## R
+```r
+library(sf); library(sdc.redistribute)
+# Split each block group's counts across its parcels, weighted by unit count.
+civic <- redistribute_parcels(block_groups, civic, parcels,
+                              extensive = c("agg_income", "households"),
+                              weights = "Total_Units")
+civic$mean_income <- civic$agg_income / civic$households
 ```
 :::
 

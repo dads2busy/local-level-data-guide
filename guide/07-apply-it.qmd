@@ -40,7 +40,7 @@ Both commands require `uv` (the Python package manager), a Census API key in the
 
 ## R implementation
 
-The areal interpolation logic in the Python pipeline mirrors the `sdc-redistribute` family of functions available in R. An R implementation of the full Arlington pipeline is forthcoming, using `tigris` for Census geometries, `censusapi` or `tidycensus` for ACS data, `ooklaOpenDataR` for speed-test tiles, and `areal` or a direct port of `redistribute_direct` for the interpolation step. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.
+The areal interpolation logic in the Python pipeline mirrors the `sdc-redistribute` family of functions available in R. A runnable R implementation of the redistribution stages ships with this guide in `pipeline-r/`, built on the [`sdc.redistribute`](https://github.com/dads2busy/sdc.redistribute) R package; the data-acquisition recipe uses `tigris` for Census geometries, `tidycensus` for ACS data, and `ooklaOpenDataR` for speed-test tiles. Analysts already working in R can follow the same six-step recipe; the redistribution algebra is language-agnostic.
 
 ## Adapting to other variables
 

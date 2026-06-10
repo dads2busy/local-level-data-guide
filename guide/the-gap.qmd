@@ -16,7 +16,7 @@ The result is a persistent data gap between the geographic scale at which data i
 
 This guide works through a concrete example: estimating mean household income and fixed-broadband download speeds for each of Arlington County, Virginia's **62 civic associations**, which together cover approximately **109,528 households**. The two source datasets (Ookla fixed-broadband speed-test tiles and American Community Survey block-group income and household counts) arrive on entirely different geographic footprints that match neither each other nor the civic-association boundaries. The guide shows, step by step, how to align those footprints through areal-weighted interpolation and produce estimates at the policy-relevant geography.
 
-The worked example is implemented in **Python**. An **R** implementation is forthcoming.
+The worked example is implemented in both **Python** and **R**. The two produce the same estimates; each stage below shows the code in both languages, and the complete source for each is in the code appendices.
 
 ::: {.callout-note title="Who this guide is for"}
 **Local government analysts** will find a reproducible workflow they can adapt to their own jurisdiction, data sources, and policy geographies. The method generalizes beyond broadband and income to any pair of spatially misaligned datasets.

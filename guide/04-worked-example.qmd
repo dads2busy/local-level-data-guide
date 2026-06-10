@@ -28,6 +28,26 @@ Once redistribution is complete, mean household income for each civic associatio
 
 $$\text{mean income}_j = \frac{\text{agg. income}_j}{\text{households}_j}$$
 
+::: {.panel-tabset}
+## Python
+```python
+from sdc_redistribute import redistribute_direct
+# agg_income and households are extensive counts.
+res = redistribute_direct(counts_long, source_geo=block_groups,
+                          target_geos={"civic_association": civic}, count_cols=["agg_income", "households"])
+civic["mean_income"] = civic["agg_income"] / civic["households"]
+```
+
+## R
+```r
+library(sf); library(sdc.redistribute)
+# agg_income and households are extensive counts.
+civic <- redistribute_direct(block_groups, civic,
+                             extensive = c("agg_income", "households"))
+civic$mean_income <- civic$agg_income / civic$households
+```
+:::
+
 The result is a population-weighted mean: larger block groups (more households) contribute more to the civic association's estimate than smaller ones, scaled continuously by the fraction of their area that falls within the association's boundary.
 
 ## Stage 3: Redistribute broadband
@@ -48,12 +68,21 @@ The division by 1,000 converts kilobits per second to megabits per second for pr
 
 ![Broadband transform: redistribute tests and speed×tests, then derive count-weighted speed.](figures/diagrams/ookla_transform.png){#fig-ookla width=95%}
 
-::: {.callout-note collapse="true" title="Python: count-weighting broadband speed"}
+::: {.panel-tabset}
+## Python
 ```python
 # Speed is INTENSIVE: redistribute counts, then derive the rate.
 tiles["d_product"] = tiles["avg_d_kbps"] * tiles["tests"]   # extensive
 # ... redistribute tests + d_product to civic associations ...
 civic["download_mbps"] = (civic["d_product"] / civic["tests"]) / 1000
+```
+
+## R
+```r
+# Speed is INTENSIVE: redistribute counts, then derive the rate.
+tiles$d_product <- tiles$avg_d_kbps * tiles$tests            # extensive
+civic <- redistribute_direct(tiles, civic, extensive = c("tests", "d_product"))
+civic$download_mbps <- (civic$d_product / civic$tests) / 1000
 ```
 :::
 
