@@ -193,7 +193,13 @@ div.csl-indent {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08-code.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (Python)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-code-r.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (R)</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -259,7 +265,7 @@ Figure&nbsp;1.1: The same county at two resolutions. Reported as a single county
 <section id="what-this-guide-demonstrates" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="what-this-guide-demonstrates"><span class="header-section-number">1.2</span> What this guide demonstrates</h2>
 <p>This guide works through a concrete example: estimating mean household income and fixed-broadband download speeds for each of Arlington County, Virginia’s <strong>62 civic associations</strong>, which together cover approximately <strong>109,528 households</strong>. The two source datasets (Ookla fixed-broadband speed-test tiles and American Community Survey block-group income and household counts) arrive on entirely different geographic footprints that match neither each other nor the civic-association boundaries. The guide shows, step by step, how to align those footprints through areal-weighted interpolation and produce estimates at the policy-relevant geography.</p>
-<p>The worked example is implemented in <strong>Python</strong>. An <strong>R</strong> implementation is forthcoming.</p>
+<p>The worked example is implemented in both <strong>Python</strong> and <strong>R</strong>. The two produce the same estimates; each stage later in the guide shows the code in both languages, and the complete source for each is in the code appendices.</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Who this guide is for">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">

@@ -208,7 +208,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08-code.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (Python)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-code-r.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (R)</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -276,7 +282,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="r-implementation" class="level2" data-number="9.3">
 <h2 data-number="9.3" class="anchored" data-anchor-id="r-implementation"><span class="header-section-number">9.3</span> R implementation</h2>
-<p>The areal interpolation logic in the Python pipeline mirrors the <code>sdc-redistribute</code> family of functions available in R. An R implementation of the full Arlington pipeline is forthcoming, using <code>tigris</code> for Census geometries, <code>censusapi</code> or <code>tidycensus</code> for ACS data, <code>ooklaOpenDataR</code> for speed-test tiles, and <code>areal</code> or a direct port of <code>redistribute_direct</code> for the interpolation step. Analysts already working in R can follow the same six-step recipe using those packages; the redistribution algebra is language-agnostic.</p>
+<p>The areal interpolation logic in the Python pipeline mirrors the <code>sdc-redistribute</code> family of functions available in R. A runnable R implementation of the redistribution stages ships with this guide in <code>pipeline-r/</code>, built on the <a href="https://github.com/dads2busy/sdc.redistribute"><code>sdc.redistribute</code></a> R package; the data-acquisition recipe uses <code>tigris</code> for Census geometries, <code>tidycensus</code> for ACS data, and <code>ooklaOpenDataR</code> for speed-test tiles. Analysts already working in R can follow the same six-step recipe; the redistribution algebra is language-agnostic.</p>
 </section>
 <section id="adapting-to-other-variables" class="level2" data-number="9.4">
 <h2 data-number="9.4" class="anchored" data-anchor-id="adapting-to-other-variables"><span class="header-section-number">9.4</span> Adapting to other variables</h2>
@@ -716,8 +722,8 @@ window.addEventListener("DOMContentLoaded", function () {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./08-code.html" class="pagination-link" aria-label="The Complete Pipeline Code">
-        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./08-code.html" class="pagination-link" aria-label="The Complete Pipeline Code (Python)">
+        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (Python)</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

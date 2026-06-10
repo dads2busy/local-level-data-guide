@@ -237,7 +237,13 @@ window.Quarto = {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./08-code.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code</span></span></a>
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (Python)</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./09-code-r.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">The Complete Pipeline Code (R)</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -312,6 +318,25 @@ Figure&nbsp;5.1: Income transform: redistribute aggregate income + households, t
 </div>
 <p>Once redistribution is complete, mean household income for each civic association is a simple arithmetic step:</p>
 <p><span class="math display">\[\text{mean income}_j = \frac{\text{agg. income}_j}{\text{households}_j}\]</span></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">R</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdc_redistribute <span class="im">import</span> redistribute_direct</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># agg_income and households are extensive counts.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>res <span class="op">=</span> redistribute_direct(counts_long, source_geo<span class="op">=</span>block_groups,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                          target_geos<span class="op">=</span>{<span class="st">"civic_association"</span>: civic}, count_cols<span class="op">=</span>[<span class="st">"agg_income"</span>, <span class="st">"households"</span>])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>civic[<span class="st">"mean_income"</span>] <span class="op">=</span> civic[<span class="st">"agg_income"</span>] <span class="op">/</span> civic[<span class="st">"households"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf); <span class="fu">library</span>(sdc.redistribute)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># agg_income and households are extensive counts.</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>civic <span class="ot">&lt;-</span> <span class="fu">redistribute_direct</span>(block_groups, civic,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">extensive =</span> <span class="fu">c</span>(<span class="st">"agg_income"</span>, <span class="st">"households"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>civic<span class="sc">$</span>mean_income <span class="ot">&lt;-</span> civic<span class="sc">$</span>agg_income <span class="sc">/</span> civic<span class="sc">$</span>households</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
 <p>The result is a population-weighted mean: larger block groups (more households) contribute more to the civic association’s estimate than smaller ones, scaled continuously by the fraction of their area that falls within the association’s boundary.</p>
 </section>
 <section id="stage-3-redistribute-broadband" class="level2" data-number="5.3">
@@ -333,26 +358,24 @@ Figure&nbsp;5.2: Broadband transform: redistribute tests and speed×tests, then 
 </figcaption>
 </figure>
 </div>
-<div class="callout callout-style-default callout-note callout-titled" title="Python: count-weighting broadband speed">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">R</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Speed is INTENSIVE: redistribute counts, then derive the rate.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tiles[<span class="st">"d_product"</span>] <span class="op">=</span> tiles[<span class="st">"avg_d_kbps"</span>] <span class="op">*</span> tiles[<span class="st">"tests"</span>]   <span class="co"># extensive</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ... redistribute tests + d_product to civic associations ...</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>civic[<span class="st">"download_mbps"</span>] <span class="op">=</span> (civic[<span class="st">"d_product"</span>] <span class="op">/</span> civic[<span class="st">"tests"</span>]) <span class="op">/</span> <span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="callout-title-container flex-fill">
-Python: count-weighting broadband speed
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Speed is INTENSIVE: redistribute counts, then derive the rate.</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>tiles[<span class="st">"d_product"</span>] <span class="op">=</span> tiles[<span class="st">"avg_d_kbps"</span>] <span class="op">*</span> tiles[<span class="st">"tests"</span>]   <span class="co"># extensive</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ... redistribute tests + d_product to civic associations ...</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>civic[<span class="st">"download_mbps"</span>] <span class="op">=</span> (civic[<span class="st">"d_product"</span>] <span class="op">/</span> civic[<span class="st">"tests"</span>]) <span class="op">/</span> <span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Speed is INTENSIVE: redistribute counts, then derive the rate.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>tiles<span class="sc">$</span>d_product <span class="ot">&lt;-</span> tiles<span class="sc">$</span>avg_d_kbps <span class="sc">*</span> tiles<span class="sc">$</span>tests            <span class="co"># extensive</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>civic <span class="ot">&lt;-</span> <span class="fu">redistribute_direct</span>(tiles, civic, <span class="at">extensive =</span> <span class="fu">c</span>(<span class="st">"tests"</span>, <span class="st">"d_product"</span>))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>civic<span class="sc">$</span>download_mbps <span class="ot">&lt;-</span> (civic<span class="sc">$</span>d_product <span class="sc">/</span> civic<span class="sc">$</span>tests) <span class="sc">/</span> <span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
-<p>The collapsible snippet above captures the key lines. Creating <code>d_product</code> before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed <code>avg_d_kbps</code> directly would produce a speed estimate weighted by <em>area</em>, not by <em>test count</em>: a different and less meaningful quantity that systematically overstates speed in low-density tiles with few tests.</p>
+<p>The snippet above captures the key lines. Creating <code>d_product</code> before redistribution is the move that makes everything else valid. An analyst who skipped this step and redistributed <code>avg_d_kbps</code> directly would produce a speed estimate weighted by <em>area</em>, not by <em>test count</em>: a different and less meaningful quantity that systematically overstates speed in low-density tiles with few tests.</p>
 </section>
 <section id="stage-4-combine" class="level2" data-number="5.4">
 <h2 data-number="5.4" class="anchored" data-anchor-id="stage-4-combine"><span class="header-section-number">5.4</span> Stage 4: Combine</h2>
