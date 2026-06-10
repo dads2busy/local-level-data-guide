@@ -370,10 +370,12 @@ civic-association boundaries. The guide shows, step by step, how to
 align those footprints through areal-weighted interpolation and produce
 estimates at the policy-relevant geography.
 
-The worked example is implemented in \textbf{Python}. An \textbf{R}
-implementation is forthcoming.
+The worked example is implemented in both \textbf{Python} and
+\textbf{R}. The two produce the same estimates; each stage later in the
+guide shows the code in both languages, and the complete source for each
+is in the code appendices.
 
-\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, bottomtitle=1mm, opacityback=0, toprule=.15mm, left=2mm, bottomrule=.15mm, breakable, opacitybacktitle=0.6, arc=.35mm, leftrule=.75mm, colframe=quarto-callout-note-color-frame, colback=white, coltitle=black, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, rightrule=.15mm, titlerule=0mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -748,7 +750,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
+\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, bottomtitle=1mm, opacityback=0, toprule=.15mm, left=2mm, bottomrule=.15mm, breakable, opacitybacktitle=0.6, arc=.35mm, leftrule=.75mm, colframe=quarto-callout-note-color-frame, colback=white, coltitle=black, colbacktitle=quarto-callout-note-color!10!white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, rightrule=.15mm, titlerule=0mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -862,6 +864,30 @@ association is a simple arithmetic step:
 
 \[\text{mean income}_j = \frac{\text{agg. income}_j}{\text{households}_j}\]
 
+\section{Python}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ sdc\_redistribute }\ImportTok{import}\NormalTok{ redistribute\_direct}
+\CommentTok{\# agg\_income and households are extensive counts.}
+\NormalTok{res }\OperatorTok{=}\NormalTok{ redistribute\_direct(counts\_long, source\_geo}\OperatorTok{=}\NormalTok{block\_groups,}
+\NormalTok{                          target\_geos}\OperatorTok{=}\NormalTok{\{}\StringTok{"civic\_association"}\NormalTok{: civic\}, count\_cols}\OperatorTok{=}\NormalTok{[}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{])}
+\NormalTok{civic[}\StringTok{"mean\_income"}\NormalTok{] }\OperatorTok{=}\NormalTok{ civic[}\StringTok{"agg\_income"}\NormalTok{] }\OperatorTok{/}\NormalTok{ civic[}\StringTok{"households"}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\section{R}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(sf); }\FunctionTok{library}\NormalTok{(sdc.redistribute)}
+\CommentTok{\# agg\_income and households are extensive counts.}
+\NormalTok{civic }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_direct}\NormalTok{(block\_groups, civic,}
+                             \AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{))}
+\NormalTok{civic}\SpecialCharTok{$}\NormalTok{mean\_income }\OtherTok{\textless{}{-}}\NormalTok{ civic}\SpecialCharTok{$}\NormalTok{agg\_income }\SpecialCharTok{/}\NormalTok{ civic}\SpecialCharTok{$}\NormalTok{households}
+\end{Highlighting}
+\end{Shaded}
+
 The result is a population-weighted mean: larger block groups (more
 households) contribute more to the civic association's estimate than
 smaller ones, scaled continuously by the fraction of their area that
@@ -909,7 +935,7 @@ speed×tests, then derive count-weighted speed.}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: count-weighting broadband speed}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
+\section{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -920,15 +946,23 @@ speed×tests, then derive count-weighted speed.}
 \end{Highlighting}
 \end{Shaded}
 
-\end{tcolorbox}
+\section{R}
 
-The collapsible snippet above captures the key lines. Creating
-\texttt{d\_product} before redistribution is the move that makes
-everything else valid. An analyst who skipped this step and
-redistributed \texttt{avg\_d\_kbps} directly would produce a speed
-estimate weighted by \emph{area}, not by \emph{test count}: a different
-and less meaningful quantity that systematically overstates speed in
-low-density tiles with few tests.
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Speed is INTENSIVE: redistribute counts, then derive the rate.}
+\NormalTok{tiles}\SpecialCharTok{$}\NormalTok{d\_product }\OtherTok{\textless{}{-}}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{avg\_d\_kbps }\SpecialCharTok{*}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{tests            }\CommentTok{\# extensive}
+\NormalTok{civic }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_direct}\NormalTok{(tiles, civic, }\AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"tests"}\NormalTok{, }\StringTok{"d\_product"}\NormalTok{))}
+\NormalTok{civic}\SpecialCharTok{$}\NormalTok{download\_mbps }\OtherTok{\textless{}{-}}\NormalTok{ (civic}\SpecialCharTok{$}\NormalTok{d\_product }\SpecialCharTok{/}\NormalTok{ civic}\SpecialCharTok{$}\NormalTok{tests) }\SpecialCharTok{/} \DecValTok{1000}
+\end{Highlighting}
+\end{Shaded}
+
+The snippet above captures the key lines. Creating \texttt{d\_product}
+before redistribution is the move that makes everything else valid. An
+analyst who skipped this step and redistributed \texttt{avg\_d\_kbps}
+directly would produce a speed estimate weighted by \emph{area}, not by
+\emph{test count}: a different and less meaningful quantity that
+systematically overstates speed in low-density tiles with few tests.
 
 \section{Stage 4: Combine}\label{stage-4-combine}
 
@@ -1294,7 +1328,7 @@ contribute to its estimate (3).}
 
 \end{figure}%
 
-\begin{tcolorbox}[enhanced jigsaw, toptitle=1mm, opacityback=0, arc=.35mm, left=2mm, titlerule=0mm, coltitle=black, rightrule=.15mm, opacitybacktitle=0.6, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: parcel redistribution}, colbacktitle=quarto-callout-note-color!10!white, bottomrule=.15mm, colback=white, breakable, toprule=.15mm, leftrule=.75mm]
+\section{Python}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1309,7 +1343,18 @@ contribute to its estimate (3).}
 \end{Highlighting}
 \end{Shaded}
 
-\end{tcolorbox}
+\section{R}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(sf); }\FunctionTok{library}\NormalTok{(sdc.redistribute)}
+\CommentTok{\# Split each block group\textquotesingle{}s counts across its parcels, weighted by unit count.}
+\NormalTok{civic }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_parcels}\NormalTok{(block\_groups, civic, parcels,}
+                              \AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{),}
+                              \AttributeTok{weights =} \StringTok{"Total\_Units"}\NormalTok{)}
+\NormalTok{civic}\SpecialCharTok{$}\NormalTok{mean\_income }\OtherTok{\textless{}{-}}\NormalTok{ civic}\SpecialCharTok{$}\NormalTok{agg\_income }\SpecialCharTok{/}\NormalTok{ civic}\SpecialCharTok{$}\NormalTok{households}
+\end{Highlighting}
+\end{Shaded}
 
 The logic is the same as the area-weighted approach (redistribute
 extensive counts, derive intensive rates afterward), with one structural
@@ -1647,14 +1692,15 @@ All code is open-source and MIT-licensed.
 \section{R implementation}\label{r-implementation}
 
 The areal interpolation logic in the Python pipeline mirrors the
-\texttt{sdc-redistribute} family of functions available in R. An R
-implementation of the full Arlington pipeline is forthcoming, using
-\texttt{tigris} for Census geometries, \texttt{censusapi} or
-\texttt{tidycensus} for ACS data, \texttt{ooklaOpenDataR} for speed-test
-tiles, and \texttt{areal} or a direct port of
-\texttt{redistribute\_direct} for the interpolation step. Analysts
-already working in R can follow the same six-step recipe using those
-packages; the redistribution algebra is language-agnostic.
+\texttt{sdc-redistribute} family of functions available in R. A runnable
+R implementation of the redistribution stages ships with this guide in
+\texttt{pipeline-r/}, built on the
+\href{https://github.com/dads2busy/sdc.redistribute}{\texttt{sdc.redistribute}}
+R package; the data-acquisition recipe uses \texttt{tigris} for Census
+geometries, \texttt{tidycensus} for ACS data, and
+\texttt{ooklaOpenDataR} for speed-test tiles. Analysts already working
+in R can follow the same six-step recipe; the redistribution algebra is
+language-agnostic.
 
 \section{Adapting to other variables}\label{adapting-to-other-variables}
 
@@ -1671,7 +1717,7 @@ interest) and follow the same pattern.
 
 \bookmarksetup{startatroot}
 
-\chapter{The Complete Pipeline Code}\label{sec-code}
+\chapter{The Complete Pipeline Code (Python)}\label{sec-code}
 
 This appendix reproduces the full, runnable Python pipeline behind the
 worked example: the actual source, not a simplified sketch. It is
@@ -2445,6 +2491,467 @@ Wire every stage into one command:
 
 \ControlFlowTok{if} \VariableTok{\_\_name\_\_} \OperatorTok{==} \StringTok{"\_\_main\_\_"}\NormalTok{:}
 \NormalTok{    main()}
+\end{Highlighting}
+\end{Shaded}
+
+\bookmarksetup{startatroot}
+
+\chapter{The Complete Pipeline Code (R)}\label{sec-code-r}
+
+This appendix reproduces the runnable R counterpart to the worked
+example. It is generated directly from the \texttt{pipeline-r/}
+directory in the companion repository. The R pipeline reads the same
+intermediate data the Python pipeline produces and performs the
+redistribution, combination, and validation in R, built on the
+\href{https://github.com/dads2busy/sdc.redistribute}{\texttt{sdc.redistribute}}
+package:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")}
+\CommentTok{\# from the repository root:}
+\CommentTok{\# Rscript pipeline{-}r/run.R}
+\end{Highlighting}
+\end{Shaded}
+
+Data acquisition is shown as a recipe (\texttt{acquire-recipe.R}) rather
+than re-run. The \texttt{compare\_to\_python.R} module confirms the R
+results match the Python results.
+
+\section{Configuration}\label{configuration-1}
+
+Shared paths, the projected CRS used for area weighting, and the count
+constants. Mirrors the Python configuration.
+
+\textbf{\texttt{pipeline-r/config.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Shared configuration for the R pipeline. Mirrors pipeline/config.py.}
+\CommentTok{\# Run all modules from the repository root (e.g. \textasciigrave{}Rscript pipeline{-}r/run.R\textasciigrave{}).}
+
+\NormalTok{PROJECT\_CRS }\OtherTok{\textless{}{-}} \DecValTok{3857}   \CommentTok{\# match the CRS sdc{-}redistribute uses internally in Python}
+\NormalTok{ACS\_YEAR    }\OtherTok{\textless{}{-}} \DecValTok{2021}
+\NormalTok{OOKLA\_YEAR  }\OtherTok{\textless{}{-}} \DecValTok{2023}
+\NormalTok{MIN\_TESTS   }\OtherTok{\textless{}{-}} \DecValTok{5}      \CommentTok{\# statistical{-}reliability filter on source tiles}
+
+\NormalTok{DATA }\OtherTok{\textless{}{-}} \StringTok{"data"}
+\NormalTok{path\_data }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(...) }\FunctionTok{file.path}\NormalTok{(DATA, ...)}
+
+\CommentTok{\# Inputs (shared with the Python pipeline)}
+\NormalTok{CIVIC\_ASSOC }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"va013\_geo\_arl\_2021\_civic\_associations.geojson"}\NormalTok{)}
+\NormalTok{ACS\_COUNTS  }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"va013\_acs\_income\_counts.geojson"}\NormalTok{)}
+\NormalTok{OOKLA\_TILES }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"ookla\_tiles\_arlington.geojson"}\NormalTok{)}
+\NormalTok{PARCELS     }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"va013\_parcels.geojson"}\NormalTok{)}
+
+\CommentTok{\# R outputs (suffixed \_r so they never clobber the Python outputs)}
+\NormalTok{CIVIC\_INCOME\_R            }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_income\_r.csv"}\NormalTok{)}
+\NormalTok{CIVIC\_BROADBAND\_R         }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_broadband\_r.csv"}\NormalTok{)}
+\NormalTok{CIVIC\_COMBINED\_R          }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_combined\_r.geojson"}\NormalTok{)}
+\NormalTok{CIVIC\_INCOME\_PARCELS\_R    }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_income\_parcels\_r.csv"}\NormalTok{)}
+\NormalTok{CIVIC\_INCOME\_COMPARISON\_R }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_income\_comparison\_r.geojson"}\NormalTok{)}
+
+\CommentTok{\# Python outputs (for parity comparison)}
+\NormalTok{CIVIC\_COMBINED\_PY }\OtherTok{\textless{}{-}} \FunctionTok{path\_data}\NormalTok{(}\StringTok{"civic\_combined.geojson"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute income}\label{redistribute-income-1}
+
+Area-weight aggregate income and households onto civic associations with
+\texttt{sdc.redistribute::redistribute\_direct()}, then derive mean
+income.
+
+\textbf{\texttt{pipeline-r/redistribute\_income.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Area{-}weight ACS income counts onto civic associations; derive mean income.}
+\CommentTok{\# Parallels pipeline/redistribute\_income.py.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(\{}
+  \FunctionTok{library}\NormalTok{(sf)}
+  \FunctionTok{library}\NormalTok{(sdc.redistribute)}
+\NormalTok{\})}
+
+\NormalTok{redistribute\_income }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}\AttributeTok{acs\_path =}\NormalTok{ ACS\_COUNTS, }\AttributeTok{civic\_path =}\NormalTok{ CIVIC\_ASSOC) \{}
+\NormalTok{  bg }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(acs\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{names}\NormalTok{(bg)[}\FunctionTok{names}\NormalTok{(bg) }\SpecialCharTok{==} \StringTok{"GEOID"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"geoid"}
+\NormalTok{  civ }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(civic\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+
+\NormalTok{  bg  }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(bg,  PROJECT\_CRS)}
+\NormalTok{  civ }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(civ, PROJECT\_CRS)}
+
+  \CommentTok{\# agg\_income and households are extensive counts; redistribute both, then}
+  \CommentTok{\# derive mean income (an intensive quantity) as their ratio.}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_direct}\NormalTok{(bg, civ, }\AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{))}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{mean\_income }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(out}\SpecialCharTok{$}\NormalTok{households }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, out}\SpecialCharTok{$}\NormalTok{agg\_income }\SpecialCharTok{/}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{households, }\ConstantTok{NA\_real\_}\NormalTok{)}
+
+\NormalTok{  d }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(out)}
+\NormalTok{  d[, }\FunctionTok{c}\NormalTok{(}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{)]}
+\NormalTok{\}}
+
+\NormalTok{run\_income }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_income}\NormalTok{()}
+  \FunctionTok{write.csv}\NormalTok{(out, CIVIC\_INCOME\_R, }\AttributeTok{row.names =} \ConstantTok{FALSE}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Wrote \%d civic{-}association income rows {-}\textgreater{} \%s}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(out), CIVIC\_INCOME\_R))}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_income}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute broadband}\label{redistribute-broadband-1}
+
+Rebuild the speed×tests product, redistribute it with the test counts,
+then derive the count-weighted mean download and upload speeds.
+
+\textbf{\texttt{pipeline-r/redistribute\_broadband.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Area{-}weight Ookla broadband onto civic associations; derive count{-}weighted}
+\CommentTok{\# mean speeds. Parallels pipeline/redistribute\_broadband.py.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(\{}
+  \FunctionTok{library}\NormalTok{(sf)}
+  \FunctionTok{library}\NormalTok{(sdc.redistribute)}
+\NormalTok{\})}
+
+\NormalTok{redistribute\_broadband }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}\AttributeTok{tiles\_path =}\NormalTok{ OOKLA\_TILES, }\AttributeTok{civic\_path =}\NormalTok{ CIVIC\_ASSOC) \{}
+\NormalTok{  tiles }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(tiles\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  tiles }\OtherTok{\textless{}{-}}\NormalTok{ tiles[tiles}\SpecialCharTok{$}\NormalTok{tests }\SpecialCharTok{\textgreater{}=}\NormalTok{ MIN\_TESTS, ]}
+  \CommentTok{\# Speed is intensive: rebuild the extensive speed x tests product so the}
+  \CommentTok{\# count{-}weighted mean can be recovered after redistribution.}
+\NormalTok{  tiles}\SpecialCharTok{$}\NormalTok{d\_product }\OtherTok{\textless{}{-}}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{avg\_d\_kbps }\SpecialCharTok{*}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{tests}
+\NormalTok{  tiles}\SpecialCharTok{$}\NormalTok{u\_product }\OtherTok{\textless{}{-}}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{avg\_u\_kbps }\SpecialCharTok{*}\NormalTok{ tiles}\SpecialCharTok{$}\NormalTok{tests}
+
+\NormalTok{  civ }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(civic\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  tiles }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(tiles, PROJECT\_CRS)}
+\NormalTok{  civ   }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(civ,   PROJECT\_CRS)}
+
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_direct}\NormalTok{(tiles, civ, }\AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"tests"}\NormalTok{, }\StringTok{"d\_product"}\NormalTok{, }\StringTok{"u\_product"}\NormalTok{))}
+\NormalTok{  valid }\OtherTok{\textless{}{-}}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{tests }\SpecialCharTok{\textgreater{}} \DecValTok{0}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{download\_mbps }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(valid, (out}\SpecialCharTok{$}\NormalTok{d\_product }\SpecialCharTok{/}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{tests) }\SpecialCharTok{/} \DecValTok{1000}\NormalTok{, }\ConstantTok{NA\_real\_}\NormalTok{)}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{upload\_mbps   }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(valid, (out}\SpecialCharTok{$}\NormalTok{u\_product }\SpecialCharTok{/}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{tests) }\SpecialCharTok{/} \DecValTok{1000}\NormalTok{, }\ConstantTok{NA\_real\_}\NormalTok{)}
+
+\NormalTok{  d }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(out)}
+\NormalTok{  d[, }\FunctionTok{c}\NormalTok{(}\StringTok{"geoid"}\NormalTok{, }\StringTok{"tests"}\NormalTok{, }\StringTok{"download\_mbps"}\NormalTok{, }\StringTok{"upload\_mbps"}\NormalTok{)]}
+\NormalTok{\}}
+
+\NormalTok{run\_broadband }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_broadband}\NormalTok{()}
+  \FunctionTok{write.csv}\NormalTok{(out, CIVIC\_BROADBAND\_R, }\AttributeTok{row.names =} \ConstantTok{FALSE}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Wrote \%d civic{-}association broadband rows {-}\textgreater{} \%s}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(out), CIVIC\_BROADBAND\_R))}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_broadband}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Combine and derive metrics}\label{combine-and-derive-metrics-1}
+
+Join redistributed income and broadband onto the civic polygons and
+compute the income-to-speed ratio and bivariate income×speed classes.
+
+\textbf{\texttt{pipeline-r/combine.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Join redistributed income + broadband onto civic polygons; derive metrics.}
+\CommentTok{\# Parallels pipeline/combine.py.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(sf))}
+
+\NormalTok{tercile }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x) \{}
+  \CommentTok{\# 1/2/3 labels by rank (robust to ties and NA), mirroring pandas qcut on ranks.}
+\NormalTok{  r }\OtherTok{\textless{}{-}} \FunctionTok{rank}\NormalTok{(x, }\AttributeTok{ties.method =} \StringTok{"first"}\NormalTok{, }\AttributeTok{na.last =} \StringTok{"keep"}\NormalTok{)}
+\NormalTok{  br }\OtherTok{\textless{}{-}}\NormalTok{ stats}\SpecialCharTok{::}\FunctionTok{quantile}\NormalTok{(r, }\AttributeTok{probs =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\SpecialCharTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{2}\SpecialCharTok{/}\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{cut}\NormalTok{(r, }\AttributeTok{breaks =}\NormalTok{ br, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"1"}\NormalTok{, }\StringTok{"2"}\NormalTok{, }\StringTok{"3"}\NormalTok{), }\AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{add\_derived\_metrics }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(df) \{}
+\NormalTok{  df}\SpecialCharTok{$}\NormalTok{income\_speed\_ratio }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{download\_mbps }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{,}
+\NormalTok{                                  df}\SpecialCharTok{$}\NormalTok{mean\_income }\SpecialCharTok{/}\NormalTok{ df}\SpecialCharTok{$}\NormalTok{download\_mbps, }\ConstantTok{NA\_real\_}\NormalTok{)}
+\NormalTok{  inc }\OtherTok{\textless{}{-}} \FunctionTok{tercile}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{mean\_income)}
+\NormalTok{  spd }\OtherTok{\textless{}{-}} \FunctionTok{tercile}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{download\_mbps)}
+\NormalTok{  df}\SpecialCharTok{$}\NormalTok{bivariate\_class }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(inc), }\StringTok{"{-}"}\NormalTok{, }\FunctionTok{as.character}\NormalTok{(spd))}
+\NormalTok{  df}
+\NormalTok{\}}
+
+\NormalTok{run\_combine }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  civ }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(CIVIC\_ASSOC, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\StringTok{"geoid"}\NormalTok{, }\StringTok{"region\_name"}\NormalTok{)]}
+\NormalTok{  income    }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(CIVIC\_INCOME\_R,    }\AttributeTok{colClasses =} \FunctionTok{c}\NormalTok{(}\AttributeTok{geoid =} \StringTok{"character"}\NormalTok{))}
+\NormalTok{  broadband }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(CIVIC\_BROADBAND\_R, }\AttributeTok{colClasses =} \FunctionTok{c}\NormalTok{(}\AttributeTok{geoid =} \StringTok{"character"}\NormalTok{))}
+\NormalTok{  civ}\SpecialCharTok{$}\NormalTok{geoid }\OtherTok{\textless{}{-}} \FunctionTok{as.character}\NormalTok{(civ}\SpecialCharTok{$}\NormalTok{geoid)}
+
+\NormalTok{  merged }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(civ, income, }\AttributeTok{by =} \StringTok{"geoid"}\NormalTok{, }\AttributeTok{all.x =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  merged }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(merged, broadband, }\AttributeTok{by =} \StringTok{"geoid"}\NormalTok{, }\AttributeTok{all.x =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  merged }\OtherTok{\textless{}{-}} \FunctionTok{add\_derived\_metrics}\NormalTok{(merged)}
+
+\NormalTok{  sf}\SpecialCharTok{::}\FunctionTok{st\_write}\NormalTok{(merged, CIVIC\_COMBINED\_R, }\AttributeTok{delete\_dsn =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Wrote \%d combined civic{-}association rows {-}\textgreater{} \%s}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+              \FunctionTok{nrow}\NormalTok{(merged), CIVIC\_COMBINED\_R))}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_combine}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Redistribute income through
+parcels}\label{redistribute-income-through-parcels-1}
+
+Dasymetric income via \texttt{redistribute\_parcels()}, weighting
+parcels by their unit count (the second approach).
+
+\textbf{\texttt{pipeline-r/redistribute\_income\_parcels.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Dasymetric income redistribution through unit{-}weighted parcels.}
+\CommentTok{\# Parallels pipeline/redistribute\_income\_parcels.py: Python replicates each}
+\CommentTok{\# parcel into Total\_Units identical points; here we pass Total\_Units as the}
+\CommentTok{\# per{-}point weight, which splits each source value in the same proportion.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(\{}
+  \FunctionTok{library}\NormalTok{(sf)}
+  \FunctionTok{library}\NormalTok{(sdc.redistribute)}
+\NormalTok{\})}
+
+\NormalTok{redistribute\_income\_parcels }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}\AttributeTok{acs\_path =}\NormalTok{ ACS\_COUNTS,}
+                                        \AttributeTok{parcels\_path =}\NormalTok{ PARCELS,}
+                                        \AttributeTok{civic\_path =}\NormalTok{ CIVIC\_ASSOC) \{}
+\NormalTok{  bg }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(acs\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{names}\NormalTok{(bg)[}\FunctionTok{names}\NormalTok{(bg) }\SpecialCharTok{==} \StringTok{"GEOID"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"geoid"}
+\NormalTok{  parcels }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(parcels\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  parcels }\OtherTok{\textless{}{-}}\NormalTok{ parcels[parcels}\SpecialCharTok{$}\NormalTok{Total\_Units }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, ]}
+\NormalTok{  civ }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(civic\_path, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+
+\NormalTok{  bg      }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(bg,      PROJECT\_CRS)}
+\NormalTok{  parcels }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(parcels, PROJECT\_CRS)}
+\NormalTok{  civ     }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_transform}\NormalTok{(civ,     PROJECT\_CRS)}
+
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_parcels}\NormalTok{(bg, civ, parcels,}
+                              \AttributeTok{extensive =} \FunctionTok{c}\NormalTok{(}\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{),}
+                              \AttributeTok{weights =} \StringTok{"Total\_Units"}\NormalTok{)}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{mean\_income }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(out}\SpecialCharTok{$}\NormalTok{households }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{, out}\SpecialCharTok{$}\NormalTok{agg\_income }\SpecialCharTok{/}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{households, }\ConstantTok{NA\_real\_}\NormalTok{)}
+
+\NormalTok{  d }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(out)}
+\NormalTok{  d[, }\FunctionTok{c}\NormalTok{(}\StringTok{"geoid"}\NormalTok{, }\StringTok{"agg\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{)]}
+\NormalTok{\}}
+
+\NormalTok{run\_income\_parcels }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{redistribute\_income\_parcels}\NormalTok{()}
+  \FunctionTok{write.csv}\NormalTok{(out, CIVIC\_INCOME\_PARCELS\_R, }\AttributeTok{row.names =} \ConstantTok{FALSE}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Wrote \%d parcel{-}weighted income rows {-}\textgreater{} \%s}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+              \FunctionTok{nrow}\NormalTok{(out), CIVIC\_INCOME\_PARCELS\_R))}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_income\_parcels}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Compare methods}\label{compare-methods-1}
+
+Join the area-weighted and parcel-weighted income and quantify the
+difference per civic association.
+
+\textbf{\texttt{pipeline-r/compare\_methods.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Compare area{-}weighted vs parcel{-}weighted income per civic association.}
+\CommentTok{\# Parallels pipeline/compare\_methods.py.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(sf))}
+
+\NormalTok{compare\_income }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(area, parcel) \{}
+\NormalTok{  a }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{geoid =} \FunctionTok{as.character}\NormalTok{(area}\SpecialCharTok{$}\NormalTok{geoid),}
+                  \AttributeTok{mean\_income\_area =}\NormalTok{ area}\SpecialCharTok{$}\NormalTok{mean\_income, }\AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{  p }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{geoid =} \FunctionTok{as.character}\NormalTok{(parcel}\SpecialCharTok{$}\NormalTok{geoid),}
+                  \AttributeTok{mean\_income\_parcel =}\NormalTok{ parcel}\SpecialCharTok{$}\NormalTok{mean\_income, }\AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(a, p, }\AttributeTok{by =} \StringTok{"geoid"}\NormalTok{, }\AttributeTok{all =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{diff }\OtherTok{\textless{}{-}}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{mean\_income\_parcel }\SpecialCharTok{{-}}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{mean\_income\_area}
+\NormalTok{  out}\SpecialCharTok{$}\NormalTok{pct\_diff }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(out}\SpecialCharTok{$}\NormalTok{mean\_income\_area }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{,}
+                         \DecValTok{100} \SpecialCharTok{*}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{diff }\SpecialCharTok{/}\NormalTok{ out}\SpecialCharTok{$}\NormalTok{mean\_income\_area, }\ConstantTok{NA\_real\_}\NormalTok{)}
+\NormalTok{  out}
+\NormalTok{\}}
+
+\NormalTok{run\_compare }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  civ    }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(CIVIC\_ASSOC, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)[, }\FunctionTok{c}\NormalTok{(}\StringTok{"geoid"}\NormalTok{, }\StringTok{"region\_name"}\NormalTok{)]}
+\NormalTok{  civ}\SpecialCharTok{$}\NormalTok{geoid }\OtherTok{\textless{}{-}} \FunctionTok{as.character}\NormalTok{(civ}\SpecialCharTok{$}\NormalTok{geoid)}
+\NormalTok{  area   }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(CIVIC\_INCOME\_R,         }\AttributeTok{colClasses =} \FunctionTok{c}\NormalTok{(}\AttributeTok{geoid =} \StringTok{"character"}\NormalTok{))}
+\NormalTok{  parcel }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(CIVIC\_INCOME\_PARCELS\_R, }\AttributeTok{colClasses =} \FunctionTok{c}\NormalTok{(}\AttributeTok{geoid =} \StringTok{"character"}\NormalTok{))}
+\NormalTok{  cmp }\OtherTok{\textless{}{-}} \FunctionTok{compare\_income}\NormalTok{(area, parcel)}
+\NormalTok{  out }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(civ, cmp, }\AttributeTok{by =} \StringTok{"geoid"}\NormalTok{, }\AttributeTok{all.x =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{  sf}\SpecialCharTok{::}\FunctionTok{st\_write}\NormalTok{(out, CIVIC\_INCOME\_COMPARISON\_R, }\AttributeTok{delete\_dsn =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Wrote \%d comparison rows {-}\textgreater{} \%s}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\FunctionTok{nrow}\NormalTok{(out), CIVIC\_INCOME\_COMPARISON\_R))}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_compare}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Validate}\label{validate-1}
+
+Confirm household totals are preserved and that no speeds or incomes are
+negative.
+
+\textbf{\texttt{pipeline-r/validate.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Integrity checks on redistributed outputs. Parallels pipeline/validate.py.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(sf))}
+
+\NormalTok{check\_total\_preserved }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(source\_total, target\_total, }\AttributeTok{tol =} \FloatTok{0.01}\NormalTok{) \{}
+  \ControlFlowTok{if}\NormalTok{ (source\_total }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{return}\NormalTok{(}\FunctionTok{invisible}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  rel }\OtherTok{\textless{}{-}} \FunctionTok{abs}\NormalTok{(target\_total }\SpecialCharTok{{-}}\NormalTok{ source\_total) }\SpecialCharTok{/} \FunctionTok{abs}\NormalTok{(source\_total)}
+  \ControlFlowTok{if}\NormalTok{ (rel }\SpecialCharTok{\textgreater{}}\NormalTok{ tol) \{}
+    \FunctionTok{stop}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"total drift \%.3f\%\% exceeds \%.3f\%\%"}\NormalTok{, }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ rel, }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ tol), }\AttributeTok{call. =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{  \}}
+  \FunctionTok{invisible}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{check\_ranges }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(df) \{}
+  \ControlFlowTok{for}\NormalTok{ (col }\ControlFlowTok{in} \FunctionTok{c}\NormalTok{(}\StringTok{"download\_mbps"}\NormalTok{, }\StringTok{"upload\_mbps"}\NormalTok{, }\StringTok{"mean\_income"}\NormalTok{, }\StringTok{"households"}\NormalTok{)) \{}
+    \ControlFlowTok{if}\NormalTok{ (col }\SpecialCharTok{\%in\%} \FunctionTok{names}\NormalTok{(df)) \{}
+\NormalTok{      vals }\OtherTok{\textless{}{-}}\NormalTok{ df[[col]][}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(df[[col]])]}
+      \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{any}\NormalTok{(vals }\SpecialCharTok{\textless{}} \DecValTok{0}\NormalTok{)) }\FunctionTok{stop}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"\%s has negative values"}\NormalTok{, col), }\AttributeTok{call. =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{    \}}
+\NormalTok{  \}}
+  \FunctionTok{invisible}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{run\_validate }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{() \{}
+\NormalTok{  combined }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(CIVIC\_COMBINED\_R, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  acs }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(ACS\_COUNTS, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{))}
+  \FunctionTok{check\_total\_preserved}\NormalTok{(}\FunctionTok{sum}\NormalTok{(acs}\SpecialCharTok{$}\NormalTok{households), }\FunctionTok{sum}\NormalTok{(combined}\SpecialCharTok{$}\NormalTok{households, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{), }\AttributeTok{tol =} \FloatTok{0.02}\NormalTok{)}
+  \FunctionTok{check\_ranges}\NormalTok{(combined)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Validation passed.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{run\_validate}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Run the R pipeline}\label{run-the-r-pipeline}
+
+Run the redistribute/combine/validate stages end to end:
+\texttt{Rscript\ pipeline-r/run.R}.
+
+\textbf{\texttt{pipeline-r/run.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Run the runnable R stages end to end (acquisition is a recipe; see}
+\CommentTok{\# pipeline{-}r/acquire{-}recipe.R). Parallels pipeline/run.py.}
+\CommentTok{\# Usage from the repository root: Rscript pipeline{-}r/run.R}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/redistribute\_income.R"}\NormalTok{)}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/redistribute\_broadband.R"}\NormalTok{)}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/combine.R"}\NormalTok{)}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/redistribute\_income\_parcels.R"}\NormalTok{)}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/compare\_methods.R"}\NormalTok{)}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/validate.R"}\NormalTok{)}
+
+\FunctionTok{run\_income}\NormalTok{()}
+\FunctionTok{run\_broadband}\NormalTok{()}
+\FunctionTok{run\_combine}\NormalTok{()}
+\FunctionTok{run\_income\_parcels}\NormalTok{()}
+\FunctionTok{run\_compare}\NormalTok{()}
+\FunctionTok{run\_validate}\NormalTok{()}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"R pipeline complete.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Acquisition recipe}\label{acquisition-recipe}
+
+How the same inputs would be produced in R
+(\texttt{tidycensus}/\texttt{tigris}/\texttt{ooklaOpenDataR}). Shown for
+reference; not executed by the pipeline.
+
+\textbf{\texttt{pipeline-r/acquire-recipe.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Data{-}acquisition recipe (NOT executed by run.R). Shows how the same}
+\CommentTok{\# intermediate inputs the R pipeline reads would be produced in R, paralleling}
+\CommentTok{\# the Python acquire\_*.py modules. Requires a Census API key and network access.}
+\CommentTok{\#}
+\CommentTok{\# install.packages(c("tidycensus", "tigris", "sf"))}
+\CommentTok{\# \# ooklaOpenDataR is on GitHub: remotes::install\_github("teamookla/ooklaOpenDataR")}
+
+\ControlFlowTok{if}\NormalTok{ (}\ConstantTok{FALSE}\NormalTok{) \{  }\CommentTok{\# recipe guard: never runs}
+
+  \FunctionTok{library}\NormalTok{(tidycensus)}
+  \FunctionTok{library}\NormalTok{(tigris)}
+  \FunctionTok{library}\NormalTok{(sf)}
+
+  \CommentTok{\# 1. Census block{-}group geometries for Arlington County, VA (FIPS 51013),}
+  \CommentTok{\#    2021 vintage. Parallels acquire\_geographies.py.}
+\NormalTok{  bg\_geo }\OtherTok{\textless{}{-}}\NormalTok{ tigris}\SpecialCharTok{::}\FunctionTok{block\_groups}\NormalTok{(}\AttributeTok{state =} \StringTok{"51"}\NormalTok{, }\AttributeTok{county =} \StringTok{"013"}\NormalTok{, }\AttributeTok{year =} \DecValTok{2021}\NormalTok{, }\AttributeTok{cb =} \ConstantTok{FALSE}\NormalTok{)}
+
+  \CommentTok{\# 2. ACS extensive counts: aggregate household income (B19025\_001) and}
+  \CommentTok{\#    households (B11001\_001). Parallels acquire\_acs.py. NEVER fetch the median.}
+\NormalTok{  acs }\OtherTok{\textless{}{-}}\NormalTok{ tidycensus}\SpecialCharTok{::}\FunctionTok{get\_acs}\NormalTok{(}
+    \AttributeTok{geography =} \StringTok{"block group"}\NormalTok{, }\AttributeTok{state =} \StringTok{"51"}\NormalTok{, }\AttributeTok{county =} \StringTok{"013"}\NormalTok{,}
+    \AttributeTok{year =} \DecValTok{2021}\NormalTok{, }\AttributeTok{survey =} \StringTok{"acs5"}\NormalTok{, }\AttributeTok{geometry =} \ConstantTok{TRUE}\NormalTok{,}
+    \AttributeTok{variables =} \FunctionTok{c}\NormalTok{(}\AttributeTok{agg\_income =} \StringTok{"B19025\_001"}\NormalTok{, }\AttributeTok{households =} \StringTok{"B11001\_001"}\NormalTok{),}
+    \AttributeTok{output =} \StringTok{"wide"}
+\NormalTok{  )}
+  \CommentTok{\# acs has agg\_incomeE / householdsE columns; rename to agg\_income / households.}
+
+  \CommentTok{\# 3. Ookla fixed{-}broadband tiles, clipped to Arlington. Parallels acquire\_ookla.py.}
+  \CommentTok{\#    ooklaOpenDataR::get\_performance\_tiles(service = "fixed", year = 2023,}
+  \CommentTok{\#      quarter = 2) returns the global tile set; clip to the county bbox.}
+
+  \CommentTok{\# 4. Parcels: county MHUD parcel points carrying Total\_Units. Parallels}
+  \CommentTok{\#    acquire\_parcels.py (an ArcGIS FeatureServer; read via arcgislayers or sf).}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Parity with the Python
+pipeline}\label{parity-with-the-python-pipeline}
+
+Confirm the R outputs match the Python pipeline's mean income and
+download speed within tolerance.
+
+\textbf{\texttt{pipeline-r/compare\_to\_python.R}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Parity check: confirm the R combined output matches the Python combined output}
+\CommentTok{\# (mean\_income and download\_mbps) within tolerance. Small differences are}
+\CommentTok{\# expected from GEOS/sf vs shapely/geopandas geometry handling.}
+\FunctionTok{source}\NormalTok{(}\StringTok{"pipeline{-}r/config.R"}\NormalTok{)}
+\FunctionTok{suppressPackageStartupMessages}\NormalTok{(}\FunctionTok{library}\NormalTok{(sf))}
+
+\NormalTok{compare\_to\_python }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}\AttributeTok{tol =} \FloatTok{0.02}\NormalTok{) \{}
+\NormalTok{  r  }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(CIVIC\_COMBINED\_R, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  py }\OtherTok{\textless{}{-}}\NormalTok{ sf}\SpecialCharTok{::}\FunctionTok{st\_drop\_geometry}\NormalTok{(sf}\SpecialCharTok{::}\FunctionTok{st\_read}\NormalTok{(CIVIC\_COMBINED\_PY, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{  r}\SpecialCharTok{$}\NormalTok{geoid  }\OtherTok{\textless{}{-}} \FunctionTok{as.character}\NormalTok{(r}\SpecialCharTok{$}\NormalTok{geoid)}
+\NormalTok{  py}\SpecialCharTok{$}\NormalTok{geoid }\OtherTok{\textless{}{-}} \FunctionTok{as.character}\NormalTok{(py}\SpecialCharTok{$}\NormalTok{geoid)}
+\NormalTok{  m }\OtherTok{\textless{}{-}} \FunctionTok{merge}\NormalTok{(r, py, }\AttributeTok{by =} \StringTok{"geoid"}\NormalTok{, }\AttributeTok{suffixes =} \FunctionTok{c}\NormalTok{(}\StringTok{"\_r"}\NormalTok{, }\StringTok{"\_py"}\NormalTok{))}
+
+\NormalTok{  rel }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(a, b) \{}
+\NormalTok{    ok }\OtherTok{\textless{}{-}} \FunctionTok{is.finite}\NormalTok{(a) }\SpecialCharTok{\&} \FunctionTok{is.finite}\NormalTok{(b) }\SpecialCharTok{\&}\NormalTok{ b }\SpecialCharTok{!=} \DecValTok{0}
+    \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(a[ok] }\SpecialCharTok{{-}}\NormalTok{ b[ok]) }\SpecialCharTok{/} \FunctionTok{abs}\NormalTok{(b[ok]))}
+\NormalTok{  \}}
+\NormalTok{  d\_income }\OtherTok{\textless{}{-}} \FunctionTok{rel}\NormalTok{(m}\SpecialCharTok{$}\NormalTok{mean\_income\_r,   m}\SpecialCharTok{$}\NormalTok{mean\_income\_py)}
+\NormalTok{  d\_speed  }\OtherTok{\textless{}{-}} \FunctionTok{rel}\NormalTok{(m}\SpecialCharTok{$}\NormalTok{download\_mbps\_r, m}\SpecialCharTok{$}\NormalTok{download\_mbps\_py)}
+
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Parity vs Python (n=\%d): max rel diff  mean\_income=\%.4f\%\%  download\_mbps=\%.4f\%\%}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}
+              \FunctionTok{nrow}\NormalTok{(m), }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ d\_income, }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ d\_speed))}
+  \ControlFlowTok{if}\NormalTok{ (d\_income }\SpecialCharTok{\textgreater{}}\NormalTok{ tol }\SpecialCharTok{||}\NormalTok{ d\_speed }\SpecialCharTok{\textgreater{}}\NormalTok{ tol) \{}
+    \FunctionTok{stop}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"parity exceeds tolerance \%.2f\%\%"}\NormalTok{, }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ tol), }\AttributeTok{call. =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{  \}}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Parity OK (within \%.2f\%\%).}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DecValTok{100} \SpecialCharTok{*}\NormalTok{ tol))}
+  \FunctionTok{invisible}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{\}}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{sys.nframe}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) }\FunctionTok{compare\_to\_python}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
 
