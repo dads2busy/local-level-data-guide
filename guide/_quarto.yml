@@ -22,6 +22,7 @@ book:
     - 06-limitations.qmd
     - 07-apply-it.qmd
     - 08-code.qmd
+    - 09-code-r.qmd
     - references.qmd
 
 bibliography: references.bib

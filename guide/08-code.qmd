@@ -1,4 +1,4 @@
-# The Complete Pipeline Code {#sec-code}
+# The Complete Pipeline Code (Python) {#sec-code}
 
 This appendix reproduces the full, runnable Python pipeline behind the worked
 example: the actual source, not a simplified sketch. It is generated directly
