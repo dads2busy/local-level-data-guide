@@ -20,7 +20,7 @@ format:
 ::: {.cover-sponsor}
 [Project sponsor]{.cover-sponsor-label}
 
-![](figures/partners-mclogo.png){fig-alt="Mastercard Center for Inclusive Growth" width=260}
+![](figures/mc_center_for_inclusive_growth_rgb_pos.png){fig-alt="Mastercard Center for Inclusive Growth" width=260}
 :::
 
 :::
