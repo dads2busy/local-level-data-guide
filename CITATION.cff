@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this guide, please cite it as below."
+title: "Creating Local-Level Geographic Datasets: A Practical, Illustrated Guide for Sub-County Policy Analysis"
+abstract: "A practical, illustrated guide for sub-county policy analysis, demonstrating how to build local-level geographic datasets using Arlington County, Virginia as a worked example."
+type: book
+authors:
+  - family-names: Schroeder
+    given-names: Aaron
+date-released: "2026-06-04"
+url: "https://dads2busy.github.io/local-level-data-guide/"
+repository-code: "https://github.com/dads2busy/local-level-data-guide"
+publisher:
+  name: "Mastercard Center for Inclusive Growth"
+keywords:
+  - geographic datasets
+  - sub-county analysis
+  - policy analysis
+  - small-area estimation
+  - GIS
+  - digital equity
+license: CC-BY-4.0
