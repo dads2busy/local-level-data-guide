@@ -268,10 +268,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>This appendix reproduces the runnable R counterpart to the worked example. It is generated directly from the <code>pipeline-r/</code> directory in the companion repository. The R pipeline reads the same intermediate data the Python pipeline produces and performs the redistribution, combination, and validation in R, built on the <a href="https://github.com/dads2busy/sdc.redistribute"><code>sdc.redistribute</code></a> package:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># from the repository root:</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Rscript pipeline-r/run.R</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This appendix reproduces the runnable R counterpart to the worked example. It is generated directly from the <code>pipeline-r/</code> directory in the companion repository. The R pipeline reads the same intermediate data the Python pipeline produces and performs the redistribution, combination, and validation in R, built on the <a href="https://cran.r-project.org/package=sdc.redistribute"><code>sdc.redistribute</code></a> package:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install the released package from CRAN:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("sdc.redistribute")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or the development version from the repository:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># from the repository root:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Rscript pipeline-r/run.R</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Data acquisition is shown as a recipe (<code>acquire-recipe.R</code>) rather than re-run. The <code>compare_to_python.R</code> module confirms the R results match the Python results.</p>
 <section id="configuration" class="level2" data-number="11.1">
 <h2 data-number="11.1" class="anchored" data-anchor-id="configuration"><span class="header-section-number">11.1</span> Configuration</h2>
