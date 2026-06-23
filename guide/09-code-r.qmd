@@ -4,9 +4,12 @@ This appendix reproduces the runnable R counterpart to the worked example. It is
 generated directly from the `pipeline-r/` directory in the companion repository.
 The R pipeline reads the same intermediate data the Python pipeline produces and
 performs the redistribution, combination, and validation in R, built on the
-[`sdc.redistribute`](https://github.com/dads2busy/sdc.redistribute) package:
+[`sdc.redistribute`](https://cran.r-project.org/package=sdc.redistribute) package:
 
 ```r
+# install the released package from CRAN:
+# install.packages("sdc.redistribute")
+# or the development version from the repository:
 # install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")
 # from the repository root:
 # Rscript pipeline-r/run.R

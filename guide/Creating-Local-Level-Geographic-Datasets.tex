@@ -375,7 +375,7 @@ The worked example is implemented in both \textbf{Python} and
 guide shows the code in both languages, and the complete source for each
 is in the code appendices.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, toprule=.15mm, coltitle=black, breakable, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, opacityback=0, leftrule=.75mm, toptitle=1mm, arc=.35mm, opacitybacktitle=0.6, titlerule=0mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, bottomrule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, leftrule=.75mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Who this guide is for}, opacityback=0, bottomtitle=1mm, opacitybacktitle=0.6, titlerule=0mm, breakable, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-note-color-frame, bottomrule=.15mm, toprule=.15mm, colbacktitle=quarto-callout-note-color!10!white, left=2mm]
 
 \textbf{Local government analysts} will find a reproducible workflow
 they can adapt to their own jurisdiction, data sources, and policy
@@ -750,7 +750,7 @@ columns are extensive counts. The function returns a target-geometry
 GeoDataFrame with redistributed count columns that can be combined or
 divided to produce any desired derived measure.
 
-\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, toprule=.15mm, coltitle=black, breakable, colbacktitle=quarto-callout-note-color!10!white, colframe=quarto-callout-note-color-frame, bottomtitle=1mm, opacityback=0, leftrule=.75mm, toptitle=1mm, arc=.35mm, opacitybacktitle=0.6, titlerule=0mm, colback=white, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, bottomrule=.15mm, left=2mm]
+\begin{tcolorbox}[enhanced jigsaw, rightrule=.15mm, leftrule=.75mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Python: the redistribution call}, opacityback=0, bottomtitle=1mm, opacitybacktitle=0.6, titlerule=0mm, breakable, coltitle=black, toptitle=1mm, colback=white, colframe=quarto-callout-note-color-frame, bottomrule=.15mm, toprule=.15mm, colbacktitle=quarto-callout-note-color!10!white, left=2mm]
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2503,11 +2503,14 @@ example. It is generated directly from the \texttt{pipeline-r/}
 directory in the companion repository. The R pipeline reads the same
 intermediate data the Python pipeline produces and performs the
 redistribution, combination, and validation in R, built on the
-\href{https://github.com/dads2busy/sdc.redistribute}{\texttt{sdc.redistribute}}
+\href{https://cran.r-project.org/package=sdc.redistribute}{\texttt{sdc.redistribute}}
 package:
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# install the released package from CRAN:}
+\CommentTok{\# install.packages("sdc.redistribute")}
+\CommentTok{\# or the development version from the repository:}
 \CommentTok{\# install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")}
 \CommentTok{\# from the repository root:}
 \CommentTok{\# Rscript pipeline{-}r/run.R}

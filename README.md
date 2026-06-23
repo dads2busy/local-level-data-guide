@@ -12,6 +12,21 @@ export CENSUS_API_KEY=your_key   # free: https://api.census.gov/data/key_signup.
 # or put CENSUS_API_KEY=your_key in a .env file (gitignored)
 ```
 
+### R (optional)
+
+The redistribution algebra is also available in R via the
+[`sdc.redistribute`](https://cran.r-project.org/package=sdc.redistribute)
+package, which powers the parallel pipeline in `pipeline-r/`:
+
+```r
+# released package from CRAN:
+install.packages("sdc.redistribute")
+# or the development version from the repository:
+# install.packages("pak"); pak::pak("dads2busy/sdc.redistribute")
+```
+
+Then run the R pipeline from the repository root with `Rscript pipeline-r/run.R`.
+
 ## Run
 
 ```bash
