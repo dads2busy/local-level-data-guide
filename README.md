@@ -82,4 +82,4 @@ Regenerate it after changing pipeline code:
 uv run python scripts/build_code_appendix.py   # rewrites guide/08-code.qmd
 ```
 
-Published site: <https://dads2busy.github.io/local-level-data-guide/>
+Published site: <https://uva-bi-sdad.github.io/local-level-data-guide/>
